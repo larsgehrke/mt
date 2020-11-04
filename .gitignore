@@ -1,0 +1,12 @@
+__pycache__/
+*.synctex.gz
+*.aux
+*.log
+*.toc
+*.out
+*.blg
+*.bbl
+*.DS_Store
+*.npy
+*.egg-info
+/bin
