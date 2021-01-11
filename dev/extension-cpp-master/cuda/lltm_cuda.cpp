@@ -43,7 +43,7 @@ std::vector<torch::Tensor> lltm_forward(
   std::ofstream MyFile("gehrkela_log.txt");
 
   // Write to the file
-  MyFile << "Test: Log from file lltm_cuda.cpp. Author: gehrkela. Please contact me if you see this file!";
+  MyFile << "Test: Log from file lltm_cuda.cpp. Author: gehrkela.";
 
   // Close the file
   MyFile.close();
