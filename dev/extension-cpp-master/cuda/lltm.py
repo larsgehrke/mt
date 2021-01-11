@@ -47,8 +47,11 @@ class LLTMFunction(Function):
 
         '''
         for idx,var in enumerate(ctx.saved_variables):
+
             if (idx == 6):
                 var_list.append(var.unsqueeze_(0))
+            else:
+                var_list.append(var)
         
 
         outputs = lltm_cuda.backward(
