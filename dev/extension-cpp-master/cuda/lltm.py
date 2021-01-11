@@ -27,10 +27,13 @@ class LLTMFunction(Function):
         
         print(grad_h.size()) # <class 'torch.Tensor'>: torch.Size([16, 128])
         print(grad_cell.size()) # <class 'torch.Tensor'>: torch.Size([16, 128])
-        print("Doing unsqueeze_")
+
+        for var in ctx.saved_variables:
+            print(var)
+        
 
         outputs = lltm_cuda.backward(
-            grad_h.contiguous(), grad_cell.contiguous(), ctx.saved_variables)
+            grad_h.contiguous(), grad_cell.contiguous(), *ctx.saved_variables)
         d_old_h, d_input, d_weights, d_bias, d_old_cell, d_gates = outputs
         return d_input, d_weights, d_bias, d_old_h, d_old_cell
 
