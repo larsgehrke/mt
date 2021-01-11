@@ -31,7 +31,7 @@ class LLTMFunction(Function):
         var_list = []
 
         for var in ctx.saved_variables:
-            var_list.add(var.unsqueeze_(0))
+            var_list.append(var.unsqueeze_(0))
         
 
         outputs = lltm_cuda.backward(
