@@ -29,7 +29,7 @@ class LLTMFunction(Function):
         print(grad_cell.size()) # <class 'torch.Tensor'>: torch.Size([16, 128])
 
         for var in ctx.saved_variables:
-            print(var)
+            print(var.size())
         
 
         outputs = lltm_cuda.backward(
