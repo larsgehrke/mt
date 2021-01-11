@@ -20,13 +20,12 @@ class LLTMFunction(Function):
 
     @staticmethod
     def backward(ctx, grad_h, grad_cell):
-        print(type(ctx)) # <class 'torch.autograd.function.LLTMFunctionBackward'>
-        print(type(grad_h)) # <class 'torch.Tensor'>
-        print(type(grad_cell)) # <class 'torch.Tensor'>
+        #print(type(ctx)) # <class 'torch.autograd.function.LLTMFunctionBackward'>
+        #print(type(grad_h)) # <class 'torch.Tensor'>
+        #print(type(grad_cell)) # <class 'torch.Tensor'>
 
         
-        print(grad_h.size()) # <class 'torch.Tensor'>: torch.Size([16, 128])
-        print(grad_cell.size()) # <class 'torch.Tensor'>: torch.Size([16, 128])
+        #print(grad_h.size()) # <class 'torch.Tensor'>: torch.Size([16, 128])
 
         var_list = []
 
@@ -42,7 +41,7 @@ class LLTMFunction(Function):
         2: torch.Size([16, 128])
         3: torch.Size([16, 128])
         4: torch.Size([16, 160])
-        5: torch.Size([16, 384])
+        5: torch.Size([16, 384]) this neeeded an extra dim
         6: torch.Size([384, 160])
 
         '''

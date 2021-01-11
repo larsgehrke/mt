@@ -1,0 +1,6 @@
+Forward: 111.341/113.866 us | Backward 158.310/161.591 us (plain python running on cpu)
+Forward: 149.965/154.841 us | Backward 265.598/295.734 us (plain python running on gpu)
+Forward: 81.778/83.368 us | Backward 244.141/248.315 us (cpp embedding running on cpu)
+Forward: 110.626/119.538 us | Backward 405.788/442.290 us (cpp embedding running on gpu)
+Forward: 98.467/107.067 us | Backward 235.796/266.833 us (cuda embedding running on ?)
+Forward: 101.805/107.782 us | Backward 243.664/267.322 us (cuda embedding running on gpu)
