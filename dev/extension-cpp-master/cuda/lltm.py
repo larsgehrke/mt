@@ -30,8 +30,25 @@ class LLTMFunction(Function):
 
         var_list = []
 
-        for var in ctx.saved_variables:
-            var_list.append(var.unsqueeze_(0))
+        '''
+        grad_h:
+        torch.Size([16, 128])
+        grad_cell:
+        torch.Size([16, 128])
+    
+        ctx:
+        0: torch.Size([16, 128])
+        1: torch.Size([16, 128])
+        2: torch.Size([16, 128])
+        3: torch.Size([16, 128])
+        4: torch.Size([16, 160])
+        5: torch.Size([16, 384])
+        6: torch.Size([384, 160])
+
+        '''
+        for idx,var in enumerate(ctx.saved_variables):
+            if (idx == 6):
+                var_list.append(var.unsqueeze_(0))
         
 
         outputs = lltm_cuda.backward(
