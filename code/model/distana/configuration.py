@@ -5,7 +5,14 @@ This file contains the configuration for the kernel network
 #
 # General configurations
 
-SOURCE_PATH = "/home/karlbau/Documents/phd/weather_prediction/pytorch/wave_simulation/"
+from pathlib import Path
+import os
+
+# get full path of parent folder (with /data and /modle subfolders)
+# note that it ends with a slash (system path seperator)
+SOURCE_PATH = str(Path().resolve().parent.parent)+str(os.path.sep) 
+print(f"Operating on SOURCE_PATH: {SOURCE_PATH}") 
+
 
 ARCHITECTURE_NAME = "distana"
 MODEL_NAME = "tmp_model"
@@ -22,7 +29,7 @@ DEVICE = "CPU"  # or "CPU" - for grid sizes > 25x25 the GPU version is faster
 SAVE_MODEL = True
 CONTINUE_TRAINING = False
 
-EPOCHS = 100
+EPOCHS = 20
 SEQ_LEN = 40  # 150
 LEARNING_RATE = 0.001
 

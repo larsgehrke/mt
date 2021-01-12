@@ -85,6 +85,7 @@ class KernelNetwork(nn.Module):
                         # field.
 
                         # Determine the index of the neighbor
+                        # Get the index from the other half
                         neighbor_idx = (neighbor_col + (cfg.PK_COLS // 2))\
                                        % cfg.PK_COLS
 

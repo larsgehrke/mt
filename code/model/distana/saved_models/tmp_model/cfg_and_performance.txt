@@ -4,8 +4,14 @@ This file contains the configuration for the kernel network
 
 #
 # General configurations
+from pathlib import Path
+import os
 
-SOURCE_PATH = "/Users/zxmwn43/Documents/Informatik/Masterarbeit/main/MSC-Gehrke/code/"
+# get full path of parent folder (with /data and /modle subfolders)
+# note that it ends with a slash (system path seperator)
+SOURCE_PATH = str(Path().resolve().parent.parent)+str(os.path.sep) 
+print(f"Operating on SOURCE_PATH: {SOURCE_PATH}") 
+
 
 ARCHITECTURE_NAME = "distana"
 MODEL_NAME = "tmp_model"
@@ -22,7 +28,7 @@ DEVICE = "CPU"  # or "CPU" - for grid sizes > 25x25 the GPU version is faster
 SAVE_MODEL = True
 CONTINUE_TRAINING = False
 
-EPOCHS = 100
+EPOCHS = 20
 SEQ_LEN = 40  # 150
 LEARNING_RATE = 0.001
 
@@ -49,9 +55,9 @@ PK_LAT_OUT_SIZE = 1  # Must be equal to PK_LAT_IN_SIZE
 #
 # Performance
 
-CURRENT_EPOCH = 99
-EPOCHS = 100
-CURRENT_TRAINING_ERROR = 1.5715423501205804e-06
-LOWEST_TRAINING_ERROR = 1.5715423501205804e-06
-CURRENT_VALIDATION_ERROR = 1.4356163546835887e-06
-LOWEST_VALIDATION_ERROR = 1.4356163546835887e-06
+CURRENT_EPOCH = 19
+EPOCHS = 20
+CURRENT_TRAINING_ERROR = 1.6760760881879833e-05
+LOWEST_TRAINING_ERROR = 1.6760760881879833e-05
+CURRENT_VALIDATION_ERROR = 1.4651132914877962e-05
+LOWEST_VALIDATION_ERROR = 1.4651132914877962e-05

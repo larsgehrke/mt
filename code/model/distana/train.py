@@ -43,15 +43,19 @@ def run_training():
     print("Model name:", cfg.MODEL_NAME)
 
     # Specify the paths for this script
+    # (Two or more physical lines may be joined into logical lines using backslash character)
     data_src_path = cfg.SOURCE_PATH + "data/" + cfg.DATA_TYPE
     model_src_path = cfg.SOURCE_PATH + "model/" + \
                      cfg.ARCHITECTURE_NAME + "/saved_models/"
 
     # Set device on GPU if specified in the configuration file, else CPU
+    # (just depends on th.cuda.is_available())
     device = helpers.determine_device()
 
-    # Compute batch size for the PKs (every PK is processed in a separate batch
-    # to parallelize computation)
+    # Compute batch size for the PKs (every PK is processed in a separate sample of the batch
+    # to parallelize computation) 
+    # TRICK: Batch size used for parallelization
+    # Batch size depends on amount of PKs
     pk_batches = cfg.PK_ROWS * cfg.PK_COLS
 
     # Set up the parameter and tensor classes
