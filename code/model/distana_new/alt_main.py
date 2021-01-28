@@ -79,14 +79,14 @@ if len(val_data_filenames) == 0:
 TRAINING
 """
 
-start_0 = time.time()
+training_start_time = time.time()
 
 # Start the training and iterate over all epochs
 for epoch in range(cfg.EPOCHS):
     print(epoch)
 
-duration = time.time() - start_0
-print("Duration of program: " + duration)
+program_duration = np.round(time.time() - training_start_time, 2)
+print("Duration of program: " + str(program_duration))
 
 
 
