@@ -3,6 +3,7 @@ import numba
 import sys
 import glob
 import time
+import math
 import torch as th
 import torch.nn as nn
 
@@ -94,7 +95,7 @@ for epoch in range(cfg.EPOCHS):
     batch_errors = []
 
     # Calculate number of iterations
-    amount_batches = (len(train_data_filenames) // cfg.BATCH_SIZE) + 1
+    amount_batches = math.ceil(len(train_data_filenames)/cfg.BATCH_SIZE)
 
     for batch_iter in range(amount_batches):
 

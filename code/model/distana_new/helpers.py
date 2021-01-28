@@ -22,9 +22,11 @@ def _set_up_batch(batch_iter, data_filenames):
     """
     first_sample = cfg.BATCH_SIZE * batch_iter
     # Handling also last batch
-    last_sample = min(first_sample + cfg.BATCH_SIZE -1, len(data_filenames))
-    
-    sprint(data_filenames,"data_filenames", exit=True)
+    last_sample_excl = min(first_sample + cfg.BATCH_SIZE, len(data_filenames)) 
+
+    data = np.load(data_filenames[first_sample:last_sample_excl])[:cfg.SEQ_LEN + 1]
+
+    sprint(data, "data", exit=True)
 
 
 
