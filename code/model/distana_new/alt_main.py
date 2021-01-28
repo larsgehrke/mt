@@ -39,7 +39,7 @@ amount_pks = cfg.PK_ROWS * cfg.PK_COLS
 # Set up the parameter and tensor classes
 params = kernel_variables.KernelParameters(
     pk_batches=amount_pks,
-    device=device
+    device=th.device("cuda")
 )
 tensors = kernel_variables.KernelTensors(params=params)
 
