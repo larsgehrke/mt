@@ -85,6 +85,9 @@ start_0 = time.time()
 for epoch in range(cfg.EPOCHS):
     print(epoch)
 
+duration = time.time() - start_0
+print("Duration of program: " + duration)
+
 
 
 
