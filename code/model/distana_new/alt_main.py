@@ -1,8 +1,12 @@
 import numpy as np
 import numba
 import sys
-import configuration as cfg
 import torch as th
+
+import configuration as cfg
+
+import kernel_variables
+import kernel_net
 
 # JUST TRAINING FOR NOW
 
