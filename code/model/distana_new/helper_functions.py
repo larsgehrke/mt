@@ -10,6 +10,23 @@ import configuration as cfg
 # ONLY DEV
 import sys
 
+def sprint(obj, obj_name="Object", complete=False, exit=False):
+    print("Printing out", obj_name)
+    print(type(obj))
+
+    if (isinstance(obj, th.Tensor)):
+        obj = obj.cpu().detach().numpy()
+
+    if (isinstance(obj, np.ndarray)):
+        print(obj.shape)
+
+    if (complete):
+        print(obj)
+
+    if(exit):
+        sys.exit()
+
+
 
 def set_up_batch(_iter, data_filenames):
     """
@@ -170,6 +187,8 @@ def evaluate(net, data_filenames, params, tensors, pk_batches, criterion=None,
             dyn_net_in_step = net_input[t, :, :params.pk_dyn_out_size]
 
         # Forward the input through the network
+        sprint(dyn_net_in_step, "dyn_net_in_step", complete=False, exit=False)
+        
         net.forward(dyn_in=dyn_net_in_step)
 
         # Store the output of the network for this sequence step

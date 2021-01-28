@@ -84,10 +84,11 @@ def run_training():
     optimizer = th.optim.Adam(net.parameters(), lr=cfg.LEARNING_RATE)
     criterion = nn.MSELoss()
 
-    for param in net.parameters():
-        print(type(param), param.size())
+    #DEV
+    #for param in net.parameters():
+    #    print(type(param), param.size())
 
-    sys.exit("Exit.")
+    #sys.exit("Exit.")
 
     #
     # Set up lists to save and store the epoch errors
@@ -119,7 +120,8 @@ def run_training():
         # during training and inference (evaluating) time. For example, Dropouts Layers,
         # BatchNorm Layers etc. You need to turn off them during model evaluation, 
         #  and .eval() will do it for you"
-        net.eval()
+        #net.eval()
+        net.train()
 
     """
     TRAINING

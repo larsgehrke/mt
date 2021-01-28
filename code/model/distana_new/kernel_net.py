@@ -4,6 +4,8 @@ import torch.nn as nn
 import prediction_kernel
 import configuration as cfg
 
+import helper_functions as helpers
+
 
 class KernelNetwork(nn.Module):
     """
@@ -109,11 +111,17 @@ class KernelNetwork(nn.Module):
             self.tensors.pk_dyn_in = th.from_numpy(
                 dyn_in
             ).to(device=self.params.device)
+
+        helpers.sprint(self.pos0, "kernel_net.pos0")
+        helpers.sprint(self.going_to, "kernel_net.going_to")
+        helpers.sprint(self.coming_from, "kernel_net.coming_from")
         
         # Set the appropriate lateral inputs to the lateral outputs from the
         # previous time step
         self.tensors.pk_lat_in[self.pos0, self.going_to] = \
             self.tensors.pk_lat_out[self.coming_from, self.going_to]
+
+        helpers.sprint(self.tensors.pk_lat_in.cpu().detach().numpy(), exit=False)
         
         # Forward the PK inputs through the pk_net to get the outputs and hidden
         # states of these PKs
