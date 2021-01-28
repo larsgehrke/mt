@@ -83,10 +83,60 @@ training_start_time = time.time()
 
 # Start the training and iterate over all epochs
 for epoch in range(cfg.EPOCHS):
-    print(epoch)
+    epoch_start_time = time.time()
+
+    # Shuffle training data
+    np.random.shuffle(train_data_filenames)
+
+    # save epoch errors
+    batch_errors = []
+
+    # Calculate number of iterations
+    amount_iter = (len(train_data_filenames) // cfg.BATCH_SIZE) + 1
+
+    for train_iter in range(amount_iter):
+
+        # Training
+        # Forward pass
+        # backward pass
+        #training error (mean squared error)
+        mse = 0.1-0.1*train_iter*(epoch+1)# TODO
+
+        batch_errors.append(mse) # mse.item()
+
+    epoch_errors_train.append(np.mean(batch_errors))
+
+    # Create a plus or minus sign for the training error
+    train_sign = "(-)"
+    if epoch_errors_train[-1] < best_tr*(epoch+1)ain:
+        train_sign = "(+)"
+        best_train = epoch_errors_train[-1]
+
+    # Compute validation error
+    # . . .
+    mse = 0.01-0.001*train_iter
+
+    epoch_errors_val.append(mse) # mse.item()
+
+    # Create a plus or minus sign for the validation error
+    val_sign = "(-)"
+    if epoch_errors_val[-1] < best_val:
+        best_val = epoch_errors_val[-1]
+        val_sign = "(+)"
+
+
+    # Print progress to the console with nice formatting
+    print('Epoch ' + str(epoch + 1).zfill(int(np.log10(cfg.EPOCHS)) + 1)
+          + '/' + str(cfg.EPOCHS) + ' took '
+          + str(np.round(time.time() - epoch_start_time, 2)).ljust(5, '0')
+          + ' seconds.\t\tAverage epoch training error: ' + train_sign
+          + str(np.round(epoch_errors_train[-1], 10)).ljust(12, ' ')
+          + '\t\tValidation error: ' + val_sign
+          + str(np.round(epoch_errors_val[-1], 10)).ljust(12, ' '))
 
 program_duration = np.round(time.time() - training_start_time, 2)
-print("Duration of program: " + str(program_duration))
+print('\nTraining took ' + str(program_duration) + ' seconds.\n\n')
+print("Done!")
 
 
 
