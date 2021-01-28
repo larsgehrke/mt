@@ -11,6 +11,8 @@ import configuration as cfg
 import kernel_variables
 import kernel_net
 
+import helpers
+
 # JUST TRAINING FOR NOW
 
 # GPU only Code
@@ -92,15 +94,21 @@ for epoch in range(cfg.EPOCHS):
     batch_errors = []
 
     # Calculate number of iterations
-    amount_iter = (len(train_data_filenames) // cfg.BATCH_SIZE) + 1
+    amount_batches = (len(train_data_filenames) // cfg.BATCH_SIZE) + 1
 
-    for train_iter in range(amount_iter):
+    for batch_iter in range(amount_batches):
 
         # Training
         # Forward pass
         # backward pass
         #training error (mean squared error)
-        mse = 0.1-0.1*train_iter*(epoch+1)# TODO
+        mse = helpers.train_batch(
+            net = net,
+            data_filenames = train_data_filenames,
+            criterion=criterion,
+            optimizer=optimizer,
+            batch_iter= batch_iter
+                )
 
         batch_errors.append(mse) # mse.item()
 
@@ -114,7 +122,11 @@ for epoch in range(cfg.EPOCHS):
 
     # Compute validation error
     # . . .
-    mse = 0.01-0.001*train_iter
+    mse = helpers.validate(
+            net = net,
+            data_filenames = val_data_filenames,
+            criterion=criterion
+                )
 
     epoch_errors_val.append(mse) # mse.item()
 
