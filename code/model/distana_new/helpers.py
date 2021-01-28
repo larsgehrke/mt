@@ -22,7 +22,7 @@ def _set_up_batch(batch_iter, data_filenames):
     """
     first_sample = cfg.BATCH_SIZE * batch_iter
     # Handling also last batch
-    last_sample = min(first_sample + cfg.Batch_Size -1, len(data_filenames))
+    last_sample = min(first_sample + cfg.BATCH_SIZE -1, len(data_filenames))
     
     sprint(data_filenames,"data_filenames", exit=True)
 
