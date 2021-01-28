@@ -2,6 +2,7 @@ import numpy as np
 import numba
 import sys
 import torch as th
+import torch.nn as nn
 
 import configuration as cfg
 
