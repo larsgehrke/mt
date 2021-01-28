@@ -108,7 +108,7 @@ for epoch in range(cfg.EPOCHS):
 
     # Create a plus or minus sign for the training error
     train_sign = "(-)"
-    if epoch_errors_train[-1] < best_tr*(epoch+1)ain:
+    if epoch_errors_train[-1] < best_train:
         train_sign = "(+)"
         best_train = epoch_errors_train[-1]
 
