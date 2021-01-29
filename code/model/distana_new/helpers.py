@@ -29,7 +29,7 @@ def _set_up_batch(batch_iter, data_filenames):
     for file in data_filenames[first_sample:last_sample_excl]:
         data_file = np.load(file)[:cfg.SEQ_LEN + 1]
         sprint(data_file, "data_file")
-        data.append(data_file)
+        np.append(data,data_file)
         sprint(data, "data")
 
     sprint("","DEV",exit=True)
