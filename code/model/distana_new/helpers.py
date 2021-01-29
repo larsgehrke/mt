@@ -34,8 +34,18 @@ def _set_up_batch(batch_iter, data_filenames):
         data_file = data_file[np.newaxis, :]
         data = np.append(data, data_file, axis=0)
 
-    sprint(data,"data",exit=True)
+    
+    # shape: ( cfg.BATCH_SIZE , 41, 2, 16, 16)
 
+    # Get first and second dimension of data
+    dim0, dim1, dim2 = np.shape(data)[:3]
+
+    # Reshape the data array to have the kernels on one dimension
+    data = np.reshape(data, [dim0, dim1, dim2, cfg.PK_ROWS * cfg.PK_COLS])
+
+    # Swap the third and fourth dimension of the data
+    data = np.swapaxes(data, axis1=2, axis2=3)
+    sprint(data,"data",exit=True)
 
 
 
