@@ -24,9 +24,15 @@ def _set_up_batch(batch_iter, data_filenames):
     # Handling also last batch
     last_sample_excl = min(first_sample + cfg.BATCH_SIZE, len(data_filenames)) 
 
-    data = np.load(data_filenames[first_sample:last_sample_excl])[:cfg.SEQ_LEN + 1]
+    data = np.array([])
 
-    sprint(data, "data", exit=True)
+    for file in data_filenames[first_sample:last_sample_excl]:
+        data_file = np.load(file)[:cfg.SEQ_LEN + 1]
+        sprint(data_file, "data_file")
+        data.append(data_file)
+        sprint(data, "data")
+
+    sprint("","DEV",exit=True)
 
 
 
