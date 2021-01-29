@@ -32,7 +32,7 @@ def _set_up_batch(batch_iter, data_filenames):
         data_file = np.load(file)[:cfg.SEQ_LEN + 1]
         # Expand Dim for batch 
         data_file = data_file[np.newaxis, :]
-        data = np.append(data, data_file)
+        data = np.append(data, data_file, axis=0)
 
     sprint(data,"data",exit=True)
 
