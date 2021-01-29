@@ -1,5 +1,8 @@
 import numpy as np
+import torch as th
+
 import configuration as cfg
+
 from helper_functions import sprint
 
 def train_batch( net,
