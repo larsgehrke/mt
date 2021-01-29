@@ -45,7 +45,30 @@ def _set_up_batch(batch_iter, data_filenames):
 
     # Swap the third and fourth dimension of the data
     data = np.swapaxes(data, axis1=2, axis2=3)
-    sprint(data,"data",exit=True)
+    # (8, 41, 256, 2)
+
+    # Split the data into inputs (where some noise is added) and labels
+    # Add noise to all timesteps except very last one
+    _net_input = np.array(
+        data[:,:-1] + np.random.normal(0, cfg.DATA_NOISE, np.shape(data[:,:-1])),
+        dtype=np.float32
+    )
+
+    _net_label = np.array(data[:,1:, :, 0:1], dtype=np.float32)
+
+    if cfg.TRAINING:
+        # Set the dynamic inputs with a certain probability to zero to force
+        # the network to use lateral connections
+        _net_input *= np.array(
+            np.random.binomial(n=1, p=1 - cfg.P_ZERO_INPUT,
+                               size=_net_input.shape),
+            dtype=np.float32
+        )
+
+    sprint(_net_input, "_net_input")
+    sprint(_net_label, "_net_label", exit=True)
+    return _net_input, _net_label
+
 
 
 
