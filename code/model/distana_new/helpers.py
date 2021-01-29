@@ -7,9 +7,61 @@ def train_batch( net,
             criterion,
             optimizer,
             batch_iter):
+    mse = None
+
+    batch_size = cfg.BATCH_SIZE
+    seq_len = cfg.SEQ_LEN
+    amount_pks = cfg.PK_ROWS * cfg.PK_COLS
+
+    # Generate the training data batch for this iteration
+    net_input, net_label = _set_up_batch(batch_iter, data_filenames)
+
+
+    # Set up an array of zeros to store the network outputs
+    net_outputs = th.zeros(size=(batch_size,
+                                 seq_len,
+                                 amount_pks,
+                                 params.pk_dyn_out_size))
+
+    if optimizer:
+        # Set the gradients back to zero
+        optimizer.zero_grad()
+
+    # Reset the network to clear the previous sequence
+    net.reset(pk_num=amount_pks)
+
+    # Iterate over the whole sequence of the training example and perform a
+    # forward pass
+    for t in range(seq_len):
+        # Teacher forcing
+
+        # Set the dynamic input for this iteration
+        dyn_net_in_step = net_input[:,t, :, :params.pk_dyn_out_size]
+
+        # Forward the input through the network
+        sprint(dyn_net_in_step, "dyn_net_in_step", complete=False, exit=True)
+        
+        net.forward(dyn_in=dyn_net_in_step)
+
+        # Store the output of the network for this sequence step
+        net_outputs[t] = tensors.pk_dyn_out
+
+    if criterion:
+        # Get the mean squared error from the evaluation list
+        mse = criterion(net_outputs, th.from_numpy(net_label))
+        # Alternatively, the mse can be calculated 'manually'
+        # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
+
+        if optimizer:
+            mse.backward()
+            optimizer.step()
+
+    return mse, net_input, net_label, net_outputs
+
+
+def validate():
     mse = 1
 
-    _set_up_batch(batch_iter, data_filenames)
 
     return mse
 
@@ -65,15 +117,7 @@ def _set_up_batch(batch_iter, data_filenames):
             dtype=np.float32
         )
 
-    sprint(_net_input, "_net_input")
-    sprint(_net_label, "_net_label", exit=True)
+
+
     return _net_input, _net_label
 
-
-
-
-def validate():
-    mse = 1
-
-
-    return mse
