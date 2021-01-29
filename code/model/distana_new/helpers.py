@@ -24,16 +24,15 @@ def _set_up_batch(batch_iter, data_filenames):
     # Handling also last batch
     last_sample_excl = min(first_sample + cfg.BATCH_SIZE, len(data_filenames)) 
 
-    data = None
+    data = np.load(data_filenames[first_sample])[:cfg.SEQ_LEN + 1]
+    # Expand Dim for batch 
+    data = data[np.newaxis, :]
 
-    for file in data_filenames[first_sample:last_sample_excl]:
+    for file in data_filenames[first_sample+1:last_sample_excl]:
         data_file = np.load(file)[:cfg.SEQ_LEN + 1]
         # Expand Dim for batch 
         data_file = data_file[np.newaxis, :]
-        if(data == None):
-            data = data_file
-        else:
-            data = np.append(data, data_file)
+        data = np.append(data, data_file)
 
     sprint(data,"data",exit=True)
 
