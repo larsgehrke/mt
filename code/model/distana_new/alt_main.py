@@ -135,20 +135,22 @@ for epoch in range(cfg.EPOCHS):
     # epoch_errors_val.append(mse) # mse.item()
 
     # Create a plus or minus sign for the validation error
-    val_sign = "(-)"
-    if epoch_errors_val[-1] < best_val:
-        best_val = epoch_errors_val[-1]
-        val_sign = "(+)"
+    # val_sign = "(-)"
+    # if epoch_errors_val[-1] < best_val:
+    #     best_val = epoch_errors_val[-1]
+    #     val_sign = "(+)"
 
 
     # Print progress to the console with nice formatting
     print('Epoch ' + str(epoch + 1).zfill(int(np.log10(cfg.EPOCHS)) + 1)
           + '/' + str(cfg.EPOCHS) + ' took '
           + str(np.round(time.time() - epoch_start_time, 2)).ljust(5, '0')
-          + ' seconds.\t\tAverage epoch training error: ' + train_sign
-          + str(np.round(epoch_errors_train[-1], 10)).ljust(12, ' ')
-          + '\t\tValidation error: ' + val_sign
-          + str(np.round(epoch_errors_val[-1], 10)).ljust(12, ' '))
+          + ' seconds.'
+          # + ' seconds.\t\tAverage epoch training error: ' + train_sign
+          # + str(np.round(epoch_errors_train[-1], 10)).ljust(12, ' ')
+          # + '\t\tValidation error: ' + val_sign
+          # + str(np.round(epoch_errors_val[-1], 10)).ljust(12, ' ')
+          )
 
 program_duration = np.round(time.time() - training_start_time, 2)
 print('\nTraining took ' + str(program_duration) + ' seconds.\n\n')
