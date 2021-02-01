@@ -23,8 +23,8 @@ def train_batch( net,
 
 
     # Set up an array of zeros to store the network outputs
-    net_outputs = th.zeros(size=(seq_len,
-                                 batch_size,
+    net_outputs = th.zeros(size=(batch_size,
+                                 seq_len,
                                  amount_pks,
                                  params.pk_dyn_out_size))
 
@@ -47,10 +47,12 @@ def train_batch( net,
         net.forward(dyn_in=dyn_net_in_step)
 
         # Store the output of the network for this sequence step
-        net_outputs[t] = tensors.pk_dyn_out
+        net_outputs[:,t] = tensors.pk_dyn_out
 
     if criterion:
         # Get the mean squared error from the evaluation list
+        sprint(net_outputs, "net_outputs")
+        sprint(net_label, "net_label")
         mse = criterion(net_outputs, th.from_numpy(net_label))
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
