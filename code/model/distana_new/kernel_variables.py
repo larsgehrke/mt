@@ -7,7 +7,7 @@ class KernelParameters:
     This class holds the parameters of the Kernel Network.
     """
 
-    def __init__(self, pk_batches, device):
+    def __init__(self, amount_pks, device):
 
         #
         # System parameters
@@ -19,7 +19,7 @@ class KernelParameters:
 
         #
         # PK specific parameters
-        self.pk_batches = pk_batches
+        self.amount_pks = amount_pks
         self.pk_neighbors = cfg.PK_NEIGHBORS
 
         # Input sizes (dimensions)
@@ -45,7 +45,7 @@ class KernelTensors:
 
         # Initialize the tensors by calling the reset method (this may not be
         # clean code style, yet it spares lots of lines :p)
-        self.reset(self.params.pk_batches)
+        self.reset(self.params.amount_pks)
 
     def reset(self):
 
