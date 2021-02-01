@@ -24,7 +24,7 @@ class KernelNetwork(nn.Module):
         # Prediction Kernels
 
         # Initialize the shared Prediction Kernel (PK) network that will do the
-        # PK calculations
+        # PK calculations 
         self.pk_net = prediction_kernel.PredictionKernelNet(params=params)
 
         # Initialize an adjacency matrix for the PK-TK connections
@@ -96,7 +96,7 @@ class KernelNetwork(nn.Module):
 
     def forward(self, dyn_in, pk_stat_in=None, tk_stat_in=None):
         """
-        Runs the forward pass of all PKs and TKs, respectively, sequentially 
+        Runs the forward pass of all PKs and TKs, respectively, in parallel 
         for a given input
 
         """
