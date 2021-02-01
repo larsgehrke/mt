@@ -13,6 +13,7 @@ import kernel_variables
 import kernel_net
 
 import helpers
+from helper_functions import sprint
 
 # JUST TRAINING FOR NOW
 
@@ -112,6 +113,8 @@ for epoch in range(cfg.EPOCHS):
             params = params,
             tensors = tensors
                 )
+
+        sprint(mse, "mse", exit= True)
 
         batch_errors.append(mse) # mse.item()
 
