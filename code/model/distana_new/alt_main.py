@@ -114,13 +114,9 @@ for epoch in range(cfg.EPOCHS):
             tensors = tensors
                 )
 
-        for k,v in enumerate(mse):
-            sprint(v, str(k))
+        batch_errors.append(mse) # mse.item()
 
-
-        batch_errors.append(mse.item()) # mse.item()
-
-    epoch_errors_train.append(np.mean(batch_errors))
+    epoch_errors_train.append(0)#np.mean(batch_errors))
 
     # Create a plus or minus sign for the training error
     train_sign = "(-)"
