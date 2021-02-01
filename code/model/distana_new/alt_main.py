@@ -126,13 +126,13 @@ for epoch in range(cfg.EPOCHS):
 
     # Compute validation error
     # . . .
-    mse = helpers.validate(
-            net = net,
-            data_filenames = val_data_filenames,
-            criterion=criterion
-                )
+    # mse = helpers.validate(
+    #         net = net,
+    #         data_filenames = val_data_filenames,
+    #         criterion=criterion
+    #             )
 
-    epoch_errors_val.append(mse) # mse.item()
+    # epoch_errors_val.append(mse) # mse.item()
 
     # Create a plus or minus sign for the validation error
     val_sign = "(-)"
