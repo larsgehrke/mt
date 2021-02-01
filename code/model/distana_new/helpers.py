@@ -13,6 +13,7 @@ def train_batch( net,
             params,
             tensors):
     mse = None
+    torch.autograd.set_detect_anomaly(True)
 
     batch_size = cfg.BATCH_SIZE
     seq_len = cfg.SEQ_LEN
@@ -51,8 +52,8 @@ def train_batch( net,
 
     if criterion:
         # Get the mean squared error from the evaluation list
-        sprint(net_outputs, "net_outputs")
-        sprint(net_label, "net_label")
+        # (8, 40, 256, 1)
+
         mse = criterion(net_outputs, th.from_numpy(net_label))
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
