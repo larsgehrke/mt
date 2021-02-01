@@ -101,7 +101,37 @@ class KernelNetwork(nn.Module):
 
         """
 
-        helpers.sprint(dyn_in, "kenel_net.dyn_in")
+        for batch_no in range(cfg.BATCH_SIZE):
+
+
+            # Write the dynamic PK input to the corresponding tensor
+            if isinstance(dyn_in, th.Tensor):
+                self.tensors.pk_dyn_in = dyn_in
+            else:
+                self.tensors.pk_dyn_in = th.from_numpy(
+                    dyn_in
+                ).to(device=self.params.device)
+
+            # Set the appropriate lateral inputs to the lateral outputs from the
+            # previous time step
+            self.tensors.pk_lat_in[batch_no,self.pos0, self.going_to] = \
+            self.tensors.pk_lat_out[batch_no,self.coming_from, self.going_to]
+
+            # Forward the PK inputs through the pk_net to get the outputs and hidden
+            # states of these PKs
+            pk_dyn_out, pk_lat_out, pk_lstm_c, pk_lstm_h = self.pk_net.forward(
+                dyn_in=th.squeeze(self.tensors.pk_dyn_in[batch_no], dim=0),
+                lat_in=th.squeeze(self.tensors.pk_lat_in[batch_no], dim=0),
+                lstm_c=th.squeeze(self.tensors.pk_lstm_c[batch_no], dim=0),
+                lstm_h=th.squeeze(self.tensors.pk_lstm_h[batch_no], dim=0)
+            )
+
+            # Update the output and hidden state tensors of the PKs
+            self.tensors.pk_dyn_out[batch_no] = pk_dyn_out
+            self.tensors.pk_lat_out[batch_no] = pk_lat_out
+            self.tensors.pk_lstm_c[batch_no] = pk_lstm_c
+            self.tensors.pk_lstm_h[batch_no] = pk_lstm_h
+
 
 
 

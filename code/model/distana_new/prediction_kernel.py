@@ -57,36 +57,25 @@ class PredictionKernelNet(nn.Module):
                   self.params.pk_neighbors * self.params.pk_lat_in_size)
         )
 
-        helpers.sprint(dyn_in, "prediction_kernel.dyn_in")
-        helpers.sprint(lat_in, "prediction_kernel.lat_in")
-
         #
         # Forward the activities through the shared PK
         pre_act = th.tanh(
             self.pre_weights(th.cat(tensors=(dyn_in, lat_in), dim=1))
         )
 
-        helpers.sprint(pre_act, "prediction_kernel.pre_act")
-
         lstm_c, lstm_h = self.lstm(pre_act, (lstm_c, lstm_h))
-
-        helpers.sprint(lstm_c, "prediction_kernel.lstm_c")
-        helpers.sprint(lstm_h, "prediction_kernel.lstm_h")
 
         # Postprocessing layer activation
         post_act = th.tanh(self.post_weights(lstm_h))
 
-        helpers.sprint(post_act, "prediction_kernel.post_act")
 
         # Dynamic output
         dyn_out = post_act[:, :self.params.pk_dyn_out_size]
 
-        helpers.sprint(dyn_out, "prediction_kernel.dyn_out")
 
         # Lateral output
         lat_out = post_act[:, self.params.pk_dyn_out_size:]
-
-        helpers.sprint(lat_out, "prediction_kernel.lat_out", exit=True)
+        
 
         # Unflatten the last dimension of the lateral output such that it has
         # the correct dimensionality for the further processing

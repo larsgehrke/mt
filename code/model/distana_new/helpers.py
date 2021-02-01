@@ -47,7 +47,7 @@ def train_batch( net,
         net.forward(dyn_in=dyn_net_in_step)
 
         # Store the output of the network for this sequence step
-        net_outputs[:,t] = tensors.pk_dyn_out
+        net_outputs[:,t] = tensors.pk_dyn_out_all
 
     if criterion:
         # Get the mean squared error from the evaluation list

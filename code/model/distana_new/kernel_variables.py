@@ -7,7 +7,7 @@ class KernelParameters:
     This class holds the parameters of the Kernel Network.
     """
 
-    def __init__(self, amount_pks, device):
+    def __init__(self, pk_batches, device):
 
         #
         # System parameters
@@ -16,11 +16,10 @@ class KernelParameters:
         #
         # General network parameters
         self.seq_len = cfg.SEQ_LEN
-        self.batch_size = cfg.BATCH_SIZE
 
         #
         # PK specific parameters
-        self.amount_pks = amount_pks
+        self.pk_batches = pk_batches
         self.pk_neighbors = cfg.PK_NEIGHBORS
 
         # Input sizes (dimensions)
@@ -46,35 +45,40 @@ class KernelTensors:
 
         # Initialize the tensors by calling the reset method (this may not be
         # clean code style, yet it spares lots of lines :p)
-        self.reset()
+        self.reset(self.params.pk_batches)
 
     def reset(self):
 
         #
         # PK tensors
 
+        batch = cfg.BATCH_SIZE
+        pk_num = cfg.PK_ROWS * cfg.PK_COLS
+
         # Inputs
-        self.pk_dyn_in = th.zeros(size=(self.params.batch_size,
+        self.pk_dyn_in = th.zeros(size=(batch,
+                                        pk_num,
                                         self.params.pk_dyn_in_size),
                                   device=self.params.device)
-        self.pk_lat_in = th.zeros(size=(self.params.batch_size,
+        self.pk_lat_in = th.zeros(size=(batch,
+                                        pk_num,
                                         self.params.pk_neighbors,
                                         self.params.pk_lat_in_size),
                                   device=self.params.device)
 
         # LSTM states
-        self.pk_lstm_c = th.zeros(size=(self.params.batch_size, self.params.pk_num_lstm_cells),
+        self.pk_lstm_c = th.zeros(size=(batch, pk_num, self.params.pk_num_lstm_cells),
                                   device=self.params.device,
                                   requires_grad=False)
-        self.pk_lstm_h = th.zeros(size=(self.params.batch_size, self.params.pk_num_lstm_cells),
+        self.pk_lstm_h = th.zeros(size=(batch, pk_num, self.params.pk_num_lstm_cells),
                                   device=self.params.device,
                                   requires_grad=False)
 
         # Outputs
-        self.pk_dyn_out = th.zeros(size=(self.params.batch_size,
+        self.pk_dyn_out = th.zeros(size=(batch, pk_num,
                                          self.params.pk_dyn_out_size),
                                    device=self.params.device)
-        self.pk_lat_out = th.zeros(size=(self.params.batch_size,
+        self.pk_lat_out = th.zeros(size=(batch, pk_num,
                                          self.params.pk_neighbors,
                                          self.params.pk_lat_out_size),
                                    device=self.params.device)
