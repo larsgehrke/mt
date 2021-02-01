@@ -114,9 +114,7 @@ for epoch in range(cfg.EPOCHS):
             tensors = tensors
                 )
 
-        sprint(mse, "mse", exit= True)
-
-        batch_errors.append(mse) # mse.item()
+        batch_errors.append(mse.item()) # mse.item()
 
     epoch_errors_train.append(np.mean(batch_errors))
 
