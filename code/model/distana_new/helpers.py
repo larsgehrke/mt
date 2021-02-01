@@ -66,10 +66,8 @@ def train_batch( net,
 
 
 def validate():
-    mse = 1
-
-
-    return mse
+    
+    return 0
 
 
 def _set_up_batch(batch_iter, data_filenames):

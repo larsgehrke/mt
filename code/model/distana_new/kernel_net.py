@@ -120,10 +120,10 @@ class KernelNetwork(nn.Module):
             # Forward the PK inputs through the pk_net to get the outputs and hidden
             # states of these PKs
             pk_dyn_out, pk_lat_out, pk_lstm_c, pk_lstm_h = self.pk_net.forward(
-                dyn_in=th.squeeze(self.tensors.pk_dyn_in[batch_no], dim=0),
-                lat_in=th.squeeze(self.tensors.pk_lat_in[batch_no], dim=0),
-                lstm_c=th.squeeze(self.tensors.pk_lstm_c[batch_no], dim=0),
-                lstm_h=th.squeeze(self.tensors.pk_lstm_h[batch_no], dim=0)
+                dyn_in=self.tensors.pk_dyn_in[batch_no],
+                lat_in=self.tensors.pk_lat_in[batch_no],
+                lstm_c=self.tensors.pk_lstm_c[batch_no],
+                lstm_h=self.tensors.pk_lstm_h[batch_no]
             )
 
             # Update the output and hidden state tensors of the PKs
