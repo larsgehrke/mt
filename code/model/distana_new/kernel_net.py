@@ -94,8 +94,19 @@ class KernelNetwork(nn.Module):
         self.coming_from = th.from_numpy(a[1]).to(dtype=th.long)
         self.going_to = (self.pk_adj_mat[1][a] - 1).to(dtype=th.long)
 
-
     def forward(self, dyn_in, pk_stat_in=None, tk_stat_in=None):
+        """
+        Runs the forward pass of all PKs and TKs, respectively, sequentially 
+        for a given input
+
+        """
+
+        helpers.sprint(dyn_in, "kenel_net.dyn_in")
+
+
+
+
+    def forward_old(self, dyn_in, pk_stat_in=None, tk_stat_in=None):
         """
         Runs the forward pass of all PKs and TKs, respectively, in parallel for
         a given input
@@ -112,16 +123,12 @@ class KernelNetwork(nn.Module):
                 dyn_in
             ).to(device=self.params.device)
 
-        helpers.sprint(self.pos0, "kernel_net.pos0")
-        helpers.sprint(self.going_to, "kernel_net.going_to")
-        helpers.sprint(self.coming_from, "kernel_net.coming_from")
         
         # Set the appropriate lateral inputs to the lateral outputs from the
         # previous time step
         self.tensors.pk_lat_in[self.pos0, self.going_to] = \
             self.tensors.pk_lat_out[self.coming_from, self.going_to]
 
-        helpers.sprint(self.tensors.pk_lat_in.cpu().detach().numpy(), exit=False)
         
         # Forward the PK inputs through the pk_net to get the outputs and hidden
         # states of these PKs
@@ -138,8 +145,8 @@ class KernelNetwork(nn.Module):
         self.tensors.pk_lstm_c = pk_lstm_c
         self.tensors.pk_lstm_h = pk_lstm_h
 
-    def reset(self, pk_num):
-        self.tensors.reset(pk_num=pk_num)
+    def reset(self):
+        self.tensors.reset()
 
     def detach(self):
         self.tensors.detach()

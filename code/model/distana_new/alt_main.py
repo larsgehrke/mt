@@ -44,7 +44,7 @@ amount_pks = cfg.PK_ROWS * cfg.PK_COLS
 
 # Set up the parameter and tensor classes
 params = kernel_variables.KernelParameters(
-    pk_batches=amount_pks,
+    amount_pks=amount_pks,
     device=th.device("cuda")
 )
 tensors = kernel_variables.KernelTensors(params=params)
@@ -108,7 +108,9 @@ for epoch in range(cfg.EPOCHS):
             data_filenames = train_data_filenames,
             criterion=criterion,
             optimizer=optimizer,
-            batch_iter= batch_iter
+            batch_iter= batch_iter,
+            params = params,
+            tensors = tensors
                 )
 
         batch_errors.append(mse) # mse.item()

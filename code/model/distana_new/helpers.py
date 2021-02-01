@@ -9,7 +9,9 @@ def train_batch( net,
             data_filenames,
             criterion,
             optimizer,
-            batch_iter):
+            batch_iter,
+            params,
+            tensors):
     mse = None
 
     batch_size = cfg.BATCH_SIZE
@@ -31,7 +33,7 @@ def train_batch( net,
         optimizer.zero_grad()
 
     # Reset the network to clear the previous sequence
-    net.reset(pk_num=amount_pks)
+    net.reset()
 
     # Iterate over the whole sequence of the training example and perform a
     # forward pass
@@ -42,12 +44,10 @@ def train_batch( net,
         dyn_net_in_step = net_input[:,t, :, :params.pk_dyn_out_size]
 
         # Forward the input through the network
-        sprint(dyn_net_in_step, "dyn_net_in_step", complete=False, exit=True)
-        
         net.forward(dyn_in=dyn_net_in_step)
 
         # Store the output of the network for this sequence step
-        net_outputs[t] = tensors.pk_dyn_out
+        net_outputs[:,t] = tensors.pk_dyn_out
 
     if criterion:
         # Get the mean squared error from the evaluation list
