@@ -45,7 +45,7 @@ class KernelTensors:
 
         # Initialize the tensors by calling the reset method (this may not be
         # clean code style, yet it spares lots of lines :p)
-        self.reset(self.params.amount_pks)
+        self.reset()
 
     def reset(self):
 
@@ -53,7 +53,7 @@ class KernelTensors:
         # PK tensors
 
         batch = cfg.BATCH_SIZE
-        pk_num = cfg.PK_ROWS * cfg.PK_COLS
+        pk_num = self.params.amount_pks
 
         # Inputs
         self.pk_dyn_in = th.zeros(size=(batch,
