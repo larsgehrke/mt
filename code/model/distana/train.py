@@ -22,12 +22,12 @@ import kernel_variables
 import kernel_net
 import configuration as cfg
 import helper_functions as helpers
+import sys
 
 # Hide the GPU(s) in case the user specified to use the CPU in the config file
 if cfg.DEVICE == "CPU":
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
-
 
 def run_training():
     # Set a globally reachable boolean in the config file for training
@@ -66,6 +66,7 @@ def run_training():
     tensors = kernel_variables.KernelTensors(params=params)
 
     # Initialize and set up the kernel network
+    # build adjacent matrix and configure all linkages
     net = kernel_net.KernelNetwork(
         params=params,
         tensors=tensors
@@ -95,12 +96,23 @@ def run_training():
     train_data_filenames = np.sort(glob.glob(data_src_path + 'train/*'))#[:1]
     val_data_filenames = np.sort(glob.glob(data_src_path + 'val/*'))
 
+    if len(train_data_filenames) == 0:
+        raise Exception('Could not find training data in '+ str(data_src_path) + 'train/*')
+    if len(val_data_filenames) == 0:
+        raise Exception('Could not find validation data in '+ str(data_src_path) + 'val/*')
+
+
     # If desired, restore the network by loading the weights saved in the .pt
     # file
     if cfg.CONTINUE_TRAINING:
         print('Restoring model (that is the network\'s weights) from file...')
         net.load_state_dict(th.load(model_src_path + "/" + cfg.MODEL_NAME + "/"
                                     + cfg.MODEL_NAME + ".pt"))
+        # TOASK REALLY CORRECT? Shouldnt it be net.train() ?
+        # .eval(): "switch for some specific layers/parts of the model that behave differently 
+        # during training and inference (evaluating) time. For example, Dropouts Layers,
+        # BatchNorm Layers etc. You need to turn off them during model evaluation, 
+        #  and .eval() will do it for you"
         net.eval()
 
     """
@@ -108,6 +120,7 @@ def run_training():
     """
 
     a = time.time()
+
 
     #
     # Start the training and iterate over all epochs
@@ -138,6 +151,7 @@ def run_training():
                 _iter=train_iter
             )
 
+            helpers.sprint(mse, exit=True)
             sequence_errors.append(mse.item())
 
         epoch_errors_train.append(np.mean(sequence_errors))
@@ -182,7 +196,7 @@ def run_training():
             val_sign = "(+)"
 
         #
-        # Print progress to the console
+        # Print progress to the console with nice formatting
         print('Epoch ' + str(epoch + 1).zfill(int(np.log10(cfg.EPOCHS)) + 1)
               + '/' + str(cfg.EPOCHS) + ' took '
               + str(np.round(time.time() - epoch_start_time, 2)).ljust(5, '0')
@@ -194,4 +208,4 @@ def run_training():
     b = time.time()
     print('\nTraining took ' + str(np.round(b - a, 2)) + ' seconds.\n\n')
 
-print("Done!")
+    print("Done!")

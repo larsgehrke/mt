@@ -7,7 +7,26 @@ import matplotlib.animation as animation
 from multiprocessing import Pool
 import configuration as cfg
 
+# ONLY DEV
+import sys
 
+
+def sprint(obj, obj_name="Object", complete=False, exit=False):
+    print("Printing out", obj_name)
+    print(type(obj))
+
+    if (isinstance(obj, th.Tensor)):
+        obj = obj.cpu().detach().numpy()
+
+    if (isinstance(obj, np.ndarray)):
+        print(obj.shape)
+
+    if (complete):
+        print(obj)
+
+    if(exit):
+        sys.exit()
+        
 def set_up_batch(_iter, data_filenames):
     """
     In this function, a batch is composed to be fed into the network.
@@ -28,7 +47,27 @@ def set_up_batch(_iter, data_filenames):
     width, height = data_xmax - data_xmin, data_ymax - data_ymin
 
     # Load data from file
+    # TOASK Why +1 ?
+    # Probably because of the shift in the input and output array
     data = np.load(data_filenames[_iter])[:cfg.SEQ_LEN + 1]
+
+    # data.shape = (cfg.SEQ_LEN +1 , 2, 16, 16)
+
+    # for sample in range(len(data_filenames)):
+
+    #     
+
+    #     print("\nsample:",sample)
+
+
+    #     for item in range(40):
+    #         for i in range(width):
+    #             for j in range(height):
+    #                 cur = data[item,:,i,j]
+    #                 if(not np.isclose(cur[1],0.0)):
+    #                     print("=== Sample:", sample, ", Sequenz:", item," ===")
+    #                     print(f"[{i}|{j}]: {cur}")
+    
 
     # Generate a random position for the visual field
     x = np.random.randint(0, max(1, 15 - width))
@@ -55,21 +94,29 @@ def set_up_batch(_iter, data_filenames):
 
     # Reshape the data array to have the kernels on one dimension
     data = np.reshape(data, [dim0, dim1, cfg.PK_ROWS * cfg.PK_COLS])
+    # data.shape = (41, 2, 256)
+    
 
     # Swap the second and third dimension of the data
     data = np.swapaxes(data, axis1=1, axis2=2)
+    # shape = (41, 256, 2)
 
     # Split the data into inputs (where some noise is added) and labels
+    # Add noise to all timesteps except very last one
     _net_input = np.array(
         data[:-1] + np.random.normal(0, cfg.DATA_NOISE, np.shape(data[:-1])),
         dtype=np.float32
     )
+    # shape: (40, 256, 2)
+
     # noise = cfg.DATA_NOISE
     # _net_input = np.array(
     #     data[:-1] + np.random.uniform(-noise, noise, np.shape(data[:-1])),
     #     dtype=np.float32
     # )
     _net_label = np.array(data[1:, :, 0:1], dtype=np.float32)
+    # shape: (40, 256, 1)
+    
 
     if cfg.TRAINING:
         # Set the dynamic inputs with a certain probability to zero to force
