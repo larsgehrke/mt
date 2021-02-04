@@ -4,11 +4,13 @@
 from typing import Tuple
 import os
 import torch
-# import center_surround_cuda as csc
+import center_surround_cuda as csc
 from torch.utils.cpp_extension import load
 
 # TODO: use the Just In Time compiler from pytorch to load the module that you
 # exported from c++.
+center_surround_convolution= load(name="center_surround_convolution",
+sources=["center_surround_convolution.cu"], verbose=True)
 
 # e) Load your the exported python module in center surround convolution.py and
 # implement the torch.autograd.Function class center surround convolution.
@@ -20,6 +22,7 @@ class center_surround_convolution(torch.autograd.Function):
                 w_s: torch.Tensor,
                 w_b: torch.Tensor) -> torch.Tensor:
         # TODO: implement the forward pass using the imported module
+
         return None  # This leads to test errors
 
     @staticmethod

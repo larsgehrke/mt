@@ -22,7 +22,37 @@ __global__ void center_surround_convolution_forward_kernel (
         const torch::PackedTensorAccessor32<scalar_t, 1,
         torch::RestrictPtrTraits> w_b,
         torch::PackedTensorAccessor32<scalar_t, 4, torch::RestrictPtrTraits> O) {
-    // TODO implement the forward kernel
+
+    const int o = blockIdx.x * blockDim.x + threadIdx.x;// Calculate this threads output index
+    const int n = blockIdx.y * blockDim.y + threadIdx.y;// Calculate this threads batch index
+
+    // 28 x 28 Images
+
+    scalar_t result = 0.0f;
+
+    idx_o = 29 + (o/27)*28 + o%27;
+
+    for (int i = -1; i< 2; ++i)
+    {
+        for (int j = -1; j< 2; ++j)
+        {
+            idx = idx_o + i + 28*j;
+
+            if(idx >= 0 && idx < 784)
+            {
+                if(idx == o)
+                {
+                    result += I[n][o] * w_c;
+                }
+                else
+                {
+                    result += I[n][o] * w_s;
+                }
+            }
+        }
+    }
+
+    O[n][o] = result;
 }
 
 /** backward kernels
@@ -51,6 +81,12 @@ __global__ void dL_dw_b_kernel (
         torch::RestrictPtrTraits> dL_dO,
         torch::PackedTensorAccessor32<scalar_t, 1, torch::RestrictPtrTraits>
         dL_dw_b) {
+
+    const int i= blockIdx.x* blockDim.x+ threadIdx.x;// Calculate this thread's input index
+    const int n = blockIdx.y* blockDim.y+ threadIdx.y;// Calculate this thread's batch index
+
+    
+
     // TODO compute dL_dw_b here
 }
 
@@ -78,7 +114,7 @@ __global__ void dL_dI_kernel(
  *   w_c, w_s and w_b as torch::Tensor objects and returns a
  *   std::vector<torch::Tensor> the computed O tensor.
  */
-std::vector<torch::Tensor> center_surrond_convolution_forward (
+std::vector<torch::Tensor> center_surround_convolution_forward (
         torch::Tensor I,
         torch::Tensor w_c,
         torch::Tensor w_s,
@@ -88,7 +124,35 @@ std::vector<torch::Tensor> center_surrond_convolution_forward (
     // - Allocate Memory for O
     // - Call the kernel (only for floating types)
     // - return {O}
-    return {I.slice(2, 1, -1, 1).slice(3, 1, -1, 1)};
+
+    CHECK_INPUT(I);
+    CHECK_INPUT(w_c);
+    CHECK_INPUT(w_s);
+    CHECK_INPUT(w_b);
+
+    // 27x27 =729
+    // batch size 100
+
+    const auto batch_size = I.size(0);// Obtain the batch size
+    const auto input_size = I.size(1);// Obtain the I size
+
+    auto O = torch::empty({batch_size, 729}, input_size.options());// Create an uninitialized output tensor
+
+    const dim3 block_dim(32, 32);// Use 1024 element blocks
+    const dim3 grid_dim((729 + 31) / 32, (100 + 31) / 32);// Map output elements to x and batch elements to y
+
+    // -> One thread per calculated output element
+    AT_DISPATCH_FLOATING_TYPES(// Executes the kernel only if I.type() is a floating point type
+    I.type(), "center_surround_convolution", ([&] { // and sets the kernel's template parameter accordingly.
+    center_surround_convolution_forward_kernel<scalar_t><<<grid_dim, block_dim>>>(
+    I.packed_accessor32<scalar_t, 2, torch::RestrictPtrTraits>(),
+    w_c.packed_accessor32<scalar_t, 1, torch::RestrictPtrTraits>(),
+    w_s.packed_accessor32<scalar_t, 1, torch::RestrictPtrTraits>(),
+    w_b.packed_accessor32<scalar_t, 1, torch::RestrictPtrTraits>(),
+    O.packed_accessor32<scalar_t, 2, torch::RestrictPtrTraits>());
+    }));
+
+    return {O};    
 }
 
 /** d)
