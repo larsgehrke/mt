@@ -4,12 +4,12 @@
 from typing import Tuple
 import os
 import torch
-import center_surround_cuda as csc
+#import center_surround_c as csc
 from torch.utils.cpp_extension import load
 
 # TODO: use the Just In Time compiler from pytorch to load the module that you
 # exported from c++.
-center_surround_convolution= load(name="center_surround_convolution",
+center_surround_cuda= load(name="center_surround_convolution",
 sources=["center_surround_convolution.cu"], verbose=True)
 
 # e) Load your the exported python module in center surround convolution.py and
