@@ -5,10 +5,29 @@ import torch
 
 from torch.utils.cpp_extension import load
 
+import numpy as np
+import sys
+
 lltm_cuda = load(
     'lltm_cuda', ['lltm_cuda.cpp', 'lltm_cuda_kernel.cu'], verbose=True)
 
 torch.manual_seed(42)
+
+def sprint(obj, obj_name="Object", complete=False, exit=False):
+    print("Printing out", obj_name)
+    print(type(obj))
+
+    if (isinstance(obj, torch.Tensor)):
+        obj = obj.cpu().detach().numpy()
+
+    if (isinstance(obj, np.ndarray)):
+        print(obj.shape)
+
+    if (complete):
+        print(obj)
+
+    if(exit):
+        sys.exit()
 
 
 class LLTMFunction(Function):
@@ -18,7 +37,11 @@ class LLTMFunction(Function):
         new_h, new_cell = outputs[:2]
         
         # unflatten "gates" containing input gate, output gate, candidate cell 
-        outputs[-1] = outputs[-1].unflatten(1, (3, outputs[2].size(1))) 
+        #outputs[-1] = outputs[-1].unflatten(1, (3, outputs[2].size(1))) 
+        gates = outputs[-1]
+        sprint(gates,"gates", exit=True)
+
+
 
         variables = outputs[1:] + [weights]
         ctx.save_for_backward(*variables)
