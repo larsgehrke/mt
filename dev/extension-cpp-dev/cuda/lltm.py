@@ -9,6 +9,22 @@ import sys
 
 torch.manual_seed(42)
 
+def sprint(obj, obj_name="Object", complete=False, exit=False):
+    print("Printing out", obj_name)
+    print(type(obj))
+
+    if (isinstance(obj, th.Tensor)):
+        obj = obj.cpu().detach().numpy()
+
+    if (isinstance(obj, np.ndarray)):
+        print(obj.shape)
+
+    if (complete):
+        print(obj)
+
+    if(exit):
+        sys.exit()
+
 
 class LLTMFunction(Function):
     @staticmethod
@@ -17,9 +33,7 @@ class LLTMFunction(Function):
         new_h, new_cell = outputs[:2]
         variables = outputs[1:] + [weights]
         gates = outputs[-1]
-        print(type(gates))
-        print(gates)
-        sys.exit("END")
+        sprint(gates, "gates", exit=True)
         ctx.save_for_backward(*variables)
 
         return new_h, new_cell
