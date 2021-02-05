@@ -6,6 +6,7 @@ import torch
 import lltm_cuda
 
 import sys
+import numpy as np
 
 torch.manual_seed(42)
 
