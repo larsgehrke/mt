@@ -49,12 +49,7 @@ __global__ void lltm_cuda_forward_kernel(
   // column index
   const int c = blockIdx.x * blockDim.x + threadIdx.x;
   if (c < gates.size(2)){
-    input_gate[n][c] = sigmoid(gates[n][0][c]);
-    output_gate[n][c] = sigmoid(gates[n][1][c]);
-    candidate_cell[n][c] = elu(gates[n][2][c]);
-    new_cell[n][c] =
-        old_cell[n][c] + candidate_cell[n][c] * input_gate[n][c];
-    new_h[n][c] = tanh(new_cell[n][c]) * output_gate[n][c];
+    input_gate[n][c] = -7;
   }
 }
 

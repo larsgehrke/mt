@@ -35,6 +35,10 @@ class LLTMFunction(Function):
     def forward(ctx, input, weights, bias, old_h, old_cell):
         outputs = lltm_cuda.forward(input, weights, bias, old_h, old_cell)
         new_h, new_cell = outputs[:2]
+        input_gate = outputs[2]
+
+        print(input_gate)
+        sys.exit()
         
         # unflatten "gates" containing input gate, output gate, candidate cell 
         #outputs[-1] = outputs[-1].unflatten(1, (3, outputs[2].size(1))) 
