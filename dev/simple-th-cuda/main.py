@@ -18,7 +18,7 @@ if options.example == 'py':
 elif options.example == 'cpp':
     from cpp.lltm import LLTMFunction
 else:
-    from cuda.lltm import LLTMFunction
+    from lltm import LLTMFunction
     options.cuda = True
 
 device = torch.device("cuda") if options.cuda else torch.device("cpu")
