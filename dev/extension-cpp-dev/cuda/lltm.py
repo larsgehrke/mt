@@ -33,7 +33,7 @@ class LLTMFunction(Function):
         outputs = lltm_cuda.forward(input, weights, bias, old_h, old_cell)
         # outputs =  {new_h, new_cell, input_gate, output_gate, candidate_cell, X, gates};
         new_h, new_cell = outputs[:2]
-        outputs[-1] = outputs[-1].unflatten(1, (3, 128))
+        outputs[-1] = outputs[-1].unflatten(1, (3, -1))
         variables = outputs[1:] + [weights]
         ctx.save_for_backward(*variables)
 
