@@ -38,10 +38,8 @@ class LLTMFunction(Function):
         
         # unflatten "gates" containing input gate, output gate, candidate cell 
         #outputs[-1] = outputs[-1].unflatten(1, (3, outputs[2].size(1))) 
-        gates = outputs[-1]
-        sprint(gates,"gates", exit=True)
-
-
+        #gates = outputs[-1]
+        #sprint(gates,"gates", exit=True)
 
         variables = outputs[1:] + [weights]
         ctx.save_for_backward(*variables)
