@@ -5,16 +5,23 @@ import argparse
 import torch
 from torch.autograd import gradcheck
 
-from lltm import LLTMFunction
-
 parser = argparse.ArgumentParser()
+parser.add_argument('example', choices=['py', 'cpp', 'cuda'])
 parser.add_argument('-b', '--batch-size', type=int, default=3)
 parser.add_argument('-f', '--features', type=int, default=17)
 parser.add_argument('-s', '--state-size', type=int, default=5)
 parser.add_argument('-c', '--cuda', action='store_true')
 options = parser.parse_args()
 
-device = torch.device("cuda") 
+if options.example == 'py':
+    from python.lltm_baseline import LLTMFunction
+elif options.example == 'cpp':
+    from cpp.lltm import LLTMFunction
+else:
+    from cuda.lltm import LLTMFunction
+    options.cuda = True
+
+device = torch.device("cuda") if options.cuda else torch.device("cpu")
 
 kwargs = {'dtype': torch.float64,
           'device': device,
