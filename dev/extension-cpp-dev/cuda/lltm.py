@@ -31,10 +31,10 @@ class LLTMFunction(Function):
     @staticmethod
     def forward(ctx, input, weights, bias, old_h, old_cell):
         outputs = lltm_cuda.forward(input, weights, bias, old_h, old_cell)
+        # outputs =  {new_h, new_cell, input_gate, output_gate, candidate_cell, X, gates};
         new_h, new_cell = outputs[:2]
+        outputs[-1] = outputs[-1].unflatten(1, (3, 128))
         variables = outputs[1:] + [weights]
-        gates = outputs[-1]
-        sprint(gates, "gates", exit=True)
         ctx.save_for_backward(*variables)
 
         return new_h, new_cell
@@ -50,18 +50,18 @@ class LLTMFunction(Function):
         torch.Size([16, 128])
     
         ctx:
-        0: torch.Size([16, 128])
+        0:  torch.Size([16, 128]) 
         1: torch.Size([16, 128])
         2: torch.Size([16, 128])
-        3: torch.Size([16, 128])
-        4: torch.Size([16, 160])
-        5: torch.Size([16, 384]) this neeeded an extra dim
+        3: torch.Size([16, 128]) 
+        4: torch.Size([16, 160]) "X"
+        5: torch.Size([16, 384]) this neeeded an extra dim "gates"
         6: torch.Size([384, 160])
 
         '''
         for idx,var in enumerate(ctx.saved_variables):
 
-            if (idx in [5]):
+            if (False)#idx in [5]):
                 var_list.append(var.unsqueeze_(0))
             else:
                 var_list.append(var)

@@ -56,8 +56,6 @@ std::vector<torch::Tensor> lltm_backward(
     torch::Tensor gate_weights,
     torch::Tensor weights) {
 
-  
-
   CHECK_INPUT(grad_h);
   CHECK_INPUT(grad_cell);
   CHECK_INPUT(input_gate);
