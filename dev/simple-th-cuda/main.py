@@ -12,7 +12,7 @@ parser.add_argument('-s', '--state-size', type=int, default=5)
 parser.add_argument('-c', '--cuda', action='store_true')
 options = parser.parse_args()
 
-from lltm import LLTMFunction
+from lltm import LLTM
 options.cuda = True
 
 device = torch.device("cuda")
