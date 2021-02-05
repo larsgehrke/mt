@@ -14,6 +14,8 @@ class LLTMFunction(Function):
         outputs = lltm_cuda.forward(input, weights, bias, old_h, old_cell)
         new_h, new_cell = outputs[:2]
         variables = outputs[1:] + [weights]
+        print(type(ctx))
+        print(ctx)
         ctx.save_for_backward(*variables)
 
         return new_h, new_cell
