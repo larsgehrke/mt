@@ -101,36 +101,39 @@ class KernelNetwork(nn.Module):
 
         """
 
-        for batch_no in range(cfg.BATCH_SIZE):
 
+        # Write the dynamic PK input to the corresponding tensor
+        if isinstance(dyn_in, th.Tensor):
+            self.tensors.pk_dyn_in = dyn_in
+        else:
+            self.tensors.pk_dyn_in = th.from_numpy(
+                dyn_in
+            ).to(device=self.params.device)
 
-            # Write the dynamic PK input to the corresponding tensor
-            if isinstance(dyn_in, th.Tensor):
-                self.tensors.pk_dyn_in = dyn_in
-            else:
-                self.tensors.pk_dyn_in = th.from_numpy(
-                    dyn_in
-                ).to(device=self.params.device)
+        # Set the appropriate lateral inputs to the lateral outputs from the
+        # previous time step
+        self.tensors.pk_lat_in[:,self.pos0, self.going_to] = \
+        self.tensors.pk_lat_out[:,self.coming_from, self.going_to]
 
-            # Set the appropriate lateral inputs to the lateral outputs from the
-            # previous time step
-            self.tensors.pk_lat_in[batch_no,self.pos0, self.going_to] = \
-            self.tensors.pk_lat_out[batch_no,self.coming_from, self.going_to]
+        helpers.sprint(self.tensors.pk_dyn_in, "self.tensors.pk_dyn_in")
+        helpers.sprint(self.tensors.pk_lat_in, "self.tensors.pk_lat_in")
+        helpers.sprint(self.tensors.pk_lstm_c, "self.tensors.pk_lstm_c")
+        helpers.sprint(self.tensors.pk_lstm_h, "self.tensors.pk_lstm_h", exit=True)
 
-            # Forward the PK inputs through the pk_net to get the outputs and hidden
-            # states of these PKs
-            pk_dyn_out, pk_lat_out, pk_lstm_c, pk_lstm_h = self.pk_net.forward(
-                dyn_in=th.clone(self.tensors.pk_dyn_in[batch_no]),
-                lat_in=th.clone(self.tensors.pk_lat_in[batch_no]),
-                lstm_c=th.clone(self.tensors.pk_lstm_c[batch_no]),
-                lstm_h=th.clone(self.tensors.pk_lstm_h[batch_no])
-            )
+        # Forward the PK inputs through the pk_net to get the outputs and hidden
+        # states of these PKs
+        pk_dyn_out, pk_lat_out, pk_lstm_c, pk_lstm_h = self.pk_net.forward(
+            dyn_in=th.clone(self.tensors.pk_dyn_in),
+            lat_in=th.clone(self.tensors.pk_lat_in),
+            lstm_c=th.clone(self.tensors.pk_lstm_c),
+            lstm_h=th.clone(self.tensors.pk_lstm_h)
+        )
 
-            # Update the output and hidden state tensors of the PKs
-            self.tensors.pk_dyn_out[batch_no] = pk_dyn_out
-            self.tensors.pk_lat_out[batch_no] = pk_lat_out
-            self.tensors.pk_lstm_c[batch_no] = pk_lstm_c
-            self.tensors.pk_lstm_h[batch_no] = pk_lstm_h
+        # Update the output and hidden state tensors of the PKs
+        self.tensors.pk_dyn_out = pk_dyn_out
+        self.tensors.pk_lat_out = pk_lat_out
+        self.tensors.pk_lstm_c = pk_lstm_c
+        self.tensors.pk_lstm_h = pk_lstm_h
 
 
 

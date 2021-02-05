@@ -63,7 +63,7 @@ class PredictionKernelNet(nn.Module):
             self.pre_weights(th.cat(tensors=(dyn_in, lat_in), dim=1))
         )
 
-        lstm_c_, lstm_h_ = self.lstm(pre_act, (lstm_c, lstm_h))
+        lstm_c, lstm_h = self.lstm(pre_act, (lstm_c, lstm_h))
 
         # Postprocessing layer activation
         post_act = th.tanh(self.post_weights(lstm_h_))
@@ -83,4 +83,4 @@ class PredictionKernelNet(nn.Module):
                                      self.params.pk_neighbors,
                                      self.params.pk_lat_out_size))
 
-        return dyn_out, lat_out, lstm_c_, lstm_h_
+        return dyn_out, lat_out, lstm_c, lstm_h_

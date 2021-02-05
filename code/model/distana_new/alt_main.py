@@ -115,6 +115,7 @@ for epoch in range(cfg.EPOCHS):
                 )
 
         batch_errors.append(mse) # mse.item()
+        # mse tupel 3 x (8, 40, 256, 1)
 
     epoch_errors_train.append(0)#np.mean(batch_errors))
 
