@@ -20,13 +20,6 @@ class LLTMFunction(Function):
 
     @staticmethod
     def backward(ctx, grad_h, grad_cell):
-        #print(type(ctx)) # <class 'torch.autograd.function.LLTMFunctionBackward'>
-        #print(type(grad_h)) # <class 'torch.Tensor'>
-        #print(type(grad_cell)) # <class 'torch.Tensor'>
-
-        
-        #print(grad_h.size()) # <class 'torch.Tensor'>: torch.Size([16, 128])
-
         var_list = []
 
         '''

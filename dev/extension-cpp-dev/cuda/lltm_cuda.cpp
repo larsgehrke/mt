@@ -36,11 +36,11 @@ std::vector<torch::Tensor> lltm_forward(
     torch::Tensor old_h,
     torch::Tensor old_cell) {
 
-  /*CHECK_INPUT(input);
+  CHECK_INPUT(input);
   CHECK_INPUT(weights);
   CHECK_INPUT(bias);
   CHECK_INPUT(old_h);
-  CHECK_INPUT(old_cell);*/
+  CHECK_INPUT(old_cell);
 
   return lltm_cuda_forward(input, weights, bias, old_h, old_cell);
 }
@@ -58,14 +58,14 @@ std::vector<torch::Tensor> lltm_backward(
 
   
 
-  /*CHECK_INPUT(grad_h);
+  CHECK_INPUT(grad_h);
   CHECK_INPUT(grad_cell);
   CHECK_INPUT(input_gate);
   CHECK_INPUT(output_gate);
   CHECK_INPUT(candidate_cell);
   CHECK_INPUT(X);
   CHECK_INPUT(gate_weights);
-  CHECK_INPUT(weights);*/
+  CHECK_INPUT(weights);
 
   return lltm_cuda_backward(
       grad_h,
