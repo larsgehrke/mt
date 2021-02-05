@@ -104,16 +104,6 @@ std::vector<torch::Tensor> lltm_cuda_forward(
     torch::Tensor old_h,
     torch::Tensor old_cell) {
 
-  // Create and open a text file
-  std::ofstream MyFile("gehrkela_log.txt");
-
-  // Write to the file
-  MyFile << "Test: Log from file lltm_cuda.cpp. Author: gehrkela.";
-
-  // Close the file
-  MyFile.close();
-
-
   auto X = torch::cat({old_h, input}, /*dim=*/1);
   auto gate_weights = torch::addmm(bias, X, weights.transpose(0, 1));
 

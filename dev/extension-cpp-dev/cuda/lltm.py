@@ -5,6 +5,8 @@ import torch
 
 import lltm_cuda
 
+import sys
+
 torch.manual_seed(42)
 
 
@@ -14,8 +16,10 @@ class LLTMFunction(Function):
         outputs = lltm_cuda.forward(input, weights, bias, old_h, old_cell)
         new_h, new_cell = outputs[:2]
         variables = outputs[1:] + [weights]
-        print(type(ctx))
-        print(ctx)
+        gates = outputs[-1]
+        print(type(gates))
+        print(gates)
+        sys.exit("END")
         ctx.save_for_backward(*variables)
 
         return new_h, new_cell
