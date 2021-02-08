@@ -6,6 +6,8 @@ import configuration as cfg
 
 import helper_functions as helpers
 
+from cuda.distana import DISTANA
+
 
 class KernelNetwork(nn.Module):
     """
@@ -25,7 +27,7 @@ class KernelNetwork(nn.Module):
 
         # Initialize the shared Prediction Kernel (PK) network that will do the
         # PK calculations 
-        self.pk_net = prediction_kernel.PredictionKernelNet(params=params)
+        self.pk_net = DISTANA(params=params)
 
         # Initialize an adjacency matrix for the PK-TK connections
         self.pk_adj_mat = th.zeros(size=(2,
@@ -115,18 +117,21 @@ class KernelNetwork(nn.Module):
         self.tensors.pk_lat_in[:,self.pos0, self.going_to] = \
         self.tensors.pk_lat_out[:,self.coming_from, self.going_to]
 
-        helpers.sprint(self.tensors.pk_dyn_in, "self.tensors.pk_dyn_in")
-        helpers.sprint(self.tensors.pk_lat_in, "self.tensors.pk_lat_in")
-        helpers.sprint(self.tensors.pk_lstm_c, "self.tensors.pk_lstm_c")
-        helpers.sprint(self.tensors.pk_lstm_h, "self.tensors.pk_lstm_h", exit=True)
+        # helpers.sprint(self.tensors.pk_dyn_in, "self.tensors.pk_dyn_in")
+        # helpers.sprint(self.tensors.pk_lat_in, "self.tensors.pk_lat_in")
+        # helpers.sprint(self.tensors.pk_lstm_c, "self.tensors.pk_lstm_c")
+        # helpers.sprint(self.tensors.pk_lstm_h, "self.tensors.pk_lstm_h", exit=True)
+
+        # Insert Dim 10, 256, 1 -> 10, 256, 1,1 and concat with 10, 256, 8, 1
+        # => 10, 256, 9, 1
+        input_ = th.cat((th.unsqueeze(self.tensors.pk_dyn_in,2), self.tensors.pk_lat_in),2)
 
         # Forward the PK inputs through the pk_net to get the outputs and hidden
         # states of these PKs
         pk_dyn_out, pk_lat_out, pk_lstm_c, pk_lstm_h = self.pk_net.forward(
-            dyn_in=th.clone(self.tensors.pk_dyn_in),
-            lat_in=th.clone(self.tensors.pk_lat_in),
-            lstm_c=th.clone(self.tensors.pk_lstm_c),
-            lstm_h=th.clone(self.tensors.pk_lstm_h)
+            input=th.clone(input_), # (10, 256, 9, 1)
+            state= (th.clone(self.tensors.pk_lstm_c), # (10, 256, 16)
+                    th.clone(self.tensors.pk_lstm_h))  # (10, 256, 16)
         )
 
         # Update the output and hidden state tensors of the PKs

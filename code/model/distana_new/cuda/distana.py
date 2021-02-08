@@ -11,10 +11,27 @@ distana_cuda = load(
 
 torch.manual_seed(42)
 
+def sprint(obj, obj_name="Object", complete=False, exit=False):
+    print("Printing out", obj_name)
+    print(type(obj))
+
+    if (isinstance(obj, th.Tensor)):
+        obj = obj.cpu().detach().numpy()
+
+    if (isinstance(obj, np.ndarray)):
+        print(obj.shape)
+
+    if (complete):
+        print(obj)
+
+    if(exit):
+        sys.exit()
+
+
 class DISTANAFunction(torch.autograd.Function):
     @staticmethod
-    def forward(ctx, input, weights, bias, old_h, old_cell):
-        print(input)
+    def forward(ctx, input, pre_weights, lstm_weights, post_weights, old_h, old_cell):
+        sprint(input,"input", exit=True)
         outputs = distana_cuda.forward(input, weights, bias, old_h, old_cell)
         new_h, new_cell = outputs[:2]
         input_gate = outputs[2]
@@ -26,20 +43,47 @@ class DISTANAFunction(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, grad_h, grad_cell):
+        # When you call contiguous(), it actually makes a copy of tensor 
+        # so the order of elements would be same 
+        # as if tensor of same shape created from scratch.
         outputs = distana_cuda.backward(
             grad_h.contiguous(), grad_cell.contiguous(), *ctx.saved_variables)
+
         d_old_h, d_input, d_weights, d_bias, d_old_cell, d_gates = outputs
+
+
         return d_input, d_weights, d_bias, d_old_h, d_old_cell
 
 
 class DISTANA(torch.nn.Module):
-    def __init__(self, input_features, state_size):
+
+    def __init__(self, params):
+
         super(DISTANA, self).__init__()
-        self.input_features = input_features
-        self.state_size = state_size
-        self.weights = torch.nn.Parameter(
-            torch.Tensor(3 * state_size, input_features + state_size))
-        self.bias = torch.nn.Parameter(torch.Tensor(1, 3 * state_size))
+        self.params = params
+
+        '''
+
+        Information in self.params, e.g. 
+        nn.Linear: in_features = params.pk_dyn_in_size +
+                        (params.pk_lat_in_size * params.pk_neighbors
+
+        '''
+
+        self.pre_weights = torch.nn.Parameter(
+            torch.Tensor(params.pk_dyn_in_size +
+                        (params.pk_lat_in_size * params.pk_neighbors), 
+                            params.pk_pre_layer_size))
+
+        self.lstm_weights = torch.nn.Parameter(
+            torch.Tensor(params.pk_pre_layer_size, 
+                         params.pk_num_lstm_cells))
+
+        self.post_weights = torch.nn.Parameter(
+            torch.Tensor(params.pk_num_lstm_cells, 
+                         params.pk_dyn_out_size +
+                         (params.pk_lat_out_size * params.pk_neighbors)))
+
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -48,4 +92,7 @@ class DISTANA(torch.nn.Module):
             weight.data.uniform_(-stdv, +stdv)
 
     def forward(self, input, state):
-        return DISTANAFunction.apply(input, self.weights, self.bias, *state)
+        return DISTANAFunction.apply(input, self.pre_weights, self.lstm_weights, self.post_weights, *state)
+
+    def backward(self, grad_h, grad_cell):
+        return LLTMFunction.apply(grad_h, grad_cell)
