@@ -15,7 +15,7 @@ def sprint(obj, obj_name="Object", complete=False, exit=False):
     print("Printing out", obj_name)
     print(type(obj))
 
-    if (isinstance(obj, th.Tensor)):
+    if (isinstance(obj, torch.Tensor)):
         obj = obj.cpu().detach().numpy()
 
     if (isinstance(obj, np.ndarray)):
