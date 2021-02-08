@@ -6,8 +6,9 @@
 
 std::vector<torch::Tensor> distana_cuda_forward(
     torch::Tensor input,
-    torch::Tensor weights,
-    torch::Tensor bias,
+    torch::Tensor pre_weights,
+    torch::Tensor lstm_weights,
+    torch::Tensor post_weights,
     torch::Tensor old_h,
     torch::Tensor old_cell);
 
@@ -30,13 +31,15 @@ std::vector<torch::Tensor> distana_cuda_backward(
 
 std::vector<torch::Tensor> distana_forward(
     torch::Tensor input,
-    torch::Tensor weights,
-    torch::Tensor bias,
+    torch::Tensor pre_weights,
+    torch::Tensor lstm_weights,
+    torch::Tensor post_weights,
     torch::Tensor old_h,
     torch::Tensor old_cell) {
   CHECK_INPUT(input);
-  CHECK_INPUT(weights);
-  CHECK_INPUT(bias);
+  CHECK_INPUT(pre_weights);
+  CHECK_INPUT(lstm_weights);
+  CHECK_INPUT(post_weights);
   CHECK_INPUT(old_h);
   CHECK_INPUT(old_cell);
 

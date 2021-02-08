@@ -5,6 +5,8 @@
 
 #include <vector>
 
+#include <config.h>
+
 namespace {
 template <typename scalar_t>
 __device__ __forceinline__ scalar_t sigmoid(scalar_t z) {
@@ -37,20 +39,21 @@ __device__ __forceinline__ scalar_t d_elu(scalar_t z, scalar_t alpha = 1.0) {
 
 template <typename scalar_t>
 __global__ void distana_cuda_forward_kernel(
-    const torch::PackedTensorAccessor32<scalar_t,3,torch::RestrictPtrTraits> gates,
+    /*const torch::PackedTensorAccessor32<scalar_t,3,torch::RestrictPtrTraits> gates,
     const torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> old_cell,
     torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> new_h,
     torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> new_cell,
     torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> input_gate,
     torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> output_gate,
-    torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> candidate_cell) {
-  //batch index
-  const int n = blockIdx.y;
-  // column index
-  const int c = blockIdx.x * blockDim.x + threadIdx.x;
-  if (c < gates.size(2)){
-    input_gate[n][c] = -7;
-  }
+    torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> candidate_cell*/
+    torch::PackedTensorAccessor32<scalar_t,4,torch::RestrictPtrTraits> input) {
+  
+    // PKs ?
+    unsigned int x = blockIdx.x*blockDim.x + threadIdx.x;
+    // Batch ?
+    unsigned int y = blockIdx.y*blockDim.y + threadIdx.y;
+    
+    input_gate[y][x][0][0] = -7;
 }
 
 template <typename scalar_t>
@@ -91,38 +94,50 @@ __global__ void distana_cuda_backward_kernel(
 
 std::vector<torch::Tensor> distana_cuda_forward(
     torch::Tensor input,
-    torch::Tensor weights,
-    torch::Tensor bias,
+    torch::Tensor pre_weights,
+    torch::Tensor lstm_weights,
+    torch::Tensor post_weights,
     torch::Tensor old_h,
     torch::Tensor old_cell) {
-  auto X = torch::cat({old_h, input}, /*dim=*/1);
-  auto gate_weights = torch::addmm(bias, X, weights.transpose(0, 1));
+  // Concatinates the tensors in the given dimensionality
+  //auto X = torch::cat({old_h, input}, /*dim=*/1);
 
-  const auto batch_size = old_cell.size(0);
-  const auto state_size = old_cell.size(1);
+  // Performs a matrix multiplication of the matrices X and weights.transpose. 
+  // The matrix bias is added to the final result.
+  //auto gate_weights = torch::addmm(bias, X, pre_weights.transpose(0, 1));
 
-  auto gates = gate_weights.reshape({batch_size, 3, state_size});
+  //const auto batch_size = input.size(0);
+  //const auto state_size = old_cell.size(1);
+
+  //auto gates = gate_weights.reshape({batch_size, 3, state_size});
   auto new_h = torch::zeros_like(old_cell);
   auto new_cell = torch::zeros_like(old_cell);
   auto input_gate = torch::zeros_like(old_cell);
   auto output_gate = torch::zeros_like(old_cell);
   auto candidate_cell = torch::zeros_like(old_cell);
+  auto X = torch::zeros_like(input);
+  auto new_pre_weights = torch::zeros_like(pre_weights);
+  auto new_lstm_weights = torch::zeros_like(lstm_weights);
+  auto new_post_weights = torch::zeros_like(post_weights);
 
-  const int threads = 1024;
-  const dim3 blocks((state_size + threads - 1) / threads, batch_size);
+
+  const int threads = BATCH_SIZE;
+  const dim3 blocks(PK_ROWS, PK_COLS);
 
   AT_DISPATCH_FLOATING_TYPES(gates.type(), "distana_forward_cuda", ([&] {
     distana_cuda_forward_kernel<scalar_t><<<blocks, threads>>>(
-        gates.packed_accessor32<scalar_t,3,torch::RestrictPtrTraits>(),
+      input.packed_accessor32<scalar_t, 4, torch::RestrictPtrTraits>()
+       /* gates.packed_accessor32<scalar_t,3,torch::RestrictPtrTraits>(),
         old_cell.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
         new_h.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
         new_cell.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
         input_gate.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
         output_gate.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
-        candidate_cell.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>());
+        candidate_cell.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>()*/
+        );
   }));
 
-  return {new_h, new_cell, input_gate, output_gate, candidate_cell, X, gates};
+  return {new_h, new_cell, input_gate, output_gate, candidate_cell, X, new_pre_weights, lstm_weights, post_weights};
 }
 
 std::vector<torch::Tensor> distana_cuda_backward(

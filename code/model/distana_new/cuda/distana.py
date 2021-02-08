@@ -31,18 +31,19 @@ def sprint(obj, obj_name="Object", complete=False, exit=False):
 class DISTANAFunction(torch.autograd.Function):
     @staticmethod
     def forward(ctx, input, pre_weights, lstm_weights, post_weights, old_h, old_cell):
-        sprint(input,"input")
-        sprint(pre_weights,"pre_weights")
-        sprint(lstm_weights,"lstm_weights")
-        sprint(post_weights,"post_weights")
-        sprint(old_h,"old_h")
-        sprint(old_cell,"old_cell", exit=True)
+        '''
+        input: <class 'torch.Tensor'> (10, 256, 9, 1)
+        pre_weights: <class 'torch.nn.parameter.Parameter'> (9, 4)
+        lstm_weights: <class 'torch.nn.parameter.Parameter'> (4, 16)
+        post_weights: <class 'torch.nn.parameter.Parameter'> (16, 9)
+        old_h: <class 'torch.Tensor'> (10, 256, 16)
+        old_cell: <class 'torch.Tensor'> (10, 256, 16)
+        '''
 
-        outputs = distana_cuda.forward(input, weights, bias, old_h, old_cell)
+        outputs = distana_cuda.forward(input, pre_weights, lstm_weights, post_weights, old_h, old_cell)
         new_h, new_cell = outputs[:2]
-        input_gate = outputs[2]
 
-        variables = outputs[1:] + [weights]
+        variables = outputs[1:] + [pre_weights] + [lstm_weights] + [post_weights]
         ctx.save_for_backward(*variables)
 
         return new_h, new_cell
