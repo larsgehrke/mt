@@ -35,7 +35,8 @@ class DISTANAFunction(torch.autograd.Function):
         sprint(pre_weights,"pre_weights")
         sprint(lstm_weights,"lstm_weights")
         sprint(post_weights,"post_weights")
-        sprint(old_h,"old_h", exit=True)
+        sprint(old_h,"old_h")
+        sprint(old_cell,"old_cell", exit=True)
 
         outputs = distana_cuda.forward(input, weights, bias, old_h, old_cell)
         new_h, new_cell = outputs[:2]
