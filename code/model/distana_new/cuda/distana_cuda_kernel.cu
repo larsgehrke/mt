@@ -37,6 +37,7 @@ __device__ __forceinline__ scalar_t d_elu(scalar_t z, scalar_t alpha = 1.0) {
   return d_relu + (((alpha * (e - 1.0)) < 0.0) ? (alpha * e) : 0.0);
 }
 
+
 template <typename scalar_t>
 __global__ void distana_cuda_forward_kernel(
     /*const torch::PackedTensorAccessor32<scalar_t,3,torch::RestrictPtrTraits> gates,
@@ -47,13 +48,40 @@ __global__ void distana_cuda_forward_kernel(
     torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> output_gate,
     torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> candidate_cell*/
     torch::PackedTensorAccessor32<scalar_t,4,torch::RestrictPtrTraits> input) {
-  
-    // PKs ?
-    unsigned int x = blockIdx.x*blockDim.x + threadIdx.x;
-    // Batch ?
-    unsigned int y = blockIdx.y*blockDim.y + threadIdx.y;
+
+  /*
+
+  Number of blocks in the grid:
+  gridDim.x — number of blocks in the x dimension of the grid 
+  gridDim.y — number of blocks in the y dimension of the grid
+
+  Number of threads in a block:
+  blockDim.x — number of threads in the x dimension if the grid 
+  blockDim.y — number of threads in the y dimension if the grid
+
+  Block Index:
+  blockIdx.x — block’s index in x dimension
+  blockIdx.y — block’s index in y dimension
+
+  Thread Index:
+  ThreadIdx.x — thread’s index in x dimension
+  ThreadIdx.y — thread’s index in y dimension
+
+
+  */
+    /*
+      Calculating block index: 
+      row no (blockIdx.y) * length of row (gridDim.x) + row position (blockIdx.x)
+    */
+    const int block_id = blockIdx.y * gridDim.x + blockIdx.x;
+
+    /*
+      like block_id, see above
+    */
+    const int thread_id = threadIdx.y * blockDim.x + threadIdx.x;
     
-    input_gate[y][x][0][0] = -7;
+    
+    input_gate[block_id][thread_id][0][0] = -7;
 }
 
 template <typename scalar_t>
