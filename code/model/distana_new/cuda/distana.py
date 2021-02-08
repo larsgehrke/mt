@@ -87,7 +87,7 @@ class DISTANA(torch.nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
-        stdv = 1.0 / math.sqrt(self.state_size)
+        stdv = 1.0 / math.sqrt(self.params.pk_num_lstm_cells)
         for weight in self.parameters():
             weight.data.uniform_(-stdv, +stdv)
 
