@@ -5,6 +5,10 @@
 
 #include <vector>
 
+#define BATCH_SIZE 10
+#define PK_ROWS 16
+#define PK_COLS 16
+
 namespace {
 template <typename scalar_t>
 __device__ __forceinline__ scalar_t sigmoid(scalar_t z) {
