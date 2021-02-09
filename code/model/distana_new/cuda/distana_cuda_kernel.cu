@@ -40,7 +40,7 @@ template <typename scalar_t>
 __global__ void distana_cuda_forward_kernel(
     /*const torch::PackedTensorAccessor32<scalar_t,3,torch::RestrictPtrTraits> gates,
     const torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> old_cell,*/
-    torch::PackedTensorAccessor32<scalar_t,3,torch::RestrictPtrTraits> new_h,
+    torch::PackedTensorAccessor32<scalar_t,3,torch::RestrictPtrTraits> new_h
     /*torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> new_cell,
     torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> input_gate,
     torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> output_gate,
@@ -150,7 +150,7 @@ std::vector<torch::Tensor> distana_cuda_forward(
   const dim3 threads(PK_ROWS, PK_COLS);
   const dim3 blocks(BATCH_SIZE);
 
-  AT_DISPATCH_FLOATING_TYPES(gates.type(), "distana_forward_cuda", ([&] {
+  AT_DISPATCH_FLOATING_TYPES(new_h.type(), "distana_forward_cuda", ([&] {
     distana_cuda_forward_kernel<scalar_t><<<blocks, threads>>>(
       input.packed_accessor32<scalar_t, 4, torch::RestrictPtrTraits>()
        /* gates.packed_accessor32<scalar_t,3,torch::RestrictPtrTraits>(),

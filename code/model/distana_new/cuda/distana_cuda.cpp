@@ -43,7 +43,7 @@ std::vector<torch::Tensor> distana_forward(
   CHECK_INPUT(old_h);
   CHECK_INPUT(old_cell);
 
-  return distana_cuda_forward(input, weights, bias, old_h, old_cell);
+  return distana_cuda_forward(input, pre_weights, lstm_weights, post_weights, old_h, old_cell);
 }
 
 std::vector<torch::Tensor> distana_backward(
