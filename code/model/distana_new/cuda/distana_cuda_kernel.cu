@@ -141,6 +141,9 @@ std::vector<torch::Tensor> distana_cuda_forward(
   //const auto state_size = old_cell.size(1);
 
   //auto gates = gate_weights.reshape({batch_size, 3, state_size});
+  
+  // relevant
+
   auto new_h = torch::zeros_like(old_cell);
   auto new_cell = torch::zeros_like(old_cell);
   auto input_gate = torch::zeros_like(old_cell);
@@ -159,7 +162,7 @@ std::vector<torch::Tensor> distana_cuda_forward(
       /*input.packed_accessor32<scalar_t, 4, torch::RestrictPtrTraits>()
         gates.packed_accessor32<scalar_t,3,torch::RestrictPtrTraits>(),
         old_cell.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),*/
-        new_h.packed_accessor32<scalar_t,3,torch::RestrictPtrTraits>(),
+        new_h.packed_accessor32<scalar_t,3,torch::RestrictPtrTraits>()
         /*new_cell.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
         input_gate.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
         output_gate.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
