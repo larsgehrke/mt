@@ -8,7 +8,7 @@ import sys
 
 distana_cuda = load(
     'distana_cuda', ['cuda/distana_cuda.cpp', 'cuda/distana_cuda_kernel.cu'],
-    extra_include_paths="/home/gehrkela/MSC-Gehrke/code/model/distana_new/cuda/include",
+    extra_include_paths=["/home/gehrkela/MSC-Gehrke/code/model/distana_new/cuda/include"],
      verbose=True)
 
 torch.manual_seed(42)
