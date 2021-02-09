@@ -5,6 +5,7 @@ from torch.utils.cpp_extension import load
 
 import numpy as np
 import sys
+import os 
 
 distana_cuda = load(
     'distana_cuda', ['cuda/distana_cuda.cpp', 'cuda/distana_cuda_kernel.cu'],
@@ -66,10 +67,15 @@ class DISTANAFunction(torch.autograd.Function):
 
 class DISTANA(torch.nn.Module):
 
-    def __init__(self, params):
+    def __init__(self, params,batch_size, pk_rows, pk_cols):
 
         super(DISTANA, self).__init__()
         self.params = params
+
+        with open('cuda/include/config.h', 'w') as conf_file:
+            conf_file.write("#define BATCH_SIZE " + str(batch_size)+os.linesep)
+            conf_file.write("#define PK_ROWS " + str(pk_rows)+os.linesep)
+            conf_file.write("#define PK_COLS " + str(pk_cols)+os.linesep)
 
         '''
 

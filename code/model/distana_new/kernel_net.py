@@ -27,7 +27,7 @@ class KernelNetwork(nn.Module):
 
         # Initialize the shared Prediction Kernel (PK) network that will do the
         # PK calculations 
-        self.pk_net = DISTANA(params=params)
+        self.pk_net = DISTANA(params=params,batch_size=cfg.BATCH_SIZE,pk_rows=PK_ROWS, pk_cols=PK_COLS)
 
         # Initialize an adjacency matrix for the PK-TK connections
         self.pk_adj_mat = th.zeros(size=(2,
