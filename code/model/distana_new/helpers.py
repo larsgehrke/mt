@@ -7,8 +7,8 @@ from helper_functions import sprint
 
 def train_batch( net,
             data_filenames,
-            criterion,
-            optimizer,
+            criterion=None,
+            optimizer=None,
             batch_iter,
             params,
             tensors):
