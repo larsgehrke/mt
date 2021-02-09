@@ -128,22 +128,24 @@ class KernelNetwork(nn.Module):
 
         # Forward the PK inputs through the pk_net to get the outputs and hidden
         # states of these PKs
-        pk_dyn_out, pk_lat_out, pk_lstm_c, pk_lstm_h = self.pk_net.forward(
+        #pk_dyn_out, pk_lat_out, 
+        pk_lstm_h, pk_lstm_c = self.pk_net.forward(
             input=th.clone(input_), # (10, 256, 9, 1)
             state= (th.clone(self.tensors.pk_lstm_c), # (10, 256, 16)
                     th.clone(self.tensors.pk_lstm_h))  # (10, 256, 16)
         )
 
-        helpers.sprint(pk_dyn_out)
-        helpers.sprint(pk_lat_out)
-        helpers.sprint(pk_lstm_c)
-        helpers.sprint(pk_lstm_h)
+        #helpers.sprint(pk_dyn_out)
+        #helpers.sprint(pk_lat_out)
+        helpers.sprint(pk_lstm_h, "kernel_net.pk_lstm_h")
+        helpers.sprint(pk_lstm_c, "kernel_net.pk_lstm_c", exit=True)
+        
 
         # Update the output and hidden state tensors of the PKs
         self.tensors.pk_dyn_out = pk_dyn_out
         self.tensors.pk_lat_out = pk_lat_out
-        self.tensors.pk_lstm_c = pk_lstm_c
         self.tensors.pk_lstm_h = pk_lstm_h
+        self.tensors.pk_lstm_c = pk_lstm_c    
 
 
 
