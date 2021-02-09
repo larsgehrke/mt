@@ -7,7 +7,7 @@ import numpy as np
 import sys
 
 distana_cuda = load(
-    'distana_cuda', ['cuda/config.h','cuda/distana_cuda.cpp', 'cuda/distana_cuda_kernel.cu'], verbose=True)
+    'distana_cuda', ['cuda/config.cpp','cuda/distana_cuda.cpp', 'cuda/distana_cuda_kernel.cu'], verbose=True)
 
 torch.manual_seed(42)
 
