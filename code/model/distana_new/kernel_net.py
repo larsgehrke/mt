@@ -134,6 +134,11 @@ class KernelNetwork(nn.Module):
                     th.clone(self.tensors.pk_lstm_h))  # (10, 256, 16)
         )
 
+        helpers.sprint(pk_dyn_out)
+        helpers.sprint(pk_lat_out)
+        helpers.sprint(pk_lstm_c)
+        helpers.sprint(pk_lstm_h)
+
         # Update the output and hidden state tensors of the PKs
         self.tensors.pk_dyn_out = pk_dyn_out
         self.tensors.pk_lat_out = pk_lat_out

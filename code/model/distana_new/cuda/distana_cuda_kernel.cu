@@ -41,13 +41,13 @@ __device__ __forceinline__ scalar_t d_elu(scalar_t z, scalar_t alpha = 1.0) {
 template <typename scalar_t>
 __global__ void distana_cuda_forward_kernel(
     /*const torch::PackedTensorAccessor32<scalar_t,3,torch::RestrictPtrTraits> gates,
-    const torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> old_cell,
-    torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> new_h,
-    torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> new_cell,
+    const torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> old_cell,*/
+    torch::PackedTensorAccessor32<scalar_t,3,torch::RestrictPtrTraits> new_h,
+    /*torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> new_cell,
     torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> input_gate,
     torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> output_gate,
-    torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> candidate_cell*/
-    torch::PackedTensorAccessor32<scalar_t,4,torch::RestrictPtrTraits> input) {
+    torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> candidate_cell
+    torch::PackedTensorAccessor32<scalar_t,4,torch::RestrictPtrTraits> input*/) {
 
   /*
 
@@ -73,15 +73,16 @@ __global__ void distana_cuda_forward_kernel(
       Calculating block index: 
       row no (blockIdx.y) * length of row (gridDim.x) + row position (blockIdx.x)
     */
-    const int block_id = blockIdx.y * gridDim.x + blockIdx.x;
+    const int batch_block_id = blockIdx.y * gridDim.x + blockIdx.x;
 
     /*
+      Calculating thread index:
       like block_id, see above
     */
-    const int thread_id = threadIdx.y * blockDim.x + threadIdx.x;
+    const int pk_thread_id = threadIdx.y * blockDim.x + threadIdx.x;
     
     
-    input_gate[block_id][thread_id][0][0] = -7;
+    new_h[batch_block_id][pk_thread_id][0] = -7;
 }
 
 template <typename scalar_t>
@@ -148,17 +149,16 @@ std::vector<torch::Tensor> distana_cuda_forward(
   auto new_lstm_weights = torch::zeros_like(lstm_weights);
   auto new_post_weights = torch::zeros_like(post_weights);
 
-
-  const int threads = BATCH_SIZE;
-  const dim3 blocks(PK_ROWS, PK_COLS);
+  const dim3 threads(PK_ROWS, PK_COLS);
+  const dim3 blocks(BATCH_SIZE);
 
   AT_DISPATCH_FLOATING_TYPES(gates.type(), "distana_forward_cuda", ([&] {
     distana_cuda_forward_kernel<scalar_t><<<blocks, threads>>>(
       input.packed_accessor32<scalar_t, 4, torch::RestrictPtrTraits>()
        /* gates.packed_accessor32<scalar_t,3,torch::RestrictPtrTraits>(),
-        old_cell.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
-        new_h.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
-        new_cell.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
+        old_cell.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),*/
+        new_h.packed_accessor32<scalar_t,3,torch::RestrictPtrTraits>(),
+        /*new_cell.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
         input_gate.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
         output_gate.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
         candidate_cell.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>()*/
