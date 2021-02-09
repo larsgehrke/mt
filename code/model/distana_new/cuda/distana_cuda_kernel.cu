@@ -84,7 +84,7 @@ __global__ void distana_cuda_forward_kernel(
     const int pk_thread_id = threadIdx.y * blockDim.x + threadIdx.x;
     
     
-    new_h[batch_block_id][pk_thread_id][0] = -7;
+    new_h[batch_block_id][pk_thread_id][0] = -16;
 }
 
 template <typename scalar_t>

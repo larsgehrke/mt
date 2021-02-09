@@ -135,9 +135,13 @@ class KernelNetwork(nn.Module):
                     th.clone(self.tensors.pk_lstm_h))  # (10, 256, 16)
         )
 
+        #pk_lstm_h: (10, 256, 16)
+        #pk_lstm_c: (10, 256, 16)
+
         #helpers.sprint(pk_dyn_out)
         #helpers.sprint(pk_lat_out)
         helpers.sprint(pk_lstm_h, "kernel_net.pk_lstm_h")
+        print(pk_lstm_h[0][0][0])
         helpers.sprint(pk_lstm_c, "kernel_net.pk_lstm_c", exit=True)
         
 
