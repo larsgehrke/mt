@@ -5,9 +5,7 @@
 
 #include <vector>
 
-#define BATCH_SIZE 10
-#define PK_ROWS 16
-#define PK_COLS 16
+#include <include/config.h>
 
 namespace {
 template <typename scalar_t>
