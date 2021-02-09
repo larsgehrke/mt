@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#include <include/config.h>
+#include <config.h>
 
 namespace {
 template <typename scalar_t>
