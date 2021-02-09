@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#include <config.h>
+#include <cuda/config.h>
 
 namespace {
 template <typename scalar_t>
