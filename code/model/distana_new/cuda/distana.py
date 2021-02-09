@@ -86,14 +86,12 @@ class DISTANA(torch.nn.Module):
 
         self.lstm_weights = torch.nn.Parameter(
             torch.Tensor(params.pk_pre_layer_size, 
-                         params.pk_num_lstm_cells),
-                         device=params.device).to(device=params.device)
+                         params.pk_num_lstm_cells)).to(device=params.device)
 
         self.post_weights = torch.nn.Parameter(
             torch.Tensor(params.pk_num_lstm_cells, 
                          params.pk_dyn_out_size +
-                         (params.pk_lat_out_size * params.pk_neighbors)),
-                         device=params.device).to(device=params.device)
+                         (params.pk_lat_out_size * params.pk_neighbors))).to(device=params.device)
 
         self.reset_parameters()
 
