@@ -156,8 +156,8 @@ std::vector<torch::Tensor> distana_cuda_forward(
 
   AT_DISPATCH_FLOATING_TYPES(new_h.type(), "distana_forward_cuda", ([&] {
     distana_cuda_forward_kernel<scalar_t><<<blocks, threads>>>(
-      input.packed_accessor32<scalar_t, 4, torch::RestrictPtrTraits>()
-       /* gates.packed_accessor32<scalar_t,3,torch::RestrictPtrTraits>(),
+      /*input.packed_accessor32<scalar_t, 4, torch::RestrictPtrTraits>()
+        gates.packed_accessor32<scalar_t,3,torch::RestrictPtrTraits>(),
         old_cell.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),*/
         new_h.packed_accessor32<scalar_t,3,torch::RestrictPtrTraits>(),
         /*new_cell.packed_accessor32<scalar_t,2,torch::RestrictPtrTraits>(),
