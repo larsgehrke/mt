@@ -7,11 +7,12 @@ from helper_functions import sprint
 
 def train_batch( net,
             data_filenames,
-            criterion=None,
-            optimizer=None,
             batch_iter,
             params,
-            tensors):
+            tensors,
+            criterion=None,
+            optimizer=None
+            ):
     mse = None
     th.autograd.set_detect_anomaly(True)
 
