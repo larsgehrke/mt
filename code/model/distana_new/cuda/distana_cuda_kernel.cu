@@ -7,8 +7,6 @@
 
 #include <config.h>
 
-#define RESET 1
-
 namespace {
 template <typename scalar_t>
 __device__ __forceinline__ scalar_t sigmoid(scalar_t z) {
