@@ -25,29 +25,17 @@ __device__ __forceinline__ scalar_t d_tanh(scalar_t z) {
   return 1 - (t * t);
 }
 
-template <typename scalar_t>
-__device__ __forceinline__ scalar_t elu(scalar_t z, scalar_t alpha = 1.0) {
-  return fmaxf(0.0, z) + fminf(0.0, alpha * (exp(z) - 1.0));
-}
-
-template <typename scalar_t>
-__device__ __forceinline__ scalar_t d_elu(scalar_t z, scalar_t alpha = 1.0) {
-  const auto e = exp(z);
-  const auto d_relu = z < 0.0 ? 0.0 : 1.0;
-  return d_relu + (((alpha * (e - 1.0)) < 0.0) ? (alpha * e) : 0.0);
-}
-
 
 template <typename scalar_t>
 __global__ void distana_cuda_forward_kernel(
-    /*const torch::PackedTensorAccessor32<scalar_t,3,torch::RestrictPtrTraits> gates,
-    const torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> old_cell,*/
-    torch::PackedTensorAccessor32<scalar_t,3,torch::RestrictPtrTraits> new_h
-    /*torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> new_cell,
+    const torch::PackedTensorAccessor32<scalar_t,3,torch::RestrictPtrTraits> gates,
+    const torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> old_cell,
+    torch::PackedTensorAccessor32<scalar_t,3,torch::RestrictPtrTraits> new_h,
+    torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> new_cell,
     torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> input_gate,
     torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> output_gate,
-    torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> candidate_cell
-    torch::PackedTensorAccessor32<scalar_t,4,torch::RestrictPtrTraits> input*/) {
+    torch::PackedTensorAccessor32<scalar_t,2,torch::RestrictPtrTraits> candidate_cell,
+    torch::PackedTensorAccessor32<scalar_t,4,torch::RestrictPtrTraits> input) {
 
   /*
 
