@@ -10,7 +10,6 @@ import configuration as cfg
 # ONLY DEV
 import sys
 
-
 def sprint(obj, obj_name="Object", complete=False, exit=False):
     print("Printing out", obj_name)
     print(type(obj))
@@ -26,7 +25,9 @@ def sprint(obj, obj_name="Object", complete=False, exit=False):
 
     if(exit):
         sys.exit()
-        
+
+
+
 def set_up_batch(_iter, data_filenames):
     """
     In this function, a batch is composed to be fed into the network.
@@ -186,6 +187,8 @@ def evaluate(net, data_filenames, params, tensors, pk_batches, criterion=None,
             dyn_net_in_step = net_input[t, :, :params.pk_dyn_out_size]
 
         # Forward the input through the network
+        sprint(dyn_net_in_step, "dyn_net_in_step", complete=False, exit=False)
+        
         net.forward(dyn_in=dyn_net_in_step)
 
         # Store the output of the network for this sequence step

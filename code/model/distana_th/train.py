@@ -29,6 +29,7 @@ if cfg.DEVICE == "CPU":
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
+
 def run_training():
     # Set a globally reachable boolean in the config file for training
     cfg.TRAINING = True
@@ -83,6 +84,12 @@ def run_training():
     optimizer = th.optim.Adam(net.parameters(), lr=cfg.LEARNING_RATE)
     criterion = nn.MSELoss()
 
+    #DEV
+    #for param in net.parameters():
+    #    print(type(param), param.size())
+
+    #sys.exit("Exit.")
+
     #
     # Set up lists to save and store the epoch errors
     epoch_errors_train = []
@@ -113,7 +120,8 @@ def run_training():
         # during training and inference (evaluating) time. For example, Dropouts Layers,
         # BatchNorm Layers etc. You need to turn off them during model evaluation, 
         #  and .eval() will do it for you"
-        net.eval()
+        #net.eval()
+        net.train()
 
     """
     TRAINING
@@ -151,7 +159,6 @@ def run_training():
                 _iter=train_iter
             )
 
-            helpers.sprint(mse, exit=True)
             sequence_errors.append(mse.item())
 
         epoch_errors_train.append(np.mean(sequence_errors))

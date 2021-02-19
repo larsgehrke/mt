@@ -13,7 +13,7 @@ import os
 SOURCE_PATH = str(Path().resolve().parent.parent)+str(os.path.sep) 
 print(f"Operating on SOURCE_PATH: {SOURCE_PATH}") 
 
-ARCHITECTURE_NAME = "distana"
+ARCHITECTURE_NAME = "distana_new"
 MODEL_NAME = "tmp_model"
 
 DATA_TYPE = "tmp_data/"
@@ -30,6 +30,7 @@ CONTINUE_TRAINING = False
 
 EPOCHS = 1
 SEQ_LEN = 40  # 150
+BATCH_SIZE = 1
 LEARNING_RATE = 0.001
 
 #

@@ -1,6 +1,7 @@
 import torch as th
 import torch.nn as nn
 
+import helper_functions as helpers
 
 class PredictionKernelNet(nn.Module):
     """
@@ -52,7 +53,7 @@ class PredictionKernelNet(nn.Module):
         # Flatten the last two dimensions of the lateral input such that it has
         # the correct dimensionality for the forward pass
         lat_in = lat_in.view(
-            size=(self.params.pk_batches,
+            size=(self.params.amount_pks,
                   self.params.pk_neighbors * self.params.pk_lat_in_size)
         )
 
@@ -65,18 +66,21 @@ class PredictionKernelNet(nn.Module):
         lstm_c, lstm_h = self.lstm(pre_act, (lstm_c, lstm_h))
 
         # Postprocessing layer activation
-        post_act = th.tanh(self.post_weights(lstm_h))
+        post_act = th.tanh(self.post_weights(lstm_h_))
+
 
         # Dynamic output
         dyn_out = post_act[:, :self.params.pk_dyn_out_size]
 
+
         # Lateral output
         lat_out = post_act[:, self.params.pk_dyn_out_size:]
+        
 
         # Unflatten the last dimension of the lateral output such that it has
         # the correct dimensionality for the further processing
-        lat_out = lat_out.view(size=(self.params.pk_batches,
+        lat_out = lat_out.view(size=(self.params.amount_pks,
                                      self.params.pk_neighbors,
                                      self.params.pk_lat_out_size))
 
-        return dyn_out, lat_out, lstm_c, lstm_h
+        return dyn_out, lat_out, lstm_c, lstm_h_
