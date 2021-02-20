@@ -25,8 +25,8 @@ def train_batch( net,
 
 
     # Set up an array of zeros to store the network outputs
-    net_outputs = th.zeros(size=(batch_size,
-                                 seq_len,
+    net_outputs = th.zeros(size=(seq_len,
+                                 batch_size,                                 
                                  amount_pks,
                                  params.pk_dyn_out_size))
 
@@ -43,13 +43,18 @@ def train_batch( net,
         # Teacher forcing
 
         # Set the dynamic input for this iteration
-        dyn_net_in_step = net_input[:,t, :, :params.pk_dyn_out_size]
+        dyn_net_in_step = net_input[t,:, :, :params.pk_dyn_out_size]
+
+
 
         # Forward the input through the network
         net.forward(dyn_in=dyn_net_in_step)
 
-        # Store the output of the network for this sequence step
-        net_outputs[:,t] = tensors.pk_dyn_out
+
+
+        # Flatten the last two input dims
+        # (10, 256, 1, 1)
+        net_outputs[t] = th.flatten(tensors.pk_dyn_out, start_dim=2)
 
     if criterion:
         # Get the mean squared error from the evaluation list
@@ -122,6 +127,10 @@ def _set_up_batch(batch_iter, data_filenames):
             dtype=np.float32
         )
 
+    # sequenz/time should be first dimension
+    # and batch should be second dimension
+    _net_input = np.swapaxes(_net_input, axis1=0, axis2=1) 
+    _net_label = np.swapaxes(_net_label, axis1=0, axis2=1) 
 
 
     return _net_input, _net_label

@@ -28,9 +28,9 @@ DEVICE = "CPU"  # or "CPU" - for grid sizes > 25x25 the GPU version is faster
 SAVE_MODEL = True
 CONTINUE_TRAINING = False
 
-EPOCHS = 1
-SEQ_LEN = 40  # 150
-BATCH_SIZE = 1
+EPOCHS = 20
+SEQ_LEN = 140  # 150
+BATCH_SIZE = 20
 LEARNING_RATE = 0.001
 
 #
@@ -50,5 +50,5 @@ PK_DYN_IN_SIZE = 1  # the z-value of the wave field
 PK_LAT_IN_SIZE = 1
 PK_PRE_LAYER_SIZE = 4
 PK_NUM_LSTM_CELLS = 16
-PK_DYN_OUT_SIZE = 1  # Must be equal to PK_DYN_IN_SIZE
-PK_LAT_OUT_SIZE = 1  # Must be equal to PK_LAT_IN_SIZE
+PK_DYN_OUT_SIZE = 1  # Needs to be 1 at the moment # Must be equal to PK_DYN_IN_SIZE
+PK_LAT_OUT_SIZE = 1  # Needs to be 1 at the moment # Must be equal to PK_LAT_IN_SIZE

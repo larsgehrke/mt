@@ -6,7 +6,7 @@ import configuration as cfg
 
 import helper_functions as helpers
 
-from cuda.distana import DISTANA
+import pk
 
 
 class KernelNetwork(nn.Module):
@@ -27,8 +27,10 @@ class KernelNetwork(nn.Module):
 
         # Initialize the shared Prediction Kernel (PK) network that will do the
         # PK calculations 
-        self.pk_net = DISTANA(params=params,batch_size=cfg.BATCH_SIZE,
-                              pk_rows=cfg.PK_ROWS, pk_cols=cfg.PK_COLS)
+        self.pk_net = pk.PK(batch_size=cfg.BATCH_SIZE,
+                              amount_pks=cfg.PK_ROWS*cfg.PK_COLS, 
+                              input_size = cfg.PK_NEIGHBORS + 1, 
+                              lstm_size = cfg.PK_NUM_LSTM_CELLS)
 
         # Initialize an adjacency matrix for the PK-TK connections
         self.pk_adj_mat = th.zeros(size=(2,
@@ -129,21 +131,28 @@ class KernelNetwork(nn.Module):
 
         # Forward the PK inputs through the pk_net to get the outputs and hidden
         # states of these PKs
-        #pk_dyn_out, pk_lat_out, 
-        pk_lstm_h, pk_lstm_c = self.pk_net.forward(
-            input=th.clone(input_), # (10, 256, 9, 1)
-            state= (th.clone(self.tensors.pk_lstm_c), # (10, 256, 16)
-                    th.clone(self.tensors.pk_lstm_h))  # (10, 256, 16)
+        pk_output, pk_lstm_h, pk_lstm_c = self.pk_net.forward(
+            input_= input_, # (10, 256, 9, 1)
+            old_h= self.tensors.pk_lstm_h,  # (10, 256, 16)
+            old_c= self.tensors.pk_lstm_c # (10, 256, 16)            
         )
+
+        # Dynamic output
+        pk_dyn_out = pk_output[:, :,  :self.params.pk_dyn_out_size]
+
+        # Lateral output
+        pk_lat_out = pk_output[:, : , self.params.pk_dyn_out_size:]
+
+        
 
         #pk_lstm_h: (10, 256, 16)
         #pk_lstm_c: (10, 256, 16)
 
         #helpers.sprint(pk_dyn_out)
         #helpers.sprint(pk_lat_out)
-        helpers.sprint(pk_lstm_h, "kernel_net.pk_lstm_h")
-        print(pk_lstm_h[0][0][0])
-        helpers.sprint(pk_lstm_c, "kernel_net.pk_lstm_c", exit=True)
+        #helpers.sprint(pk_lstm_h, "kernel_net.pk_lstm_h")
+        #print(pk_lstm_h[0][0][0])
+        #helpers.sprint(pk_lstm_c, "kernel_net.pk_lstm_c", exit=True)
         
 
         # Update the output and hidden state tensors of the PKs
