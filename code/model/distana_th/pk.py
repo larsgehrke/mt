@@ -30,7 +30,7 @@ class PK(th.nn.Module):
         self.W_f = th.nn.Parameter(
             th.Tensor(lstm_size,lstm_size)).to(device=device)
 
-        '''self.W_i = th.nn.Parameter(
+        self.W_i = th.nn.Parameter(
             th.Tensor(lstm_size,lstm_size)).to(device=device)
 
         self.W_o = th.nn.Parameter(
@@ -50,7 +50,7 @@ class PK(th.nn.Module):
             th.Tensor(lstm_size,lstm_size)).to(device=device)
 
         self.Q_c = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)'''
+            th.Tensor(lstm_size,lstm_size)).to(device=device)
 
         # ending fc layer weights
         self.W_output = th.nn.Parameter(
@@ -79,10 +79,10 @@ class PK(th.nn.Module):
         # => th.Size([10, 256, 16])
 
         # LSTM forward pass
-        f_t = th.sigmoid(th.matmul(x_t,self.W_f) + th.matmul(old_h,self.W_f))
-        i_t = th.sigmoid(th.matmul(x_t,self.W_f) + th.matmul(old_h,self.W_f))
-        o_t = th.sigmoid(th.matmul(x_t,self.W_f) + th.matmul(old_h,self.W_f))
-        Ctilde_t = th.tanh(th.matmul(x_t,self.W_f) + th.matmul(old_h,self.W_f))
+        f_t = th.sigmoid(th.matmul(x_t,self.W_f) + th.matmul(old_h,self.Q_f))
+        i_t = th.sigmoid(th.matmul(x_t,self.W_i) + th.matmul(old_h,self.Q_i))
+        o_t = th.sigmoid(th.matmul(x_t,self.W_o) + th.matmul(old_h,self.Q_o))
+        Ctilde_t = th.tanh(th.matmul(x_t,self.W_c) + th.matmul(old_h,self.Q_c))
 
         C_t = f_t * old_c + i_t * Ctilde_t
         # => th.Size([10, 256, 16])
