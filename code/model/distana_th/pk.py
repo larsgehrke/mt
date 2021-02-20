@@ -19,14 +19,14 @@ class PK(th.nn.Module):
         self.lstm_size = lstm_size
 
         self.lstm_h = th.zeros(batch_size,amount_pks,lstm_size,
-                                device=device)
+                                device = device)
         self.lstm_c = th.zeros(batch_size,amount_pks,lstm_size,
-                                device=device)
+                                device = device)
 
         # starting fc layer weights
         self.W_input = th.nn.Parameter(
             th.empty(input_size,lstm_size),
-            device=params.device
+            device = device
                 ) 
 
         # LSTM weights
