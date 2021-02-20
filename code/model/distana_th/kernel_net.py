@@ -26,7 +26,7 @@ class KernelNetwork(nn.Module):
 
         # Initialize the shared Prediction Kernel (PK) network that will do the
         # PK calculations 
-        self.pk_net = pk.PK( batch_size=cfg.BATCH_SIZE,
+        self.pk_net = pk.PK(batch_size=cfg.BATCH_SIZE,
                               amount_pks=cfg.PK_ROWS*cfg.PK_COLS, 
                               input_size = cfg.PK_NEIGHBORS + 1, 
                               lstm_size = cfg.PK_NUM_LSTM_CELLS,
