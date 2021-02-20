@@ -24,7 +24,7 @@ class PK(th.nn.Module):
 
         # starting fc layer weights
         self.W_input = th.nn.Parameter(
-            th.Tensor(input_size,lstm_size)).to(device=device) 
+            th.Tensor(input_size,lstm_size),requires_grad=True).to(device=device) 
 
         # LSTM weights
         self.W_f = th.nn.Parameter(
