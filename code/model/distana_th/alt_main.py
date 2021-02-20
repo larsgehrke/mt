@@ -58,7 +58,7 @@ net = kernel_net.KernelNetwork(
 )
 
 # Set up the optimizer and the criterion (loss)
-optimizer = th.optim.Adam(net.parameters(), lr=cfg.LEARNING_RATE) #TODO: Error: net.parameters() ist empty: th.optim.Adam(net.parameters(), lr=cfg.LEARNING_RATE)
+optimizer = th.optim.Adam(list(net.parameters()), lr=cfg.LEARNING_RATE) #TODO: Error: net.parameters() ist empty: th.optim.Adam(net.parameters(), lr=cfg.LEARNING_RATE)
 criterion = nn.MSELoss()
 
 # Set up lists to save and store the epoch errors
