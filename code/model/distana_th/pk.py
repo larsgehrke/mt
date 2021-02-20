@@ -11,50 +11,62 @@ th.manual_seed(42)
 
 
 class PK(th.nn.Module):
-    def __init__(self, batch_size, amount_pks, input_size, lstm_size):
+    def __init__(self, batch_size, amount_pks, input_size, lstm_size, device):
         super(PK, self).__init__()
         self.batch_size = batch_size
         self.amount_pks = amount_pks
         self.input_size = input_size
         self.lstm_size = lstm_size
 
-        self.lstm_h = th.zeros(batch_size,amount_pks,lstm_size)
-        self.lstm_c = th.zeros(batch_size,amount_pks,lstm_size)
+        self.lstm_h = th.zeros(batch_size,amount_pks,lstm_size,
+                                device=device)
+        self.lstm_c = th.zeros(batch_size,amount_pks,lstm_size,
+                                device=device)
 
         # starting fc layer weights
         self.W_input = th.nn.Parameter(
-            th.empty(input_size,lstm_size)
+            th.empty(input_size,lstm_size),
+            device=params.device
                 ) 
 
         # LSTM weights
         self.W_f = th.nn.Parameter(
-            th.empty(lstm_size,lstm_size))
+            th.empty(lstm_size,lstm_size),
+            device = device)
 
         self.W_i = th.nn.Parameter(
-            th.empty(lstm_size,lstm_size))
+            th.empty(lstm_size,lstm_size),
+            device = device)
 
         self.W_o = th.nn.Parameter(
-            th.empty(lstm_size,lstm_size))
+            th.empty(lstm_size,lstm_size),
+            device = device)
 
         self.W_c = th.nn.Parameter(
-            th.empty(lstm_size,lstm_size))
+            th.empty(lstm_size,lstm_size),
+            device = device)
 
 
         self.Q_f = th.nn.Parameter(
-            th.empty(lstm_size,lstm_size))
+            th.empty(lstm_size,lstm_size),
+            device = device)
 
         self.Q_i = th.nn.Parameter(
-            th.empty(lstm_size,lstm_size))
+            th.empty(lstm_size,lstm_size),
+            device = device)
 
         self.Q_o = th.nn.Parameter(
-            th.empty(lstm_size,lstm_size))
+            th.empty(lstm_size,lstm_size),
+            device = device)
 
         self.Q_c = th.nn.Parameter(
-            th.empty(lstm_size,lstm_size))
+            th.empty(lstm_size,lstm_size),
+            device = device)
 
         # ending fc layer weights
         self.W_output = th.nn.Parameter(
-            th.empty(lstm_size,input_size)
+            th.empty(lstm_size,input_size),
+            device = device
                 )
 
         # 3 * state_size for input gate, output gate and candidate cell gate.

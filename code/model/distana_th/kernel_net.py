@@ -30,7 +30,8 @@ class KernelNetwork(nn.Module):
         self.pk_net = pk.PK(batch_size=cfg.BATCH_SIZE,
                               amount_pks=cfg.PK_ROWS*cfg.PK_COLS, 
                               input_size = cfg.PK_NEIGHBORS + 1, 
-                              lstm_size = cfg.PK_NUM_LSTM_CELLS)
+                              lstm_size = cfg.PK_NUM_LSTM_CELLS,
+                              device = params.device)
 
         # Initialize an adjacency matrix for the PK-TK connections
         self.pk_adj_mat = th.zeros(size=(2,
