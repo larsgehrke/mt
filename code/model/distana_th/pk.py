@@ -11,7 +11,7 @@ th.manual_seed(42)
 
 
 class PK(th.nn.Module):
-    def __init__(self, batch_size, amount_pks, input_size, lstm_size, device, params):
+    def __init__(self, batch_size, amount_pks, input_size, lstm_size, device):
         super(PK, self).__init__()
         self.batch_size = batch_size
         self.amount_pks = amount_pks
