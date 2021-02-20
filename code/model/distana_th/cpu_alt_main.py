@@ -44,7 +44,7 @@ net = kernel_net.KernelNetwork(
 )
 
 # Set up the optimizer and the criterion (loss)
-optimizer = None #TODO: Error: net.parameters() ist empty: th.optim.Adam(net.parameters(), lr=cfg.LEARNING_RATE)
+optimizer = th.optim.Adam(net.parameters(), lr=cfg.LEARNING_RATE) #TODO: Error: net.parameters() ist empty: th.optim.Adam(net.parameters(), lr=cfg.LEARNING_RATE)
 criterion = nn.MSELoss()
 
 # Set up lists to save and store the epoch errors
@@ -94,7 +94,7 @@ for epoch in range(cfg.EPOCHS):
             net = net,
             data_filenames = train_data_filenames,
             criterion=criterion,
-           # optimizer=optimizer,
+            optimizer=optimizer,
             batch_iter= batch_iter,
             params = params,
             tensors = tensors
