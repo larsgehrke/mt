@@ -63,7 +63,6 @@ pytorch_total_params = sum(
 )
 print("Trainable model parameters:", pytorch_total_params)
 
-print(list(net.pk_net.parameters()))
 
 # Set up the optimizer and the criterion (loss)
 optimizer = th.optim.Adam(list(net.parameters()), lr=cfg.LEARNING_RATE) #TODO: Error: net.parameters() ist empty: th.optim.Adam(net.parameters(), lr=cfg.LEARNING_RATE)
