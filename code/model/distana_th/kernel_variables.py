@@ -69,10 +69,10 @@ class KernelTensors:
         # LSTM states
         self.pk_lstm_c = th.zeros(size=(batch, pk_num, self.params.pk_num_lstm_cells),
                                   device=self.params.device,
-                                  requires_grad=False)
+                                  requires_grad=True)
         self.pk_lstm_h = th.zeros(size=(batch, pk_num, self.params.pk_num_lstm_cells),
                                   device=self.params.device,
-                                  requires_grad=False)
+                                  requires_grad=True)
 
         # Outputs
         self.pk_dyn_out = th.zeros(size=(batch, pk_num,
