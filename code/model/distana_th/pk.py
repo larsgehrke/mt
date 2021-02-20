@@ -11,7 +11,7 @@ th.manual_seed(42)
 
 
 class PK(th.nn.Module):
-    def __init__(self, batch_size, amount_pks, input_size, lstm_size, device):
+    def __init__(self, batch_size, amount_pks, input_size, lstm_size, device, params):
         super(PK, self).__init__()
         self.batch_size = batch_size
         self.amount_pks = amount_pks
@@ -25,37 +25,37 @@ class PK(th.nn.Module):
 
         # starting fc layer weights
         self.W_input = th.nn.Parameter(
-            th.Tensor(input_size,lstm_size)).to(device=device) 
+            th.Tensor(input_size,lstm_size)) 
 
         # LSTM weights
         self.W_f = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
         self.W_i = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
         self.W_o = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
         self.W_c = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
 
         self.Q_f = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
         self.Q_i = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
         self.Q_o = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
         self.Q_c = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
         # ending fc layer weights
         self.W_output = th.nn.Parameter(
-            th.Tensor(lstm_size,input_size)).to(device=device)
+            th.Tensor(lstm_size,input_size))
 
         # 3 * state_size for input gate, output gate and candidate cell gate.
         # input_features + state_size because we will multiply with [input, h].
