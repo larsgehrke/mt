@@ -69,6 +69,8 @@ print(list(net.pk_net.parameters()))
 optimizer = th.optim.Adam(list(net.parameters()), lr=cfg.LEARNING_RATE) #TODO: Error: net.parameters() ist empty: th.optim.Adam(net.parameters(), lr=cfg.LEARNING_RATE)
 criterion = nn.MSELoss()
 
+net.pk_net.to("cuda")
+
 # Set up lists to save and store the epoch errors
 epoch_errors_train = []
 epoch_errors_val = []

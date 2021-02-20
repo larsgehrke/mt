@@ -17,44 +17,42 @@ class PK(th.nn.Module):
         self.input_size = input_size
         self.lstm_size = lstm_size
 
-        self.lstm_h = th.zeros(batch_size,amount_pks,lstm_size,
-                                device = device)
-        self.lstm_c = th.zeros(batch_size,amount_pks,lstm_size,
-                                device = device)
+        self.lstm_h = th.zeros(batch_size,amount_pks,lstm_size)
+        self.lstm_c = th.zeros(batch_size,amount_pks,lstm_size)
 
         # starting fc layer weights
         self.W_input = th.nn.Parameter(
-            th.Tensor(input_size,lstm_size),requires_grad=True).to(device=device) 
+            th.Tensor(input_size,lstm_size),requires_grad=True) 
 
         # LSTM weights
         self.W_f = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
         self.W_i = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
         self.W_o = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
         self.W_c = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
 
         self.Q_f = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
         self.Q_i = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
         self.Q_o = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
         self.Q_c = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size)).to(device=device)
+            th.Tensor(lstm_size,lstm_size))
 
         # ending fc layer weights
         self.W_output = th.nn.Parameter(
-            th.Tensor(lstm_size,input_size)).to(device=device)
+            th.Tensor(lstm_size,input_size))
 
         # 3 * state_size for input gate, output gate and candidate cell gate.
         # input_features + state_size because we will multiply with [input, h].
