@@ -57,6 +57,12 @@ net = kernel_net.KernelNetwork(
     tensors=tensors
 )
 
+# Count number of trainable parameters
+pytorch_total_params = sum(
+    p.numel() for p in net.parameters() if p.requires_grad
+)
+print("Trainable model parameters:", pytorch_total_params)
+
 # Set up the optimizer and the criterion (loss)
 optimizer = th.optim.Adam(list(net.parameters()), lr=cfg.LEARNING_RATE) #TODO: Error: net.parameters() ist empty: th.optim.Adam(net.parameters(), lr=cfg.LEARNING_RATE)
 criterion = nn.MSELoss()
