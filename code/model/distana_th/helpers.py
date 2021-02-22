@@ -48,6 +48,7 @@ def train_batch( net,
 
 
         # Forward the input through the network
+        print(f"Time step: {t+1}")
         net.forward(dyn_in=dyn_net_in_step)
 
 

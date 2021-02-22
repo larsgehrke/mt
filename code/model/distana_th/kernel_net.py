@@ -20,7 +20,6 @@ class KernelNetwork(nn.Module):
 
         self.params = params
         self.tensors = tensors
-        self.counter = 0
 
         #
         # Prediction Kernels
@@ -121,15 +120,11 @@ class KernelNetwork(nn.Module):
         self.tensors.pk_lat_in[:,self.pos0, self.going_to] = \
         self.tensors.pk_lat_out[:,self.coming_from, self.going_to]
 
-        # helpers.sprint(self.tensors.pk_dyn_in, "self.tensors.pk_dyn_in")
-        # helpers.sprint(self.tensors.pk_lat_in, "self.tensors.pk_lat_in")
-        # helpers.sprint(self.tensors.pk_lstm_c, "self.tensors.pk_lstm_c")
-        # helpers.sprint(self.tensors.pk_lstm_h, "self.tensors.pk_lstm_h", exit=True)
 
-        sprint(self.tensors.pk_dyn_in,"self.tensors.pk_dyn_in")
-        sprint(self.tensors.pk_lat_in, "self.tensors.pk_lat_in")
-        self.counter = self.counter + 1
-        print(f"self.counter: {self.counter}")
+        # sprint(self.tensors.pk_dyn_in,"self.tensors.pk_dyn_in")
+        # sprint(self.tensors.pk_lat_in, "self.tensors.pk_lat_in")
+        # self.counter = self.counter + 1
+        # print(f"self.counter: {self.counter}")
         # Insert Dim 10, 256, 1 -> 10, 256, 1,1 and concat with 10, 256, 8, 1
         # => 10, 256, 9, 1
         input_ = th.cat((th.unsqueeze(self.tensors.pk_dyn_in,2), self.tensors.pk_lat_in),2)
@@ -152,12 +147,6 @@ class KernelNetwork(nn.Module):
 
         #pk_lstm_h: (10, 256, 16)
         #pk_lstm_c: (10, 256, 16)
-
-        #helpers.sprint(pk_dyn_out)
-        #helpers.sprint(pk_lat_out)
-        #helpers.sprint(pk_lstm_h, "kernel_net.pk_lstm_h")
-        #print(pk_lstm_h[0][0][0])
-        #helpers.sprint(pk_lstm_c, "kernel_net.pk_lstm_c", exit=True)
         
 
         # Update the output and hidden state tensors of the PKs
