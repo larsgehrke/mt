@@ -3,7 +3,7 @@ import torch as th
 import torch.nn as nn
 import configuration as cfg
 
-import helper_functions.sprint as sprint
+from helper_functions import sprint
 
 import pk
 
