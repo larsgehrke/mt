@@ -1,5 +1,6 @@
 import math
 import torch as th
+import torch.nn.functional as F
 
 import numpy as np
 import sys
@@ -22,33 +23,11 @@ class PK(th.nn.Module):
 
         # starting fc layer weights
         self.W_input = th.nn.Parameter(
-            th.Tensor(input_size,lstm_size),requires_grad=True) 
+            th.Tensor(input_size,4),requires_grad=True) 
 
         # LSTM weights
-        self.W_f = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size))
-
-        self.W_i = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size))
-
-        self.W_o = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size))
-
-        self.W_c = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size))
-
-
-        self.Q_f = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size))
-
-        self.Q_i = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size))
-
-        self.Q_o = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size))
-
-        self.Q_c = th.nn.Parameter(
-            th.Tensor(lstm_size,lstm_size))
+        self.W_lstm = th.nn.Parameter(
+            th.Tensor(4 * lstm_size, 4 + lstm_size))
 
         # ending fc layer weights
         self.W_output = th.nn.Parameter(
@@ -76,11 +55,20 @@ class PK(th.nn.Module):
         x_t = th.tanh(th.matmul(input_flat, self.W_input))
         # => th.Size([10, 256, 16])
 
+        X = th.cat([x_t, old_h], dim=2)
+        # => th.Size([10, 256, 32])
+
+        # Compute the input, output and candidate cell gates with one MM.
+        gate_weights = F.linear(X, self.W_lstm)
+
+        # Split the combined gate weight matrix into its components.
+        gates = gate_weights.chunk(4, dim=2)
+
         # LSTM forward pass
-        f_t = th.sigmoid(th.matmul(x_t,self.W_f) + th.matmul(old_h,self.Q_f))
-        i_t = th.sigmoid(th.matmul(x_t,self.W_i) + th.matmul(old_h,self.Q_i))
-        o_t = th.sigmoid(th.matmul(x_t,self.W_o) + th.matmul(old_h,self.Q_o))
-        Ctilde_t = th.tanh(th.matmul(x_t,self.W_c) + th.matmul(old_h,self.Q_c))
+        f_t = th.sigmoid(gates[0])
+        i_t = th.sigmoid(gates[1])
+        o_t = th.sigmoid(gates[2])
+        Ctilde_t = th.tanh(gates[3])
 
         C_t = f_t * old_c + i_t * Ctilde_t
         # => th.Size([10, 256, 16])
