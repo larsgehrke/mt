@@ -20,6 +20,7 @@ class KernelNetwork(nn.Module):
 
         self.params = params
         self.tensors = tensors
+        self.counter = 0
 
         #
         # Prediction Kernels
@@ -127,6 +128,8 @@ class KernelNetwork(nn.Module):
 
         sprint(self.tensors.pk_dyn_in,"self.tensors.pk_dyn_in")
         sprint(self.tensors.pk_lat_in, "self.tensors.pk_lat_in")
+        self.counter = self.counter + 1
+        print(f"self.counter: {self.counter}")
         # Insert Dim 10, 256, 1 -> 10, 256, 1,1 and concat with 10, 256, 8, 1
         # => 10, 256, 9, 1
         input_ = th.cat((th.unsqueeze(self.tensors.pk_dyn_in,2), self.tensors.pk_lat_in),2)
