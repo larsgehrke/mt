@@ -3,7 +3,7 @@ import torch as th
 import torch.nn as nn
 import configuration as cfg
 
-import helper_functions as helpers
+import helper_functions.sprint as sprint
 
 import pk
 
@@ -125,6 +125,8 @@ class KernelNetwork(nn.Module):
         # helpers.sprint(self.tensors.pk_lstm_c, "self.tensors.pk_lstm_c")
         # helpers.sprint(self.tensors.pk_lstm_h, "self.tensors.pk_lstm_h", exit=True)
 
+        sprint(self.tensors.pk_dyn_in,"self.tensors.pk_dyn_in")
+        sprint(self.tensors.pk_lat_in, "self.tensors.pk_lat_in")
         # Insert Dim 10, 256, 1 -> 10, 256, 1,1 and concat with 10, 256, 8, 1
         # => 10, 256, 9, 1
         input_ = th.cat((th.unsqueeze(self.tensors.pk_dyn_in,2), self.tensors.pk_lat_in),2)
