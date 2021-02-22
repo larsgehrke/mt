@@ -1,6 +1,5 @@
 import math
 import torch as th
-import torch.nn.functional as F
 
 import numpy as np
 import sys
@@ -23,11 +22,11 @@ class PK(th.nn.Module):
 
         # starting fc layer weights
         self.W_input = th.nn.Parameter(
-            th.Tensor(input_size,4),requires_grad=True) 
+            th.Tensor(input_size,4)) 
 
         # LSTM weights
         self.W_lstm = th.nn.Parameter(
-            th.Tensor(4 * lstm_size, 4 + lstm_size))
+            th.Tensor( 4 + lstm_size,4 * lstm_size))
 
         # ending fc layer weights
         self.W_output = th.nn.Parameter(
@@ -59,7 +58,7 @@ class PK(th.nn.Module):
         # => th.Size([10, 256, 32])
 
         # Compute the input, output and candidate cell gates with one MM.
-        gate_weights = F.linear(X, self.W_lstm)
+        gate_weights = th.matmul(X, self.W_lstm)
 
         # Split the combined gate weight matrix into its components.
         gates = gate_weights.chunk(4, dim=2)
