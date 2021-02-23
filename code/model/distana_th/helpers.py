@@ -16,12 +16,13 @@ def train_batch( net,
     mse = None
     th.autograd.set_detect_anomaly(True)
 
-    batch_size = cfg.BATCH_SIZE
     seq_len = cfg.SEQ_LEN
     amount_pks = cfg.PK_ROWS * cfg.PK_COLS
 
     # Generate the training data batch for this iteration
-    net_input, net_label = _set_up_batch(batch_iter, data_filenames)
+    # cfg.BATCH_SIZE is ideal batch size
+    # returning batch_size is real batch_size (depends on end of data)
+    net_input, net_label, batch_size = _set_up_batch(batch_iter, data_filenames)
 
 
     # Set up an array of zeros to store the network outputs
@@ -36,6 +37,7 @@ def train_batch( net,
 
     # Reset the network to clear the previous sequence
     net.reset()
+    net.pk_net.set_batch_size(batch_size)
 
     # Iterate over the whole sequence of the training example and perform a
     # forward pass
@@ -48,7 +50,6 @@ def train_batch( net,
 
 
         # Forward the input through the network
-        print(f"Time step: {t+1}")
         net.forward(dyn_in=dyn_net_in_step)
 
 
@@ -84,6 +85,7 @@ def _set_up_batch(batch_iter, data_filenames):
     89
     """
     first_sample = cfg.BATCH_SIZE * batch_iter
+    
     # Handling also last batch
     last_sample_excl = min(first_sample + cfg.BATCH_SIZE, len(data_filenames)) 
 
@@ -128,11 +130,13 @@ def _set_up_batch(batch_iter, data_filenames):
             dtype=np.float32
         )
 
+    batch_size = len(_net_input)
+
     # sequenz/time should be first dimension
     # and batch should be second dimension
     _net_input = np.swapaxes(_net_input, axis1=0, axis2=1) 
     _net_label = np.swapaxes(_net_label, axis1=0, axis2=1) 
 
 
-    return _net_input, _net_label
+    return _net_input, _net_label, batch_size
 

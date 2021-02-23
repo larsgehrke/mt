@@ -12,13 +12,11 @@ th.manual_seed(42)
 class PK(th.nn.Module):
     def __init__(self, batch_size, amount_pks, input_size, lstm_size, device):
         super(PK, self).__init__()
-        self.batch_size = batch_size
         self.amount_pks = amount_pks
         self.input_size = input_size
         self.lstm_size = lstm_size
 
-        self.lstm_h = th.zeros(batch_size,amount_pks,lstm_size)
-        self.lstm_c = th.zeros(batch_size,amount_pks,lstm_size)
+        self.set_batch_size(batch_size)
 
         # starting fc layer weights
         self.W_input = th.nn.Parameter(
@@ -38,11 +36,19 @@ class PK(th.nn.Module):
         #    th.empty(3 * state_size, input_features + state_size))
         #self.bias = th.nn.Parameter(th.empty(3 * state_size))
         self.reset_parameters()
+        
 
     def reset_parameters(self):
         stdv = 1.0 / math.sqrt(self.lstm_size)
         for weight in self.parameters():
             weight.data.uniform_(-stdv, +stdv)
+
+    def set_batch_size(self, batch_size):
+        self.lstm_h = th.zeros(batch_size,self.amount_pks,self.lstm_size)
+        self.lstm_c = th.zeros(batch_size,self.amount_pks,self.lstm_size)
+
+        self.batch_size = batch_size
+
 
     def forward(self, input_, old_c, old_h):
 
