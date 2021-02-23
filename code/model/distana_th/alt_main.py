@@ -28,7 +28,7 @@ print(th.cuda.get_device_name(0))
 print("Memory Usage:")
 print("\tAllocated:",
       round(th.cuda.memory_allocated(0) / 1024 ** 3, 1), "GB")
-print("\tCached:   ", round(th.cuda.memory_cached(0) / 1024 ** 3, 1),
+print("\tCached:   ", round(th.cuda.memory_reserved(0) / 1024 ** 3, 1),
       "GB")
 print()
 

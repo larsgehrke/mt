@@ -36,8 +36,7 @@ def train_batch( net,
         optimizer.zero_grad()
 
     # Reset the network to clear the previous sequence
-    net.reset()
-    net.pk_net.set_batch_size(batch_size)
+    net.reset(batch_size)
 
     # Iterate over the whole sequence of the training example and perform a
     # forward pass

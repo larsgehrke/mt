@@ -121,8 +121,8 @@ class KernelNetwork(nn.Module):
         self.tensors.pk_lat_out[:,self.coming_from, self.going_to]
 
 
-        sprint(self.tensors.pk_dyn_in,"self.tensors.pk_dyn_in")
-        sprint(self.tensors.pk_lat_in, "self.tensors.pk_lat_in")
+        # sprint(self.tensors.pk_dyn_in,"self.tensors.pk_dyn_in")
+        # sprint(self.tensors.pk_lat_in, "self.tensors.pk_lat_in")
         # self.counter = self.counter + 1
         # print(f"self.counter: {self.counter}")
         # Insert Dim 10, 256, 1 -> 10, 256, 1,1 and concat with 10, 256, 8, 1
@@ -198,8 +198,9 @@ class KernelNetwork(nn.Module):
         self.tensors.pk_lstm_c = pk_lstm_c
         self.tensors.pk_lstm_h = pk_lstm_h
 
-    def reset(self):
-        self.tensors.reset()
+    def reset(self, batch_size):
+        self.tensors.set_batch_size_and_reset(batch_size)
+        self.pk_net.set_batch_size(batch_size)
 
     def detach(self):
         self.tensors.detach()

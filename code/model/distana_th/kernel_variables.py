@@ -13,6 +13,8 @@ class KernelParameters:
         # System parameters
         self.device = device
 
+        self.batch_size = cfg.BATCH_SIZE
+
         #
         # General network parameters
         self.seq_len = cfg.SEQ_LEN
@@ -47,38 +49,41 @@ class KernelTensors:
         # clean code style, yet it spares lots of lines :p)
         self.reset()
 
+    def set_batch_size_and_reset(self, batch_size):
+        self.params.batch_size = batch_size
+        self.reset()
+
     def reset(self):
 
         #
         # PK tensors
 
-        batch = cfg.BATCH_SIZE
         pk_num = self.params.amount_pks
 
         # Inputs
-        self.pk_dyn_in = th.zeros(size=(batch,
+        self.pk_dyn_in = th.zeros(size=(self.params.batch_size,
                                         pk_num,
                                         self.params.pk_dyn_in_size),
                                   device=self.params.device)
-        self.pk_lat_in = th.zeros(size=(batch,
+        self.pk_lat_in = th.zeros(size=(self.params.batch_size,
                                         pk_num,
                                         self.params.pk_neighbors,
                                         self.params.pk_lat_in_size),
                                   device=self.params.device)
 
         # LSTM states
-        self.pk_lstm_c = th.zeros(size=(batch, pk_num, self.params.pk_num_lstm_cells),
+        self.pk_lstm_c = th.zeros(size=(self.params.batch_size, pk_num, self.params.pk_num_lstm_cells),
                                   device=self.params.device,
                                   requires_grad=True)
-        self.pk_lstm_h = th.zeros(size=(batch, pk_num, self.params.pk_num_lstm_cells),
+        self.pk_lstm_h = th.zeros(size=(self.params.batch_size, pk_num, self.params.pk_num_lstm_cells),
                                   device=self.params.device,
                                   requires_grad=True)
 
         # Outputs
-        self.pk_dyn_out = th.zeros(size=(batch, pk_num,
+        self.pk_dyn_out = th.zeros(size=(self.params.batch_size, pk_num,
                                          self.params.pk_dyn_out_size),
                                    device=self.params.device)
-        self.pk_lat_out = th.zeros(size=(batch, pk_num,
+        self.pk_lat_out = th.zeros(size=(self.params.batch_size, pk_num,
                                          self.params.pk_neighbors,
                                          self.params.pk_lat_out_size),
                                    device=self.params.device)
