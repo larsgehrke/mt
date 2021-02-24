@@ -11,6 +11,9 @@ import os
 class FileManager():
 
     def save(self,obj, name ):
+        if not os.path.exists(name):
+            os.makedirs(name)
+
         with open(name + '.pkl', 'wb+') as f:
             pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
 
