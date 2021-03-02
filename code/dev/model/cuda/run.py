@@ -5,6 +5,9 @@ import configuration as cfg
 
 from debug import sprint
 
+import kernel_net
+import kernel_variables
+
 
 
 def train_batch (et,

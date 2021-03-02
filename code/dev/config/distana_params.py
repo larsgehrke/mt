@@ -5,8 +5,10 @@
 
 '''
 import os
-from config.params import Params 
 import argparse
+
+from config.params import Params 
+import tools.torch_tools as th_tools
 
 class DISTANAParams(Params):
 
@@ -16,16 +18,22 @@ class DISTANAParams(Params):
 
         self.description = description
 
+        '''
+            If you add/change something here, please add also some Argparse option further below
+            and delete the current saved parameter files
+        '''
         self.init_values = {
 
             "architecture_name": "distana",
-            "model_name": "tmp_model",
+            "model_name": "th",
+            "version_name": "v1",
             "data_type": "tmp_data",
 
             "data_noise": 0.0, # 5e-5  # The noise that is added to the input data
             "p_zero_input": 0.0, # Probability of feeding no input to a PK
 
-            "device": "cpu", # for grid sizes > 25x25 the GPU version is faster
+            "use_gpu": False, # for grid sizes > 25x25 the GPU version is faster
+            "device": "cpu",
 
             #
             # Training parameters
@@ -35,6 +43,7 @@ class DISTANAParams(Params):
             "epochs": 20,
             "seq_len": 140,
             "learning_rate": 0.001,
+            "batch_size": 8,
 
             #
             # Testing parameters
@@ -58,6 +67,31 @@ class DISTANAParams(Params):
 
         }
 
+    def _save_paths(self, params):
+
+        # Specify Paths for this program
+        # Ending with directories
+        params['data_folder'] = os.path.join(self.source_path, "data", params['data_type'], "")
+        params['model_folder'] = os.path.join(self.source_path, "model", 
+                                    params['model_name'], "saved_models", "") 
+
+        return params
+
+    def _save_additional_params(self, params):
+
+        # Hide the GPU(s) in case the user specified to use the CPU in the config file
+        if not params["use_gpu"]:
+            os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID" # see issue #152
+            os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
+        # Set device on GPU if specified in the params, else CPU
+        params["device"] = th_tools.determine_device(params["use_gpu"])
+
+        # Adding dependent parameters
+        params['amount_pks'] = params['pk_rows'] * params['pk_cols']
+
+        return params
+
     def parse_params(self, is_training):
         parser = argparse.ArgumentParser(description=self.description, 
             formatter_class=argparse.RawTextHelpFormatter)
@@ -65,10 +99,13 @@ class DISTANAParams(Params):
         parser.add_argument('--architecture-name', type=str, 
             help='The name of the architecture.')
 
-        parser.add_argument('--model-name', type=str, 
+        parser.add_argument('-m','--model-name', type=str, 
             help='The name of the model.')
 
-        parser.add_argument('--data-type', type=str, 
+        parser.add_argument('-v','--version-name', type=str, 
+            help='The name of the model version.')
+
+        parser.add_argument('-d','--data-type', type=str, 
             help='The type of the data. Used to load the data from this data subfolder.')
 
         parser.add_argument('--data-noise', type=float, 
@@ -77,13 +114,11 @@ class DISTANAParams(Params):
         parser.add_argument('--p-zero-input', type=float, 
             help='Probability of feeding no input to a Prediction kernel.')
 
-        parser.add_argument('-d', '--device', choices=['cpu', 'gpu'], 
+        parser.add_argument('-g', '--use-gpu', type=super()._str2bool, 
             help='''
-            Type of device used for the computations. 
+            Should the GPU be used? Specify the type of device used for the computations. 
             For grid sizes > 25x25 the GPU version is faster
-            ''')
-
-        
+            ''')    
 
         parser.add_argument('--pk-rows', type=int, 
             help='Amount of PK (Prediction Kernel) rows.')      
@@ -126,8 +161,8 @@ class DISTANAParams(Params):
         parser.add_argument('-r', '--reset-params', action='store_true', 
             help='Reset saved default parameter values to initial values.')
 
-        parser.add_argument('-v', '--verbose', action='store_true', 
-            help='Reset saved default parameter values to initial values.')
+        parser.add_argument('--verbose', action='store_true', 
+            help='Set the Verbosity of the program to True.')
 
         if is_training:
             parser = self._parse_train_params(parser)
@@ -147,13 +182,22 @@ class DISTANAParams(Params):
 
         params = super()._replace_params(options, params)
 
-        # Verbose
-        params["verbose"] = options.verbose
+        params = self._save_additional_params(params)
         
+
+        # Verbose
+        if options.verbose:
+            for p in params:
+                print(f"{p}: {params[p]}")
 
         if options.save_params is not None:
             file = options.save_params
             super()._save(file, params)
+
+        params = self._save_paths(params)
+
+
+
 
         return params
 
@@ -177,6 +221,9 @@ class DISTANAParams(Params):
         parser.add_argument('-l','--learning-rate', type=float, 
             help='Specify the learning rate for the training.')
 
+        parser.add_argument('-b','--batch-size', type=int, 
+            help='Specify the batch size for the training.')
+
         return parser
 
         
@@ -193,6 +240,7 @@ class DISTANAParams(Params):
             help='Amount of time steps for the closed loop.')
 
         return parser
+
 
 
 
