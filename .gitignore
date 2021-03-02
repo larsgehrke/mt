@@ -1,4 +1,5 @@
 __pycache__/
+*saved_models*
 *.synctex.gz
 *.aux
 *.log

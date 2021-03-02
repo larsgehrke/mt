@@ -139,7 +139,7 @@ class Evaluator():
             first_sample = 0
             last_sample_excl = len(data_all)
   
-
+  
         data = np.load(data_all[first_sample])[:seq_len + 1]
         # Expand Dim for batch 
         data = data[np.newaxis, :]
@@ -181,7 +181,7 @@ class Evaluator():
                 dtype=np.float32
             )
 
-        batch_size = len(_net_input)
+        batch_size_ = len(_net_input)
 
         # sequenz/time should be first dimension
         # and batch should be second dimension
@@ -189,5 +189,5 @@ class Evaluator():
         # _net_label = np.swapaxes(_net_label, axis1=0, axis2=1) 
 
 
-        return _net_input, _net_label, batch_size
+        return _net_input, _net_label, batch_size_
 
