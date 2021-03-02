@@ -29,6 +29,7 @@ class PK(th.nn.Module):
         #    th.empty(3 * state_size, input_features + state_size))
         #self.bias = th.nn.Parameter(th.empty(3 * state_size))
         self.reset_parameters()
+        self.to(device)
         
 
     def reset_parameters(self):
