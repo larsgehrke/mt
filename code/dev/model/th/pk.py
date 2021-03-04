@@ -1,6 +1,8 @@
 import math
 import torch as th
 
+from tools.debug import sprint
+
 
 class PK(th.nn.Module):
     def __init__(self, batch_size, amount_pks, input_size, lstm_size, device):
@@ -23,11 +25,7 @@ class PK(th.nn.Module):
         self.W_output = th.nn.Parameter(
             th.Tensor(lstm_size,input_size))
 
-        # 3 * state_size for input gate, output gate and candidate cell gate.
-        # input_features + state_size because we will multiply with [input, h].
-        #self.weights = th.nn.Parameter(
-        #    th.empty(3 * state_size, input_features + state_size))
-        #self.bias = th.nn.Parameter(th.empty(3 * state_size))
+
         self.reset_parameters()
         self.to(device)
         
@@ -44,18 +42,26 @@ class PK(th.nn.Module):
         self.batch_size = batch_size
 
 
-    def forward(self, input_, old_c, old_h):
+    def forward(self, input_flat, old_c, old_h):
+        '''
+            Forward propagation for all PKs in all batches in parallel.
+            
+            :param input_flat: 
+                The input for the PKs where dynamical input is concatenated with flattened dynamical input.
+                Size is [B, PK, DYN + N*LAT] with batch size B, amount of PKs PK, dynamical input size DYN,
+                Neighbors N and lateral input size LAT.
 
+                
+            :param old_c: the LSTM cell values
+            :param old_h: the LSTM h vector
 
-        # Flatten the last two input dims
-        input_flat = th.flatten(input_, start_dim=2)
-        # => th.Size([10, 256, 9])
+        '''
 
         x_t = th.tanh(th.matmul(input_flat, self.W_input))
-        # => th.Size([10, 256, 16])
+        # => th.Size([B, PK, lstm_size])
 
         X = th.cat([x_t, old_h], dim=2)
-        # => th.Size([10, 256, 32])
+        # => th.Size([B, PK, 2*lstm_size])
 
         # Compute the input, output and candidate cell gates with one MM.
         gate_weights = th.matmul(X, self.W_lstm)
@@ -70,18 +76,14 @@ class PK(th.nn.Module):
         Ctilde_t = th.tanh(gates[3])
 
         C_t = f_t * old_c + i_t * Ctilde_t
-        # => th.Size([10, 256, 16])
+        # => th.Size([B, PK, lstm_size])
 
         h_t = th.tanh(C_t) * o_t
-        # => th.Size([10, 256, 16])
+        # => th.Size([B, PK, lstm_size])
 
-        y_hat = th.tanh(th.matmul(h_t, self.W_output))
-        # => th.Size([10, 256, 9])
-
-        # Unflatten the last dimension of the lateral output such that it has
-        # the correct dimensionality for the further processing
-        y_hat_unflattened = y_hat.view(size=(self.batch_size,self.amount_pks,self.input_size,1))
-        # => th.Size([10, 256, 9, 1])
+        y_hat_ = th.matmul(h_t, self.W_output)
+        y_hat = th.tanh(y_hat_)
+        # => th.Size([B, PK, DYN + N*LAT])
 
 
-        return y_hat_unflattened, h_t, C_t
+        return y_hat, h_t, C_t

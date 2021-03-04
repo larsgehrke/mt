@@ -56,10 +56,10 @@ def run_training(params):
             cfg_file=Params.to_string(params), 
             net=distana.net())
     
-    supervisor = TrainSupervisor(params['epochs'], model_saver)
+    supervisor = TrainSupervisor(params['epochs'], distana.get_trainable_params(), model_saver)
 
     if params["continue_training"]:
-        distana.set_weights(th_tools.load_model(params))
+        distana.set_weights(th_tools.load_model(params),is_training=True)
 
     """
     TRAINING
@@ -87,7 +87,7 @@ def run_training(params):
 
         # Compute validation error
         # Evaluate and validate the network for the given validation data
-        mse = distana.test(val_data_files)
+        mse = distana.test(val_data_files)[0] # get only the error
         supervisor.finished_validation(mse)
 
         supervisor.finished_epoch(epoch, epoch_start_time)

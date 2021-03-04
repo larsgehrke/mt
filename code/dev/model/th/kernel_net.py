@@ -26,7 +26,7 @@ class KernelNetwork(th.nn.Module):
         # PK calculations 
         self.pk_net = pk.PK(batch_size= config.batch_size,
                               amount_pks= config.amount_pks, 
-                              input_size = config.pk_neighbors + 1, 
+                              input_size = config.pk_neighbors * config.pk_lat_size + config.pk_dyn_size, 
                               lstm_size = config.pk_num_lstm_cells,
                               device = config.device)
 
@@ -38,7 +38,7 @@ class KernelNetwork(th.nn.Module):
 
         self._build_connections(config.pk_rows, config.pk_cols)
 
-    def forward(self, dyn_in, pk_stat_in=None, tk_stat_in=None):
+    def forward(self, dyn_in):
         """
         Runs the forward pass of all PKs and TKs, respectively, in parallel 
         for a given input
@@ -59,34 +59,32 @@ class KernelNetwork(th.nn.Module):
         self.tensors.pk_lat_in[:,self.pos0, self.going_to] = \
         self.tensors.pk_lat_out[:,self.coming_from, self.going_to]
 
+       
+        # Flatten last two dims: B, PK, N, Lat -> B, PK, N*Lat and concat with B, PK, Dyn
+        # => B, PK, N*Lat + Dyn
+        input_ = th.cat((self.tensors.pk_dyn_in, th.flatten(self.tensors.pk_lat_in,start_dim=2)),2)
 
-        # sprint(self.tensors.pk_dyn_in,"self.tensors.pk_dyn_in")
-        # sprint(self.tensors.pk_lat_in, "self.tensors.pk_lat_in")
-        # self.counter = self.counter + 1
-        # print(f"self.counter: {self.counter}")
-        # Insert Dim 10, 256, 1 -> 10, 256, 1,1 and concat with 10, 256, 8, 1
-        # => 10, 256, 9, 1
-        input_ = th.cat((th.unsqueeze(self.tensors.pk_dyn_in,2), self.tensors.pk_lat_in),2)
 
         # Forward the PK inputs through the pk_net to get the outputs and hidden
         # states of these PKs
         pk_output, pk_lstm_h, pk_lstm_c = self.pk_net.forward(
-            input_= input_, # (10, 256, 9, 1)
-            old_h= self.tensors.pk_lstm_h,  # (10, 256, 16)
-            old_c= self.tensors.pk_lstm_c # (10, 256, 16)            
+            input_flat= input_, # Size: [B, PK,  N*Lat + Dyn]
+            old_h= self.tensors.pk_lstm_h,  # Size: [B, PK,  LSTM]
+            old_c= self.tensors.pk_lstm_c # Size: [B, PK,  LSTM]
         )
+        # pk_output: [B, PK, DYN + N*LAT]
 
         # Dynamic output
-        pk_dyn_out = pk_output[:, :,  :self.config.pk_dyn_out_size]
-
-        # Lateral output
-        pk_lat_out = pk_output[:, : , self.config.pk_dyn_out_size:]
-
+        pk_dyn_out = pk_output[:, :,  :self.config.pk_dyn_size]
         
 
-        #pk_lstm_h: (10, 256, 16)
-        #pk_lstm_c: (10, 256, 16)
-        
+        # Lateral output flattened
+        pk_lat_out_flat = pk_output[:, :, self.config.pk_dyn_size:]
+
+        # Batch Size is flexibel (note end of epoch)
+        pk_lat_out = pk_lat_out_flat.view(size=(-1,
+            self.config.amount_pks, self.config.pk_neighbors, self.config.pk_lat_size))
+
 
         # Update the output and hidden state tensors of the PKs
         self.tensors.pk_dyn_out = pk_dyn_out

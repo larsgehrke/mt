@@ -57,13 +57,12 @@ class DISTANAParams(Params):
             "pk_rows": 16, # Rows of PKs
             "pk_cols": 16, # Cols of PKs
 
-            "pk_neighbors": 8,
-            "pk_dyn_in_size": 1, # the z-value of the wave field
-            "pk_lat_in_size": 1,
+            
+            "pk_dyn_size": 1, # the z-value of the wave field
+            "pk_lat_size": 1,
+
             "pk_pre_layer_size": 4,
             "pk_num_lstm_cells": 16,
-            "pk_dyn_out_size": 1, # Must be equal to PK_DYN_IN_SIZE
-            "pk_lat_out_size": 1  # Must be equal to PK_LAT_IN_SIZE       
 
         }
 
@@ -126,26 +125,17 @@ class DISTANAParams(Params):
         parser.add_argument('--pk-cols', type=int, 
             help='Amount of PK (Prediction Kernel) cols.')
 
-        parser.add_argument('--pk-neighbors', type=int, 
-            help='Amount of PK (Prediction Kernel) neighbors.')
+        parser.add_argument('--pk-dyn-size', type=int, 
+            help='The dynamical input and output size of one Prediction Kernel.')
 
-        parser.add_argument('--pk-dyn-in-size', type=int, 
-            help='The dynamical input size of one Prediction Kernel.')
-
-        parser.add_argument('--pk-lat-in-size', type=int, 
-            help='The lateral input size of one Prediction Kernel.')
+        parser.add_argument('--pk-lat-size', type=int, 
+            help='The lateral input and output size of one Prediction Kernel.')
 
         parser.add_argument('--pk-pre-layer-size', type=int, 
             help='The layer size of the first fully connected layer in the Prediction Kernel.')
 
         parser.add_argument('--pk-num-lstm-cells', type=int, 
             help='The number of LSTM cells.')
-
-        parser.add_argument('--pk-dyn-out-size', type=int, 
-            help='The dynamical output size of one Prediction Kernel.')
-
-        parser.add_argument('--pk-lat-out-size', type=int, 
-            help='The lateral output size of one Prediction Kernel.')
 
 
         # Saving and Loading parameter files

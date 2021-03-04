@@ -31,8 +31,7 @@ def determine_device(use_cuda):
 
 def load_model(params):
     print('Restoring model (that is the network\'s weights) from file...')
-    net = th.load(os.path.join(params['model_folder'], 
-                params['model_name'], params['model_name'] + ".pt"),
+    net = th.load(os.path.join(params['model_folder'], params['version_name'] + ".pt"),
             map_location=params['device'])
 
     return net

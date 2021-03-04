@@ -5,14 +5,17 @@
 '''
 
 import time
+import matplotlib.pyplot as plt
 import torch as th
 import numpy as np
+
+import tools.visualize as visualize
 
 import tools.debug as debug
 
 class TrainSupervisor():
 
-    def __init__(self, epochs, saver = None):
+    def __init__(self, epochs, trainable_params, saver = None):
         self.epochs = epochs
         self.saver = saver
 
@@ -26,6 +29,8 @@ class TrainSupervisor():
         self.val_sign = "(-)"
 
         self._epoch = 0
+
+        print("Trainable model parameters:", trainable_params)
 
     def finished_training(self,errors):
         self._epoch += 1
@@ -47,7 +52,7 @@ class TrainSupervisor():
 
         # Save the model to file (if desired)
         if self.saver is not None and error < self.best_val:
-            self.saver(self._epoch,self.epoch_errors_train, self.epoch_errors_val)
+            self.saver(self._epoch,self.epoch_errors_train, self.epoch_errors_val)  
 
         # Create a plus or minus sign for the validation error
         self.val_sign = "(-)"
@@ -74,4 +79,97 @@ class TrainSupervisor():
         print("Done!")
 
 
-        
+'''
+    ============================================
+    Supervisor (View) for the testing of DISTANA
+    ============================================
+
+'''
+
+class TestSupervisor():
+
+    def __init__(self, params, trainable_params):
+
+        print("Trainable model parameters:", trainable_params)
+
+        self.params = params
+
+        # Test statistics
+        self.time_list = []
+        self.accuracy_list = []
+
+    def plot_sample(self, net_outputs, net_label, net_input, time_start):
+
+        pk_rows = self.params['pk_rows']
+        pk_cols = self.params['pk_cols']
+        teacher_forcing_steps = self.params['teacher_forcing_steps']
+        model_name = self.params['model_name']
+        version_name = self.params['version_name']
+
+        forward_pass_duration = time.time() - time_start
+
+        print("\tForward pass took:", forward_pass_duration, "seconds.")
+
+        net_outputs = net_outputs.detach().numpy()
+
+        # Plot the wave activity
+        fig, axes = plt.subplots(2, 2, figsize=[10, 10], sharex="all")
+        for i in range(2):
+            for j in range(2):
+                make_legend = True if (i == 0 and j == 0) else False
+                visualize.plot_kernel_activity(
+                    ax=axes[i, j],
+                    label=net_label,
+                    net_out=net_outputs,
+                    pk_rows = pk_rows,
+                    pk_cols = pk_cols,
+                    teacher_forcing_steps = teacher_forcing_steps,
+                    net_in=net_input,
+                    make_legend=make_legend
+                )
+        fig.suptitle('Model ' + self.params['model_name'] + ' ' + self.params['version_name'], fontsize=12)
+        plt.show()
+
+        # Visualize and animate the propagation of the 2d wave
+        anim = visualize.animate_2d_wave(
+            pk_rows=pk_rows, 
+            pk_cols=pk_cols, 
+            teacher_forcing_steps=teacher_forcing_steps,
+            net_label= net_label, 
+            net_outputs= net_outputs, 
+            net_inputs=net_input)
+
+        plt.show()
+
+        # Append the test statistics for this sequence to the appropriate lists
+        self.time_list.append(forward_pass_duration)
+
+
+    def finished(self):
+
+        print("Average forward pass duration:", np.mean(self.time_list),
+          " +-", np.std(self.time_list))
+           
+        print('Done')
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -5,6 +5,8 @@ import torch as th
 from model.th.kernel_net import KernelNetwork
 from model.th.kernel_tensors import KernelTensors
 
+from tools.debug import sprint
+
 
 class Evaluator():
 
@@ -13,9 +15,12 @@ class Evaluator():
         self.tensors = KernelTensors(kernel_config)
         self.net = KernelNetwork(kernel_config,self.tensors)
 
-        self.train_filenames = None
-        self.optimizer = None
-        self.criterion = None
+        self.train_filenames = None # used for training
+        self.optimizer = None # used for training
+        self.criterion = None # used for training and testing
+        self.teacher_forcing_steps = None # used for testing
+        self.is_testing = False
+
 
     def set_training(self, train_filenames, optimizer, criterion):
         self.train_filenames = train_filenames
@@ -25,6 +30,11 @@ class Evaluator():
         amount_iterations = math.ceil(len(train_filenames)/self.config.batch_size)
         # Return amount of iterations per epoch
         return amount_iterations
+
+    def set_testing(self, criterion, teacher_forcing_steps):
+        self.criterion = criterion
+        self.teacher_forcing_steps = teacher_forcing_steps
+        self.is_testing = True
 
     def train(self, iter_idx):
 
@@ -38,7 +48,7 @@ class Evaluator():
         # Set the gradients back to zero
         self.optimizer.zero_grad()
 
-        mse, net_outputs = self._evaluate(net_input, net_label, batch_size)
+        net_outputs = self._evaluate(net_input, net_label, batch_size)
 
         mse = self.criterion(net_outputs, th.from_numpy(net_label))
         # Alternatively, the mse can be calculated 'manually'
@@ -56,21 +66,21 @@ class Evaluator():
 
         net_input, net_label, batch_size = self._set_up_batch(data_all = filenames, all_files = True)
 
-        mse, net_outputs = self._evaluate(net_input, net_label, batch_size)
+        net_outputs = self._evaluate(net_input, net_label, batch_size)
 
         mse = self.criterion(net_outputs, th.from_numpy(net_label))
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
 
-        return mse.item()# return only the number, not the th object
+        return mse.item(), net_outputs, net_label, net_input
 
     def _evaluate(self, net_input, net_label, batch_size):
-        mse = None
+        
         th.autograd.set_detect_anomaly(True)
 
         seq_len = self.config.seq_len
         amount_pks = self.config.amount_pks
-        pk_dyn_out_size = self.config.pk_dyn_out_size
+        pk_dyn_size = self.config.pk_dyn_size
 
 
 
@@ -78,7 +88,7 @@ class Evaluator():
         net_outputs = th.zeros(size=(batch_size,
                                      seq_len,                              
                                      amount_pks,
-                                     pk_dyn_out_size))
+                                     pk_dyn_size))
 
         
         # Reset the network to clear the previous sequence
@@ -88,25 +98,37 @@ class Evaluator():
         # forward pass
         for t in range(seq_len):
 
-            # Set the dynamic input for this iteration
-            dyn_net_in_step = net_input[:, t, :, :pk_dyn_out_size]
+            # Prepare the network input for this sequence step
+            if self.is_testing and t > self.teacher_forcing_steps:
+                #
+                # Closed loop - receiving the output of the last time step as
+                # input
+                dyn_net_in_step = net_outputs[:,t-1,:,:pk_dyn_size]
+                
+            else:
+                #
+                # Teacher forcing
+                #
+                # Set the dynamic input for this iteration
+                dyn_net_in_step = net_input[:, t, :, :pk_dyn_size]
 
+                # [B, PK, DYN]
 
             # Forward the input through the network
             self.net.forward(dyn_in=dyn_net_in_step)
 
-            # (10, 256, 1, 1)
-            # Swapping the second with third dimension
-            # because time dimension is need
-            # (10, 1, 256, 1)
-            net_outputs[:,t] = th.transpose(self.tensors.pk_dyn_out, 1, 2)[:,0]
+            # Just saving the output of the current time step
+            net_outputs[:,t,:,:] = self.tensors.pk_dyn_out
 
-        return mse, net_outputs
+        return net_outputs
 
-    def set_weights(self,loaded_weights):
+    def set_weights(self,loaded_weights, is_training):
         print('Loading model (that is the network\'s weights) from file...')
-        self.net.load_state_dict(load_state_dict)
-        self.net.train()
+        self.net.load_state_dict(loaded_weights)
+        if is_training:
+            self.net.train()
+        else:
+            self.net.eval()
 
 
     def _set_up_batch(self, data_all = None, iter_idx=0, all_files = False, is_train = True):
@@ -150,8 +172,6 @@ class Evaluator():
             data_file = data_file[np.newaxis, :]
             data = np.append(data, data_file, axis=0)
 
-        
-        # shape: ( BATCH_SIZE , 41, 2, 16, 16)
 
         # Get first and second dimension of data
         dim0, dim1, dim2 = np.shape(data)[:3]
@@ -161,7 +181,6 @@ class Evaluator():
 
         # Swap the third and fourth dimension of the data
         data = np.swapaxes(data, axis1=2, axis2=3)
-        # (8, 41, 256, 2)
 
         # Split the data into inputs (where some noise is added) and labels
         # Add noise to all timesteps except very last one
@@ -182,11 +201,6 @@ class Evaluator():
             )
 
         batch_size_ = len(_net_input)
-
-        # sequenz/time should be first dimension
-        # and batch should be second dimension
-        # _net_input = np.swapaxes(_net_input, axis1=0, axis2=1) 
-        # _net_label = np.swapaxes(_net_label, axis1=0, axis2=1) 
 
 
         return _net_input, _net_label, batch_size_

@@ -19,18 +19,21 @@ class DISTANA():
     def set_training(self,train_data, optimizer, criterion):
         return self.model.set_training(train_data,optimizer, criterion)
 
+    def set_testing(self,criterion, teacher_forcing_steps):
+        return self.model.set_testing(criterion, teacher_forcing_steps)
+
     def net(self):
         return self.model.net
 
     def get_trainable_params(self):
         # Count number of trainable parameters
         pytorch_total_params = sum(
-            p.numel() for p in net().parameters() if p.requires_grad
+            p.numel() for p in self.net().parameters() if p.requires_grad
         )
         return pytorch_total_params
 
-    def set_weights(self,loaded_weights):
-        self.model.set_weights(loaded_weights)
+    def set_weights(self,loaded_weights, is_training):
+        self.model.set_weights(loaded_weights,is_training)
 
     def train(self, iter_idx):
         return self.model.train(iter_idx)

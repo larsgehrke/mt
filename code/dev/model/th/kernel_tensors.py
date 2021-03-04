@@ -25,34 +25,35 @@ class KernelTensors:
         # Inputs
         self.pk_dyn_in = th.zeros(size=(self.batch_size,
                                         self.config.amount_pks,
-                                        self.config.pk_dyn_in_size),
+                                        self.config.pk_dyn_size),
                                   device=self.config.device)
+
         self.pk_lat_in = th.zeros(size=(self.batch_size,
                                         self.config.amount_pks,
                                         self.config.pk_neighbors,
-                                        self.config.pk_lat_in_size),
+                                        self.config.pk_lat_size),
                                   device=self.config.device)
 
         # LSTM states
         self.pk_lstm_c = th.zeros(size=(self.batch_size, 
                                         self.config.amount_pks, 
                                         self.config.pk_num_lstm_cells),
-                                  device=self.config.device,
-                                  requires_grad=True)
+                                  device=self.config.device)
+
         self.pk_lstm_h = th.zeros(size=(self.batch_size, 
                                         self.config.amount_pks, 
                                         self.config.pk_num_lstm_cells),
-                                  device=self.config.device,
-                                  requires_grad=True)
+                                  device=self.config.device)
 
         # Outputs
         self.pk_dyn_out = th.zeros(size=(self.batch_size, 
                                          self.config.amount_pks,
-                                         self.config.pk_dyn_out_size),
+                                         self.config.pk_dyn_size),
                                    device=self.config.device)
+        
         self.pk_lat_out = th.zeros(size=(self.batch_size, 
                                          self.config.amount_pks,
                                          self.config.pk_neighbors,
-                                         self.config.pk_lat_out_size),
+                                         self.config.pk_lat_size),
                                    device=self.config.device)
 

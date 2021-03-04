@@ -14,14 +14,85 @@ description = '''
  parameterized by dynamic and optional static input
 
 '''
+import os
+import time
+import numpy as np
+import torch as th 
 
+from model.distana import DISTANA
 from config.distana_params import DISTANAParams
+from config.params import Params
 from tools.persistence import FileManager
+from tools.persistence import get_data_filenames
+from tools.supervisor import TestSupervisor
+import tools.torch_tools as th_tools
 
 
-param_manager = DISTANAParams(FileManager(), description)
-# Load parameters from file
-params = param_manager.parse_params(is_training = False)
+
+
+def run_testing(params):
+
+    # Create and set up the network
+    distana = DISTANA(params)
+
+    criterion = th.nn.MSELoss() 
+
+    distana.set_weights(th_tools.load_model(params), is_training=False)
+    distana.set_testing(criterion, params['teacher_forcing_steps'])
+    
+    # Get the test data
+    test_data_files = get_data_filenames(os.path.join(params['data_folder'],'test',''))
+
+    supervisor = TestSupervisor(params,distana.get_trainable_params())
+
+    # Evaluate the network for the given test data
+    mse, net_outputs, net_label, net_input = distana.test(test_data_files)
+
+    x = u'1'
+    curr_idx = 0
+    while x == u'1':
+        time_start = time.time()
+
+        
+
+        supervisor.plot_sample(net_outputs[curr_idx], net_label[curr_idx], net_input[curr_idx], time_start)
+
+        # Retrieve user input to continue or quit the testing
+        x = input("Press 1 to see another example, anything else to quit.")
+        curr_idx += 1
+
+    supervisor.finished()
+    
+    
+
+   
+
+
+
+if __name__ == "__main__":
+
+    param_manager = DISTANAParams(FileManager(), description)
+    
+    th.manual_seed(42)
+
+    # Load parameters from file
+    params = param_manager.parse_params(is_training = False)
+
+    print(f'''Run the testing of architecture {
+        params["architecture_name"]
+        } with model {
+        params["model_name"]
+        } version {
+        params["version_name"]
+        } and data {
+        params["data_type"]
+        }''')
+    run_testing(params)
+
+
+
+
+
 
 
 
