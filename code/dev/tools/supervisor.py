@@ -168,13 +168,10 @@ class TestSupervisor():
             #  and create it if not
             if not os.path.exists(diagram_folder):
                 os.makedirs(diagram_folder)
+                
             print("Save diagram as video...")
-            # save the animation as an mp4.  This requires ffmpeg or mencoder to be
-            # installed.  The extra_args ensure that the x264 codec is used, so that
-            # the video can be embedded in html5.  You may need to adjust this for
-            # your system: for more information, see
-            # http://matplotlib.sourceforge.net/api/animation_api.html
-            anim.save(diagram_folder+file, fps=5, extra_args=['-vcodec', 'libx264'])
+            # Saves the animation as a video file 
+            anim.save(diagram_folder+file, fps=5) 
         
         if mode != "save":
             plt.show()
