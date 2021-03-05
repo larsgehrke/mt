@@ -99,7 +99,8 @@ class Evaluator():
         net_outputs = th.zeros(size=(batch_size,
                                      seq_len,                              
                                      amount_pks,
-                                     pk_dyn_size))
+                                     pk_dyn_size),
+                              device=self.config.device)
 
         
         # Reset the network to clear the previous sequence
