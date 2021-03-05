@@ -51,21 +51,14 @@ def run_testing(params):
     x = u'1'
     curr_idx = 0
     while x == u'1':
-        time_start = time.time()
-
-        
-
-        supervisor.plot_sample(net_outputs[curr_idx], net_label[curr_idx], net_input[curr_idx], time_start)
+        supervisor.plot_sample(params['mode'], net_outputs[curr_idx], net_label[curr_idx], net_input[curr_idx], curr_idx)
 
         # Retrieve user input to continue or quit the testing
         x = input("Press 1 to see another example, anything else to quit.")
         curr_idx += 1
 
     supervisor.finished()
-    
-    
 
-   
 
 
 
@@ -82,8 +75,6 @@ if __name__ == "__main__":
         params["architecture_name"]
         } with model {
         params["model_name"]
-        } version {
-        params["version_name"]
         } and data {
         params["data_type"]
         }''')

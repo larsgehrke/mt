@@ -3,12 +3,14 @@
     Visualize the 2-dimensional wave data.
 
 '''
-import numpy as np
+import math
 import time
+import numpy as np
+
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-def plot_kernel_activity(ax, label, net_out, pk_rows, pk_cols, 
+def plot_kernel_activity(idx, ax, label, net_out, pk_rows, pk_cols, 
     teacher_forcing_steps, net_in=None, make_legend=False):
     """
     This function displays the wave activity of a single kernel.
@@ -21,26 +23,27 @@ def plot_kernel_activity(ax, label, net_out, pk_rows, pk_cols,
     :param make_legend: Boolean that indicates weather a legend shall be created
     """
 
-    central_kernel = (pk_rows * pk_cols) // 2
-    central_kernel = 20
+    total = (pk_rows * pk_cols)
+    kernel = int(math.floor(total*(0.2*(idx+1))))
 
     if net_in is not None:
-        ax.plot(range(len(net_in)), net_in[:, central_kernel, 0],
+        ax.plot(range(len(net_in)), net_in[:, kernel, 0],
                 label='Network input', color='green')
-    ax.plot(range(len(label)), label[:, central_kernel, 0],
+    ax.plot(range(len(label)), label[:, kernel, 0],
             label='Target', color='deepskyblue')
-    ax.plot(range(len(net_out)), net_out[:, central_kernel, 0],
+    ax.plot(range(len(net_out)), net_out[:, kernel, 0],
             label='Network output', color='red', linestyle='dashed')
     # if net_in is None:
     yticks = ax.get_yticks()[1:-1]
+    
     ax.plot(np.ones(len(yticks)) * teacher_forcing_steps, yticks,
-            color='white', linestyle='dotted',
+            color='black', linestyle='dotted',
             label='End of teacher forcing')
     if make_legend:
         ax.legend()
 
 
-def animate_2d_wave(pk_rows, pk_cols, teacher_forcing_steps,
+def animate_2d_wave(mode, pk_rows, pk_cols, teacher_forcing_steps,
     net_label, net_outputs, net_inputs=None):
     """
     This function visualizes the spatio-temporally expanding wave
@@ -97,6 +100,7 @@ def animate_2d_wave(pk_rows, pk_cols, teacher_forcing_steps,
                              vmax=0.8, cmap="Blues")
         axes[2].set_title("Network Input")
 
+    
     anim = animation.FuncAnimation(fig, animate, frames=len(data),
                                    fargs=(teacher_forcing_steps, data, im1,
                                           im2, im3, txt1, gs1, gs2, net_label,

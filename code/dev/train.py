@@ -51,8 +51,8 @@ def run_training(params):
     model_saver = None
     if params["save_model"]:
         model_saver = th_tools.Saver(epochs = params["epochs"],
-            model_src_path=params['model_folder'], 
-            version_name=params["version_name"], 
+            model_src_path=params['model_folder'],
+            model_name = params['model_name'],
             cfg_file=Params.to_string(params), 
             net=distana.net())
     
@@ -111,8 +111,6 @@ if __name__ == "__main__":
         params["architecture_name"]
         } with model {
         params["model_name"]
-        } version {
-        params["version_name"]
         } and data {
         params["data_type"]
         }''')

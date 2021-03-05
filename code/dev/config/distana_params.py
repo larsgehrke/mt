@@ -26,7 +26,6 @@ class DISTANAParams(Params):
 
             "architecture_name": "distana",
             "model_name": "th",
-            "version_name": "v1",
             "data_type": "tmp_data",
 
             "data_noise": 0.0, # 5e-5  # The noise that is added to the input data
@@ -73,6 +72,7 @@ class DISTANAParams(Params):
         params['data_folder'] = os.path.join(self.source_path, "data", params['data_type'], "")
         params['model_folder'] = os.path.join(self.source_path, "model", 
                                     params['model_name'], "saved_models", "") 
+        params['diagram_folder'] = os.path.join(self.source_path, "diagram", "") 
 
         return params
 
@@ -222,6 +222,9 @@ class DISTANAParams(Params):
     def _parse_test_params(self, parser):
 
         # Options for testing
+
+        parser.add_argument('mode', choices=['show', 'save', 'show_save'], 
+            help='Shall the testing result be visualized, saved to file or both?')
 
         parser.add_argument('--teacher-forcing-steps', type=int, 
             help='Amount of time steps for the teacher forcing.')

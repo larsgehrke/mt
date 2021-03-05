@@ -123,7 +123,6 @@ class Evaluator():
         return net_outputs
 
     def set_weights(self,loaded_weights, is_training):
-        print('Loading model (that is the network\'s weights) from file...')
         self.net.load_state_dict(loaded_weights)
         if is_training:
             self.net.train()

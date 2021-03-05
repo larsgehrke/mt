@@ -31,19 +31,19 @@ def determine_device(use_cuda):
 
 def load_model(params):
     print('Restoring model (that is the network\'s weights) from file...')
-    net = th.load(os.path.join(params['model_folder'], params['version_name'] + ".pt"),
+    net = th.load(os.path.join(params['model_folder'], params['model_name'] + ".pt"),
             map_location=params['device'])
 
     return net
 
 class Saver():
 
-    def __init__(self, epochs, model_src_path, version_name, cfg_file, net):
+    def __init__(self, epochs, model_src_path, model_name, cfg_file, net):
         self.epochs = epochs
         self.model_save_path=model_src_path
         self.cfg_file=cfg_file
         self.net=net
-        self.version_name = version_name
+        self.model_name = model_name
 
 
     def __call__(self, epoch, epoch_errors_train, epoch_errors_val):
@@ -71,7 +71,7 @@ class Saver():
             os.makedirs(self.model_save_path)
 
         # Save model weights to file
-        th.save(self.net.state_dict(), self.model_save_path + self.version_name + ".pt")
+        th.save(self.net.state_dict(), self.model_save_path + self.model_name + ".pt")
 
         output_string = self.cfg_file + "\n#\n# Performance\n\n"
 

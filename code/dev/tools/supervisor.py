@@ -8,6 +8,7 @@ import time
 import matplotlib.pyplot as plt
 import torch as th
 import numpy as np
+import os
 
 import tools.visualize as visualize
 
@@ -98,17 +99,17 @@ class TestSupervisor():
         self.time_list = []
         self.accuracy_list = []
 
-    def plot_sample(self, net_outputs, net_label, net_input, time_start):
+    def plot_sample(self, mode, net_outputs, net_label, net_input, idx):
 
         pk_rows = self.params['pk_rows']
         pk_cols = self.params['pk_cols']
         teacher_forcing_steps = self.params['teacher_forcing_steps']
         model_name = self.params['model_name']
-        version_name = self.params['version_name']
+        diagram_folder = self.params['diagram_folder']
 
-        forward_pass_duration = time.time() - time_start
+        # forward_pass_duration = time.time() - time_start
 
-        print("\tForward pass took:", forward_pass_duration, "seconds.")
+        # print("\tForward pass took:", forward_pass_duration, "seconds.")
 
         net_outputs = net_outputs.detach().numpy()
 
@@ -118,20 +119,37 @@ class TestSupervisor():
             for j in range(2):
                 make_legend = True if (i == 0 and j == 0) else False
                 visualize.plot_kernel_activity(
-                    ax=axes[i, j],
-                    label=net_label,
-                    net_out=net_outputs,
+                    idx = i+j,
+                    ax = axes[i, j],
+                    label = net_label,
+                    net_out = net_outputs,
                     pk_rows = pk_rows,
                     pk_cols = pk_cols,
                     teacher_forcing_steps = teacher_forcing_steps,
-                    net_in=net_input,
-                    make_legend=make_legend
+                    net_in = net_input,
+                    make_legend = make_legend
                 )
-        fig.suptitle('Model ' + self.params['model_name'] + ' ' + self.params['version_name'], fontsize=12)
-        plt.show()
+        fig.suptitle('Model ' + model_name, fontsize=12)
+        #
+
+        if mode == "show":
+            plt.show()
+        else:
+            file = model_name + "_" + str(idx) +  ".png"
+
+            # Check whether the directory to save the data exists 
+            #  and create it if not
+            if not os.path.exists(diagram_folder):
+                os.makedirs(diagram_folder)
+
+            plt.savefig(diagram_folder + file)
+            if mode == "save":
+                plt.close(fig)
+
 
         # Visualize and animate the propagation of the 2d wave
         anim = visualize.animate_2d_wave(
+            mode = mode,
             pk_rows=pk_rows, 
             pk_cols=pk_cols, 
             teacher_forcing_steps=teacher_forcing_steps,
@@ -139,16 +157,30 @@ class TestSupervisor():
             net_outputs= net_outputs, 
             net_inputs=net_input)
 
-        plt.show()
+        if mode != "show":
+            file = model_name + "_" + str(idx) +  ".mp4"
+            # Check whether the directory to save the data exists 
+            #  and create it if not
+            if not os.path.exists(diagram_folder):
+                os.makedirs(diagram_folder)
+            # save the animation as an mp4.  This requires ffmpeg or mencoder to be
+            # installed.  The extra_args ensure that the x264 codec is used, so that
+            # the video can be embedded in html5.  You may need to adjust this for
+            # your system: for more information, see
+            # http://matplotlib.sourceforge.net/api/animation_api.html
+            anim.save(diagram_folder+file, fps=5, extra_args=['-vcodec', 'libx264'])
+        
+        if mode != "save":
+            plt.show()
 
         # Append the test statistics for this sequence to the appropriate lists
-        self.time_list.append(forward_pass_duration)
+        # self.time_list.append(forward_pass_duration)
 
 
     def finished(self):
 
-        print("Average forward pass duration:", np.mean(self.time_list),
-          " +-", np.std(self.time_list))
+        # print("Average forward pass duration:", np.mean(self.time_list),
+        #   " +-", np.std(self.time_list))
            
         print('Done')
 
