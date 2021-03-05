@@ -86,8 +86,6 @@ class Evaluator():
         return mse.item(), net_outputs, net_label, net_input
 
     def _evaluate(self, net_input, batch_size):
-        
-        th.autograd.set_detect_anomaly(True)
 
         seq_len = self.config.seq_len
         amount_pks = self.config.amount_pks
