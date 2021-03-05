@@ -57,7 +57,7 @@ class Evaluator():
 
         net_outputs = self._evaluate(net_input, net_label, batch_size)
 
-        mse = self.train_criterion(net_outputs, th.from_numpy(net_label))
+        mse = self.train_criterion(net_outputs, th.from_numpy(net_label).to(self.config.device))
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
 
