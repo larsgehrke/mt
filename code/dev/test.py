@@ -64,8 +64,14 @@ def run_testing(params):
             forward_pass_duration = time.time() - time_start
             print("\tForward pass for batch size ",params["batch_size"]," took: ", forward_pass_duration, " seconds.")
 
-        supervisor.plot_sample(net_outputs[sample_idx], 
-            net_label[sample_idx], net_input[sample_idx])
+        if params["batch_size"] == 1:
+            # when the model cannot handle batches
+            supervisor.plot_sample(net_outputs, 
+                net_label, net_input)
+        else:
+            # when the model is able to handle batches
+            supervisor.plot_sample(net_outputs[sample_idx], 
+                net_label[sample_idx], net_input[sample_idx])
 
         # Retrieve user input to continue or quit the testing
         x = input("Press 1 to see another example, anything else to quit.")
