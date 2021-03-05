@@ -1,24 +1,22 @@
 import numpy as np
 import torch as th
-import torch.nn as nn
-import configuration as cfg
 
-from debug import sprint
+from tools.debug import sprint
 
-import pk
+import model.old.prediction_kernel as pk
 
 
-class KernelNetwork(nn.Module):
+class KernelNetwork(th.nn.Module):
     """
     This class contains the kernelized network topology for the spatio-temporal
     propagation of information
     """
 
-    def __init__(self, params, tensors):
+    def __init__(self, config, tensors):
 
         super(KernelNetwork, self).__init__()
 
-        self.params = params
+        self.config = config
         self.tensors = tensors
 
         #
@@ -26,17 +24,63 @@ class KernelNetwork(nn.Module):
 
         # Initialize the shared Prediction Kernel (PK) network that will do the
         # PK calculations 
-        self.pk_net = pk.PK(batch_size=cfg.BATCH_SIZE,
-                              amount_pks=cfg.PK_ROWS*cfg.PK_COLS, 
-                              input_size = cfg.PK_NEIGHBORS + 1, 
-                              lstm_size = cfg.PK_NUM_LSTM_CELLS,
-                              device = params.device)
+        self.pk_net = pk.PredictionKernelNet(config)
+
+        # Variables for the PK-TK connections
+        self.pk_adj_mat = None
+        self.pos0 = None
+        self.coming_from = None
+        self.going_to = None
+
+        self._build_connections(config.pk_rows, config.pk_cols)
+
+    def forward(self, dyn_in):
+        """
+        Runs the forward pass of all PKs and TKs, respectively, in parallel for
+        a given input
+        :param dyn_in: The dynamic input for the PKs
+        :param pk_stat_in: (optional) The static input for the PKs
+        :param tk_stat_in: (optional) The static input for the TKs
+        """
+
+        # Write the dynamic PK input to the corresponding tensor
+        if isinstance(dyn_in, th.Tensor):
+            self.tensors.pk_dyn_in = dyn_in
+        else:
+            self.tensors.pk_dyn_in = th.from_numpy(
+                dyn_in
+            ).to(device=self.config.device)
+        
+        # Set the appropriate lateral inputs to the lateral outputs from the
+        # previous time step
+        self.tensors.pk_lat_in[self.pos0, self.going_to] = \
+            self.tensors.pk_lat_out[self.coming_from, self.going_to]
+        
+        # Forward the PK inputs through the pk_net to get the outputs and hidden
+        # states of these PKs
+        pk_dyn_out, pk_lat_out, pk_lstm_c, pk_lstm_h = self.pk_net.forward(
+            dyn_in=self.tensors.pk_dyn_in,
+            lat_in=self.tensors.pk_lat_in,
+            lstm_c=self.tensors.pk_lstm_c,
+            lstm_h=self.tensors.pk_lstm_h
+        )
+
+        # Update the output and hidden state tensors of the PKs
+        self.tensors.pk_dyn_out = pk_dyn_out
+        self.tensors.pk_lat_out = pk_lat_out
+        self.tensors.pk_lstm_c = pk_lstm_c
+        self.tensors.pk_lstm_h = pk_lstm_h
+
+    def reset(self):
+        self.tensors.reset()
+
+    def _build_connections(self, rows, cols):
 
         # Initialize an adjacency matrix for the PK-TK connections
         self.pk_adj_mat = th.zeros(size=(2,
-                                         cfg.PK_ROWS * cfg.PK_COLS,
-                                         cfg.PK_ROWS * cfg.PK_COLS),
-                                   device=params.device)
+                                         rows * cols,
+                                         rows * cols),
+                                   device=self.config.device)
 
         # Define a dictionary that maps directions to numbers
         # direction_dict = {"top": 1, "left": 2, "right": 3, "bottom": 4}
@@ -48,8 +92,8 @@ class KernelNetwork(nn.Module):
         pk_id_running = 0
 
         # Iterate over all PK rows and columns to create PK instances
-        for pk_row in range(cfg.PK_ROWS):
-            for pk_col in range(cfg.PK_COLS):
+        for pk_row in range(rows):
+            for pk_col in range(cols):
 
                 # Find the neighboring PKs to which this PK is connected
                 neighbors = {"top left": [pk_row - 1, pk_col - 1],
@@ -74,11 +118,11 @@ class KernelNetwork(nn.Module):
 
                     # If the neighbor lies within the defined field, define
                     # it as neighbor in the adjacency matrix
-                    if (0 <= neighbor_row < cfg.PK_ROWS) and \
-                       (0 <= neighbor_col < cfg.PK_COLS):
+                    if (0 <= neighbor_row < rows) and \
+                       (0 <= neighbor_col < cols):
 
                         # Determine the index of the neighbor
-                        neighbor_idx = neighbor_row * cfg.PK_COLS + neighbor_col
+                        neighbor_idx = neighbor_row * cols + neighbor_col
 
                         # Set the corresponding entry in the adjacency matrix to
                         # one
@@ -99,108 +143,3 @@ class KernelNetwork(nn.Module):
         self.coming_from = th.from_numpy(a[1]).to(dtype=th.long)
         self.going_to = (self.pk_adj_mat[1][a] - 1).to(dtype=th.long)
 
-    def forward(self, dyn_in, pk_stat_in=None, tk_stat_in=None):
-        """
-        Runs the forward pass of all PKs and TKs, respectively, in parallel 
-        for a given input
-
-        """
-
-
-        # Write the dynamic PK input to the corresponding tensor
-        if isinstance(dyn_in, th.Tensor):
-            self.tensors.pk_dyn_in = dyn_in
-        else:
-            self.tensors.pk_dyn_in = th.from_numpy(
-                dyn_in
-            ).to(device=self.params.device)
-
-        # Set the appropriate lateral inputs to the lateral outputs from the
-        # previous time step
-        self.tensors.pk_lat_in[:,self.pos0, self.going_to] = \
-        self.tensors.pk_lat_out[:,self.coming_from, self.going_to]
-
-
-        # sprint(self.tensors.pk_dyn_in,"self.tensors.pk_dyn_in")
-        # sprint(self.tensors.pk_lat_in, "self.tensors.pk_lat_in")
-        # self.counter = self.counter + 1
-        # print(f"self.counter: {self.counter}")
-        # Insert Dim 10, 256, 1 -> 10, 256, 1,1 and concat with 10, 256, 8, 1
-        # => 10, 256, 9, 1
-        input_ = th.cat((th.unsqueeze(self.tensors.pk_dyn_in,2), self.tensors.pk_lat_in),2)
-
-        # Forward the PK inputs through the pk_net to get the outputs and hidden
-        # states of these PKs
-        pk_output, pk_lstm_h, pk_lstm_c = self.pk_net.forward(
-            input_= input_, # (10, 256, 9, 1)
-            old_h= self.tensors.pk_lstm_h,  # (10, 256, 16)
-            old_c= self.tensors.pk_lstm_c # (10, 256, 16)            
-        )
-
-        # Dynamic output
-        pk_dyn_out = pk_output[:, :,  :self.params.pk_dyn_out_size]
-
-        # Lateral output
-        pk_lat_out = pk_output[:, : , self.params.pk_dyn_out_size:]
-
-        
-
-        #pk_lstm_h: (10, 256, 16)
-        #pk_lstm_c: (10, 256, 16)
-        
-
-        # Update the output and hidden state tensors of the PKs
-        self.tensors.pk_dyn_out = pk_dyn_out
-        self.tensors.pk_lat_out = pk_lat_out
-        self.tensors.pk_lstm_h = pk_lstm_h
-        self.tensors.pk_lstm_c = pk_lstm_c    
-
-
-
-
-
-    def forward_old(self, dyn_in, pk_stat_in=None, tk_stat_in=None):
-        """
-        Runs the forward pass of all PKs and TKs, respectively, in parallel for
-        a given input
-        :param dyn_in: The dynamic input for the PKs
-        :param pk_stat_in: (optional) The static input for the PKs
-        :param tk_stat_in: (optional) The static input for the TKs
-        """
-
-        # Write the dynamic PK input to the corresponding tensor
-        if isinstance(dyn_in, th.Tensor):
-            self.tensors.pk_dyn_in = dyn_in
-        else:
-            self.tensors.pk_dyn_in = th.from_numpy(
-                dyn_in
-            ).to(device=self.params.device)
-
-        
-        # Set the appropriate lateral inputs to the lateral outputs from the
-        # previous time step
-        self.tensors.pk_lat_in[self.pos0, self.going_to] = \
-            self.tensors.pk_lat_out[self.coming_from, self.going_to]
-
-        
-        # Forward the PK inputs through the pk_net to get the outputs and hidden
-        # states of these PKs
-        pk_dyn_out, pk_lat_out, pk_lstm_c, pk_lstm_h = self.pk_net.forward(
-            dyn_in=self.tensors.pk_dyn_in,
-            lat_in=self.tensors.pk_lat_in,
-            lstm_c=self.tensors.pk_lstm_c,
-            lstm_h=self.tensors.pk_lstm_h
-        )
-
-        # Update the output and hidden state tensors of the PKs
-        self.tensors.pk_dyn_out = pk_dyn_out
-        self.tensors.pk_lat_out = pk_lat_out
-        self.tensors.pk_lstm_c = pk_lstm_c
-        self.tensors.pk_lstm_h = pk_lstm_h
-
-    def reset(self, batch_size):
-        self.tensors.set_batch_size_and_reset(batch_size)
-        self.pk_net.set_batch_size(batch_size)
-
-    def detach(self):
-        self.tensors.detach()
