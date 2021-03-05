@@ -104,8 +104,10 @@ class TestSupervisor():
 
         plt.style.use('dark_background')
 
-    def plot_sample(self, mode, net_outputs, net_label, net_input):
+    def plot_sample(self, net_outputs, net_label, net_input):
 
+        image_mode = self.params['image_mode']
+        video_mode = self.params['video_mode']
         pk_rows = self.params['pk_rows']
         pk_cols = self.params['pk_cols']
         teacher_forcing_steps = self.params['teacher_forcing_steps']
@@ -137,9 +139,9 @@ class TestSupervisor():
         fig.suptitle('Model ' + model_name, fontsize=12)
         #
 
-        if mode == "show":
+        if image_mode == "show":
             plt.show()
-        else:
+        elif image_mode != "no":
             file = model_name + "_" + str(self.sample_idx) +  ".png"
 
             # Check whether the directory to save the data exists 
@@ -148,13 +150,12 @@ class TestSupervisor():
                 os.makedirs(diagram_folder)
 
             plt.savefig(diagram_folder + file)
-            if mode == "save":
+            if image_mode == "save":
                 plt.close(fig)
 
 
         # Visualize and animate the propagation of the 2d wave
         anim = visualize.animate_2d_wave(
-            mode = mode,
             pk_rows=pk_rows, 
             pk_cols=pk_cols, 
             teacher_forcing_steps=teacher_forcing_steps,
@@ -162,18 +163,22 @@ class TestSupervisor():
             net_outputs= net_outputs, 
             net_inputs=net_input)
 
-        if mode != "show":
+        if video_mode != "show" and video_mode != "no":
             file = model_name + "_" + str(self.sample_idx) +  ".mp4"
             # Check whether the directory to save the data exists 
             #  and create it if not
             if not os.path.exists(diagram_folder):
                 os.makedirs(diagram_folder)
-                
             print("Save diagram as video...")
-            # Saves the animation as a video file 
+            # save the animation as an mp4.  This requires ffmpeg or mencoder to be
+            # installed.  The extra_args ensure that the x264 codec is used, so that
+            # the video can be embedded in html5.  You may need to adjust this for
+            # your system: for more information, see
+            # http://matplotlib.sourceforge.net/api/animation_api.html
+            # extra_args=['-vcodec', 'libx264'])
             anim.save(diagram_folder+file, fps=5) 
         
-        if mode != "save":
+        if video_mode != "save" and video_mode != "no":
             plt.show()
 
         self.sample_idx += 1

@@ -64,7 +64,7 @@ def run_testing(params):
             forward_pass_duration = time.time() - time_start
             print("\tForward pass for batch size ",params["batch_size"]," took: ", forward_pass_duration, " seconds.")
 
-        supervisor.plot_sample(params['mode'], net_outputs[sample_idx], 
+        supervisor.plot_sample(net_outputs[sample_idx], 
             net_label[sample_idx], net_input[sample_idx])
 
         # Retrieve user input to continue or quit the testing

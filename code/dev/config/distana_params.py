@@ -101,9 +101,6 @@ class DISTANAParams(Params):
         parser.add_argument('-m','--model-name', type=str, 
             help='The name of the model.')
 
-        parser.add_argument('-v','--version-name', type=str, 
-            help='The name of the model version.')
-
         parser.add_argument('-d','--data-type', type=str, 
             help='The type of the data. Used to load the data from this data subfolder.')
 
@@ -223,8 +220,11 @@ class DISTANAParams(Params):
 
         # Options for testing
 
-        parser.add_argument('mode', choices=['show', 'save', 'show_save'], 
-            help='Shall the testing result be visualized, saved to file or both?')
+        parser.add_argument('-i', '--image-mode', choices=['no','show', 'save', 'show_save'], default='save', 
+            help='Shall an image of the testing result be visualized, saved to file or both?')
+
+        parser.add_argument('-v', '--video-mode', choices=['no','show', 'save', 'show_save'], default='no', 
+            help='Shall a video of the testing result be visualized, saved to file or both?')
 
         parser.add_argument('--teacher-forcing-steps', type=int, 
             help='Amount of time steps for the teacher forcing.')
@@ -233,7 +233,7 @@ class DISTANAParams(Params):
             help='Amount of time steps for the closed loop.')
 
         parser.add_argument('-b','--batch-size', type=int, 
-            help='Specify the batch size for the testing.')
+            help='Specify the batch size for the test run.')
 
         return parser
 

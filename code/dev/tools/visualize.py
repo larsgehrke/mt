@@ -43,7 +43,7 @@ def plot_kernel_activity(idx, ax, label, net_out, pk_rows, pk_cols,
         ax.legend()
 
 
-def animate_2d_wave(mode, pk_rows, pk_cols, teacher_forcing_steps,
+def animate_2d_wave(pk_rows, pk_cols, teacher_forcing_steps,
     net_label, net_outputs, net_inputs=None):
     """
     This function visualizes the spatio-temporally expanding wave
