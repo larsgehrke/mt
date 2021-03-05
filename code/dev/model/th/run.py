@@ -15,42 +15,49 @@ class Evaluator():
         self.tensors = KernelTensors(kernel_config)
         self.net = KernelNetwork(kernel_config,self.tensors)
 
-        self.train_filenames = None # used for training
-        self.optimizer = None # used for training
-        self.criterion = None # used for training and testing
-        self.teacher_forcing_steps = None # used for testing
+        # Train or Test mode
         self.is_testing = False
 
+        # Used for Training
+        self.train_filenames = None 
+        self.optimizer = None 
+        self.train_criterion = None 
+
+        # Used for Testing
+        self.test_criterion = None 
+        self.test_filenames = None 
+        self.teacher_forcing_steps = None 
+        
 
     def set_training(self, train_filenames, optimizer, criterion):
         self.train_filenames = train_filenames
         self.optimizer = optimizer
-        self.criterion = criterion
+        self.train_criterion = criterion
 
-        amount_iterations = math.ceil(len(train_filenames)/self.config.batch_size)
-        # Return amount of iterations per epoch
-        return amount_iterations
+        return self._get_iters(train_filenames)
 
-    def set_testing(self, criterion, teacher_forcing_steps):
-        self.criterion = criterion
+    def set_testing(self, test_filenames, criterion, teacher_forcing_steps):
+        self.test_filenames = test_filenames
+        self.test_criterion = criterion
         self.teacher_forcing_steps = teacher_forcing_steps
-        self.is_testing = True
+
+        return self._get_iters(test_filenames)
 
     def train(self, iter_idx):
+        self.is_testing = False
 
         if self.train_filenames is None or self.optimizer is None \
-            or self.criterion is None:
+            or self.train_criterion is None:
                 raise ValueError("Missing the training configuration: Data File names, Optimizer and/or Criterion.")
 
         net_input, net_label, batch_size = self._set_up_batch(iter_idx = iter_idx)
 
-        
         # Set the gradients back to zero
         self.optimizer.zero_grad()
 
         net_outputs = self._evaluate(net_input, net_label, batch_size)
 
-        mse = self.criterion(net_outputs, th.from_numpy(net_label))
+        mse = self.train_criterion(net_outputs, th.from_numpy(net_label))
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
 
@@ -61,14 +68,18 @@ class Evaluator():
         return mse.item() # return only the number, not the th object
 
 
-    def test(self, filenames):
-        th.autograd.set_detect_anomaly(True)
+    def test(self, iter_idx):
+        self.is_testing = True
 
-        net_input, net_label, batch_size = self._set_up_batch(data_all = filenames, all_files = True)
+        if self.test_filenames is None or self.test_criterion is None \
+            or self.teacher_forcing_steps is None:
+            raise ValueError("Missing the testing configuration: Data File names, Criterion and/or Amount teacher forcing steps.")
+
+        net_input, net_label, batch_size = self._set_up_batch(iter_idx = iter_idx)
 
         net_outputs = self._evaluate(net_input, net_label, batch_size)
 
-        mse = self.criterion(net_outputs, th.from_numpy(net_label))
+        mse = self.test_criterion(net_outputs, th.from_numpy(net_label))
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
 
@@ -130,7 +141,7 @@ class Evaluator():
             self.net.eval()
 
 
-    def _set_up_batch(self, data_all = None, iter_idx=0, all_files = False, is_train = True):
+    def _set_up_batch(self, iter_idx):
         """
             Training:
                 Create the batch data for the current training iteration in the epoch.
@@ -138,13 +149,20 @@ class Evaluator():
                 Create a batch of all test data samples.
 
         """
-        # Shuffle training data at the beginning of the epoch
-
-        if data_all is None:
-            data_all = self.train_filenames
-
+        
+        # Shuffle data at the beginning of the epoch
         if iter_idx == 0:
-            np.random.shuffle(data_all)        
+            if self.is_testing:
+                np.random.shuffle(self.test_filenames) # in place operation!
+            else:
+                np.random.shuffle(self.train_filenames) # in place operation!
+
+        data_all = None
+
+        if self.is_testing:
+            data_all = self.test_filenames
+        else:
+            data_all = self.train_filenames
 
         batch_size = self.config.batch_size
         seq_len = self.config.seq_len
@@ -154,11 +172,6 @@ class Evaluator():
 
         # Handling also last batch
         last_sample_excl = min(first_sample + batch_size, len(data_all))
-
-
-        if(all_files):
-            first_sample = 0
-            last_sample_excl = len(data_all)
   
   
         data = np.load(data_all[first_sample])[:seq_len + 1]
@@ -190,7 +203,7 @@ class Evaluator():
 
         _net_label = np.array(data[:,1:, :, 0:1], dtype=np.float32)
 
-        if is_train:
+        if not self.is_testing:
             # Set the dynamic inputs with a certain probability to zero to force
             # the network to use lateral connections
             _net_input *= np.array(
@@ -203,4 +216,12 @@ class Evaluator():
 
 
         return _net_input, _net_label, batch_size_
+
+
+    def _get_iters(self, filenames):
+        # Return amount of iterations per epoch
+        return math.ceil(len(filenames)/self.config.batch_size)
+
+
+
 

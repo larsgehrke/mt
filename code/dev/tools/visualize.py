@@ -37,7 +37,7 @@ def plot_kernel_activity(idx, ax, label, net_out, pk_rows, pk_cols,
     yticks = ax.get_yticks()[1:-1]
     
     ax.plot(np.ones(len(yticks)) * teacher_forcing_steps, yticks,
-            color='black', linestyle='dotted',
+            color='white', linestyle='dotted',
             label='End of teacher forcing')
     if make_legend:
         ax.legend()

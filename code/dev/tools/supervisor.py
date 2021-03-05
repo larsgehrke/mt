@@ -47,8 +47,9 @@ class TrainSupervisor():
 
 
 
-    def finished_validation(self, error):
+    def finished_validation(self, errors):
 
+        error = np.mean(errors)
         self.epoch_errors_val.append(error)
 
         # Save the model to file (if desired)
@@ -99,7 +100,11 @@ class TestSupervisor():
         self.time_list = []
         self.accuracy_list = []
 
-    def plot_sample(self, mode, net_outputs, net_label, net_input, idx):
+        self.sample_idx = 0
+
+        plt.style.use('dark_background')
+
+    def plot_sample(self, mode, net_outputs, net_label, net_input):
 
         pk_rows = self.params['pk_rows']
         pk_cols = self.params['pk_cols']
@@ -135,7 +140,7 @@ class TestSupervisor():
         if mode == "show":
             plt.show()
         else:
-            file = model_name + "_" + str(idx) +  ".png"
+            file = model_name + "_" + str(self.sample_idx) +  ".png"
 
             # Check whether the directory to save the data exists 
             #  and create it if not
@@ -158,7 +163,7 @@ class TestSupervisor():
             net_inputs=net_input)
 
         if mode != "show":
-            file = model_name + "_" + str(idx) +  ".mp4"
+            file = model_name + "_" + str(self.sample_idx) +  ".mp4"
             # Check whether the directory to save the data exists 
             #  and create it if not
             if not os.path.exists(diagram_folder):
@@ -172,6 +177,8 @@ class TestSupervisor():
         
         if mode != "save":
             plt.show()
+
+        self.sample_idx += 1
 
         # Append the test statistics for this sequence to the appropriate lists
         # self.time_list.append(forward_pass_duration)

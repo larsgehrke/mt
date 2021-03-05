@@ -46,7 +46,8 @@ def run_training(params):
 
     # Set the training parameters for the model 
     # and get the amount of iterations for one epoch
-    amount_iter = distana.set_training(train_data_files, optimizer, criterion)
+    amount_train = distana.set_training(train_data_files, optimizer, criterion)
+    amount_val = distana.set_testing(val_data_files, criterion, params['teacher_forcing_steps'])
 
     model_saver = None
     if params["save_model"]:
@@ -74,21 +75,28 @@ def run_training(params):
 
         # save batch errors
         training_errors = []
+        val_errors = []
 
         # Iterate through epoch
-        for _iter in range(amount_iter):
+        for _iter_train in range(amount_train):
 
             # Train the network for the given training data
-            mse = distana.train(iter_idx=_iter)
+            mse = distana.train(iter_idx=_iter_train)
 
             training_errors.append(mse)
             
         supervisor.finished_training(training_errors)
 
-        # Compute validation error
-        # Evaluate and validate the network for the given validation data
-        mse = distana.test(val_data_files)[0] # get only the error
-        supervisor.finished_validation(mse)
+        # Iterate through epoch
+        for _iter_val in range(amount_val):
+
+            # Test the network for the given validation data
+            mse = distana.test(iter_idx=_iter_val)[0] # get only the error
+
+            val_errors.append(mse)
+            
+        supervisor.finished_validation(val_errors)
+        
 
         supervisor.finished_epoch(epoch, epoch_start_time)
 

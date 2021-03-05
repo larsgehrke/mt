@@ -37,25 +37,44 @@ def run_testing(params):
 
     criterion = th.nn.MSELoss() 
 
+    # Load the trained weights from file
     distana.set_weights(th_tools.load_model(params), is_training=False)
-    distana.set_testing(criterion, params['teacher_forcing_steps'])
     
     # Get the test data
     test_data_files = get_data_filenames(os.path.join(params['data_folder'],'test',''))
-
+    # Save the test configuration and data in the model class
+    amount_test = distana.set_testing(test_data_files,criterion, params['teacher_forcing_steps'])
+    # Create the view object 
     supervisor = TestSupervisor(params,distana.get_trainable_params())
 
-    # Evaluate the network for the given test data
-    mse, net_outputs, net_label, net_input = distana.test(test_data_files)
+    
 
     x = u'1'
-    curr_idx = 0
-    while x == u'1':
-        supervisor.plot_sample(params['mode'], net_outputs[curr_idx], net_label[curr_idx], net_input[curr_idx], curr_idx)
+    batch_idx, sample_idx = 0, 0
+    mse, net_outputs_batch, net_label_batch, net_input_batch = None, None, None, None
+
+    while x == u'1' and batch_idx<amount_test:
+
+        if sample_idx == 0:
+            time_start = time.time()
+
+            # Evaluate the network for the given test data
+            mse, net_outputs, net_label, net_input = distana.test(iter_idx=batch_idx)
+            
+            forward_pass_duration = time.time() - time_start
+            print("\tForward pass for batch size ",params["batch_size"]," took: ", forward_pass_duration, " seconds.")
+
+        supervisor.plot_sample(params['mode'], net_outputs[sample_idx], 
+            net_label[sample_idx], net_input[sample_idx])
 
         # Retrieve user input to continue or quit the testing
         x = input("Press 1 to see another example, anything else to quit.")
-        curr_idx += 1
+        
+        sample_idx += 1
+        
+        if sample_idx >= params["batch_size"]:
+            batch_idx += 1 
+            sample_idx = 0 
 
     supervisor.finished()
 

@@ -232,6 +232,9 @@ class DISTANAParams(Params):
         parser.add_argument('--closed-loop-steps', type=int, 
             help='Amount of time steps for the closed loop.')
 
+        parser.add_argument('-b','--batch-size', type=int, 
+            help='Specify the batch size for the testing.')
+
         return parser
 
 

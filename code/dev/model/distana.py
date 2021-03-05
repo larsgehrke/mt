@@ -16,11 +16,11 @@ class DISTANA():
 
         self.model = model.Evaluator(KernelConfig(params))
 
-    def set_training(self,train_data, optimizer, criterion):
+    def set_training(self, train_data, optimizer, criterion):
         return self.model.set_training(train_data,optimizer, criterion)
 
-    def set_testing(self,criterion, teacher_forcing_steps):
-        return self.model.set_testing(criterion, teacher_forcing_steps)
+    def set_testing(self, test_data, criterion, teacher_forcing_steps):
+        return self.model.set_testing(test_data, criterion, teacher_forcing_steps)
 
     def net(self):
         return self.model.net
@@ -38,5 +38,5 @@ class DISTANA():
     def train(self, iter_idx):
         return self.model.train(iter_idx)
 
-    def test(self, data):
-        return self.model.test(data)
+    def test(self, iter_idx):
+        return self.model.test(iter_idx)
