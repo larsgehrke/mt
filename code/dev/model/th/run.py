@@ -55,9 +55,9 @@ class Evaluator():
         # Set the gradients back to zero
         self.optimizer.zero_grad()
 
-        net_outputs = self._evaluate(net_input, net_label, batch_size)
+        net_outputs = self._evaluate(net_input, batch_size)
 
-        mse = self.train_criterion(net_outputs, th.from_numpy(net_label).to(self.config.device))
+        mse = self.train_criterion(net_outputs, net_label)
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
 
@@ -77,15 +77,15 @@ class Evaluator():
 
         net_input, net_label, batch_size = self._set_up_batch(iter_idx = iter_idx)
 
-        net_outputs = self._evaluate(net_input, net_label, batch_size)
+        net_outputs = self._evaluate(net_input, batch_size)
 
-        mse = self.test_criterion(net_outputs, th.from_numpy(net_label))
+        mse = self.test_criterion(net_outputs, net_label)
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
 
         return mse.item(), net_outputs, net_label, net_input
 
-    def _evaluate(self, net_input, net_label, batch_size):
+    def _evaluate(self, net_input, batch_size):
         
         th.autograd.set_detect_anomaly(True)
 
@@ -213,10 +213,13 @@ class Evaluator():
                 dtype=np.float32
             )
 
-        batch_size_ = len(_net_input)
+        _batch_size = len(_net_input)
+
+        # convert to th.tensor
+        _net_label = th.from_numpy(_net_label).to(self.config.device)
 
 
-        return _net_input, _net_label, batch_size_
+        return _net_input, _net_label, _batch_size
 
 
     def _get_iters(self, filenames):
