@@ -9,6 +9,7 @@ class DISTANA():
 
         if params["model_name"] == "old":
             import model.old.run as model
+            params["batch_size"] = 1
         elif params["model_name"] == "th":
             import model.th.run as model
         elif params["model_name"] == "cuda":
