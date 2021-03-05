@@ -168,6 +168,7 @@ class TestSupervisor():
             #  and create it if not
             if not os.path.exists(diagram_folder):
                 os.makedirs(diagram_folder)
+            print("Save diagram as video...")
             # save the animation as an mp4.  This requires ffmpeg or mencoder to be
             # installed.  The extra_args ensure that the x264 codec is used, so that
             # the video can be embedded in html5.  You may need to adjust this for
