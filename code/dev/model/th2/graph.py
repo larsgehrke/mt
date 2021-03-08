@@ -55,7 +55,7 @@ class Graph(th.nn.Module):
         # previous time step
         # output[:,self.pos0, self.going_to] = \
         # input_[:,self.coming_from, self.going_to]
-        sprint(input_, "input_", exit=True)
+        sprint(input_, "input_")
 
         return GraphFunction.apply(input_)
 
