@@ -25,7 +25,6 @@ class Evaluator(BaseEvaluator):
 
     def train(self, iter_idx):
         
-        clock = Clock(" ===> Iteration: " + str(iter_idx))
         self.is_testing = False
 
         if self.train_filenames is None or self.optimizer is None \
@@ -33,30 +32,24 @@ class Evaluator(BaseEvaluator):
                 raise ValueError("Missing the training configuration: Data File names, Optimizer and/or Criterion.")
 
         net_input, net_label, batch_size = self._set_up_batch(iter_idx = iter_idx)
-        clock.split("_set_up_batch")
 
         # Set the gradients back to zero
         self.optimizer.zero_grad()
-        clock.split("self.optimizer.zero_grad()")
 
-        net_outputs = self._evaluate(self._np_to_th(net_input), batch_size)
-        clock.split("self._evaluate")
+        net_outputs = self._evaluate(self._np_to_th(net_input), batch_size, iter_idx)
 
         mse = self.train_criterion(net_outputs, self._np_to_th(net_label))
-        clock.split("self.train_criterion")
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
 
         # backward pass
         mse.backward()
-        clock.split("mse.backward()")
         self.optimizer.step()
-        clock.split("self.optimizer.step()")
-        
+
         return mse.item() # return only the number, not the th object
         
 
-    def _evaluate(self, net_input, batch_size):
+    def _evaluate(self, net_input, batch_size, iter_idx):
 
         seq_len = self.config.seq_len
         amount_pks = self.config.amount_pks
@@ -96,7 +89,7 @@ class Evaluator(BaseEvaluator):
                 # [B, PK, DYN]
 
             # Forward the input through the network
-            self.net.forward(dyn_in=dyn_net_in_step)
+            self.net.forward(dyn_in=dyn_net_in_step, iter_idx=iter_idx, t=t)
 
             # Just saving the output of the current time step
             net_outputs[:,t,:,:] = self.tensors.pk_dyn_out

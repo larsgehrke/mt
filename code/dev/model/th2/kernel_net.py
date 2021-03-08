@@ -39,29 +39,32 @@ class KernelNetwork(th.nn.Module):
         self._build_connections(config.pk_rows, config.pk_cols)
         # c1.split("_build_connections")
 
-    def forward(self, dyn_in):
+    def forward(self, dyn_in, iter_idx, t):
         """
         Runs the forward pass of all PKs and TKs, respectively, in parallel 
         for a given input
 
         """
-
-        # c2 = Clock("kenel_net.forward()")
+        if iter_idx >0:
+            c2 = Clock(f"==> Iteration: {str(iter_idx)}, timestep {str(t)}")
         # Write the dynamic PK input to the corresponding tensor
         self.tensors.pk_dyn_in = dyn_in
-        # c2.split("self.tensors.pk_dyn_in = dyn_in")
+        if iter_idx >0:
+            c2.split("self.tensors.pk_dyn_in = dyn_in")
         # Set the appropriate lateral inputs to the lateral outputs from the
         # previous time step
         self.tensors.pk_lat_in[:,self.pos0, self.going_to] = \
         self.tensors.pk_lat_out[:,self.coming_from, self.going_to]
-        # c2.split("graph connections")
+        if iter_idx >0:
+            c2.split("graph connections")
        
         # Flatten last two dims: B, PK, N, Lat -> B, PK, N*Lat and concat with B, PK, Dyn
         # => B, PK, N*Lat + Dyn
         lat_in_flat = th.flatten(self.tensors.pk_lat_in,start_dim=2)
 
         input_ = th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
-        # c2.split("flatten input")
+        if iter_idx >0:
+            c2.split("flatten input")
 
         # Forward the PK inputs through the pk_net to get the outputs and hidden
         # states of these PKs
@@ -71,21 +74,25 @@ class KernelNetwork(th.nn.Module):
             old_c= self.tensors.pk_lstm_c # Size: [B, PK,  LSTM]
         )
         # pk_output: [B, PK, DYN + N*LAT]
-        # c2.split("doing forward")
+        if iter_idx >0:
+            c2.split("doing forward")
 
         # Dynamic output
         pk_dyn_out = pk_output[:, :,  :self.config.pk_dyn_size]
-        # c2.split("getting dyn_out")
+        if iter_idx >0:
+            c2.split("getting dyn_out")
         
 
         # Lateral output flattened
         pk_lat_out_flat = pk_output[:, :, self.config.pk_dyn_size:]
-        # c2.split("getting lat_out")
+        if iter_idx >0:
+            c2.split("getting lat_out")
 
         # Batch Size is flexibel (note end of epoch)
         pk_lat_out = pk_lat_out_flat.view(size=(-1,
             self.config.amount_pks, self.config.pk_neighbors, self.config.pk_lat_size))
-        # c2.split("reshape lat_out")
+        if iter_idx >0:
+            c2.split("reshape lat_out")
 
 
         # Update the output and hidden state tensors of the PKs
@@ -93,7 +100,8 @@ class KernelNetwork(th.nn.Module):
         self.tensors.pk_lat_out = pk_lat_out
         self.tensors.pk_lstm_h = pk_lstm_h
         self.tensors.pk_lstm_c = pk_lstm_c 
-        # c2.split("save output values")   
+        if iter_idx >0:
+            c2.split("save output values")   
 
     def reset(self, batch_size):
         self.tensors.set_batch_size_and_reset(batch_size)
