@@ -10,6 +10,7 @@ from model.th2.kernel_tensors import KernelTensors
 
 from tools.debug import sprint
 from tools.debug import Clock
+import time
 
 
 class Evaluator(BaseEvaluator):
@@ -24,7 +25,7 @@ class Evaluator(BaseEvaluator):
 
     def train(self, iter_idx):
         
-        clock = Clock("train()")
+        t = time.time()
         self.is_testing = False
 
         if self.train_filenames is None or self.optimizer is None \
@@ -51,7 +52,8 @@ class Evaluator(BaseEvaluator):
         # clock.split(" mse.backward()")
         self.optimizer.step()
         # clock.split("self.optimizer.step()")
-        # clock.stop()
+        print(str(np.round(time.time() - t, 2)).ljust(5, '0')
+              + ' seconds.')
         return mse.item() # return only the number, not the th object
         
 
