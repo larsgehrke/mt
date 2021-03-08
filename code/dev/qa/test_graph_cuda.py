@@ -20,8 +20,9 @@ def test_graph():
                                  pk_neighbors,
                                  pk_neighbor_size),
                               device="cuda")
+    input_ = input_zeros + 1 
 
-    out = g.forward(input_zeros)
+    out = g.forward(input_)
     print(out)
     sprint(out, "out")
     
