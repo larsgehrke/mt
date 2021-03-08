@@ -51,7 +51,7 @@ class Evaluator(BaseEvaluator):
         # clock.split(" mse.backward()")
         self.optimizer.step()
         # clock.split("self.optimizer.step()")
-        clock.stop()
+        # clock.stop()
         return mse.item() # return only the number, not the th object
         
 
