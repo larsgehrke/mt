@@ -9,8 +9,6 @@ from model.th2.kernel_net import KernelNetwork
 from model.th2.kernel_tensors import KernelTensors
 
 from tools.debug import sprint
-from tools.debug import Clock
-import time
 
 
 class Evaluator(BaseEvaluator):
