@@ -51,7 +51,6 @@ namespace
         */
         const int pk_thread_id = threadIdx.y * blockDim.x + threadIdx.x;
 
-        int sum = 0
         
         /* TODO: Forward Pass */
         for (int i = 0; i<8; i++)
