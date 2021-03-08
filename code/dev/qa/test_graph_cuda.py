@@ -7,6 +7,8 @@
 from model.th2.graph import Graph
 import torch as th
 
+import time
+
 from tools.debug import sprint
 
 def test_graph():
@@ -21,10 +23,12 @@ def test_graph():
                                  pk_neighbor_size),
                               device="cuda")
     input_ = input_zeros + 1 
-
+    start = time.time()
     out = g.forward(input_)
+    stop = time.time()
     print(out)
     sprint(out, "out")
+    print(stop-start)
     
     
 
