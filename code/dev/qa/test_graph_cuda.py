@@ -7,7 +7,7 @@
 from model.th2.graph import Graph
 import torch as th
 
-from debug.tools import sprint
+from tools.debug import sprint
 
 def test_graph():
 
