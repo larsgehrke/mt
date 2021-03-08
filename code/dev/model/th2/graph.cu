@@ -10,7 +10,7 @@
 #define BATCH_SIZE 10
 #define PK_ROWS 16
 #define PK_COLS 16
-#define DIMS 3
+#define DIMS 4
 
 namespace 
 {
