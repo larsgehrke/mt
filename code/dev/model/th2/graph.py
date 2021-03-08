@@ -2,7 +2,30 @@ import math
 import torch as th
 import numpy as np
 
+from torch.utils.cpp_extension import load
+
 from tools.debug import sprint
+
+graph_cuda = load(
+    'graph', ['model/th2/graph.cpp', 'model/th2/graph.cu'],
+    verbose=True)
+# extra_include_paths=["cuda/include"]
+
+class GraphFunction(th.autograd.Function):
+
+    @staticmethod
+    def forward(ctx, input_):
+
+        rearranged_in = graph_cuda.forward(input_)
+
+        return rearranged_in
+
+    @staticmethod
+    def backward(ctx, grad_rearranged_in):
+
+        d_input_ = graph_cuda.backward(grad_rearranged_in.contiguous())
+
+        return d_input_
 
 
 class Graph(th.nn.Module):
@@ -17,7 +40,7 @@ class Graph(th.nn.Module):
         self._build_connections(pk_rows, pk_cols)
 
 
-    def forward(self, input_ , output):
+    def forward(self, input_):
         '''
             Implementing the lateral connections (graph edges) of DISTANA
             
@@ -28,13 +51,12 @@ class Graph(th.nn.Module):
 
         '''
 
-
         # Set the appropriate lateral inputs to the lateral outputs from the
         # previous time step
-        output[:,self.pos0, self.going_to] = \
-        input_[:,self.coming_from, self.going_to]
+        # output[:,self.pos0, self.going_to] = \
+        # input_[:,self.coming_from, self.going_to]
 
-        return output
+        return GraphFunction.apply(input_)
 
     def _build_connections(self, rows, cols):
 

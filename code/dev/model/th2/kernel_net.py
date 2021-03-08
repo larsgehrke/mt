@@ -55,9 +55,10 @@ class KernelNetwork(th.nn.Module):
 
         # Set the appropriate lateral inputs to the lateral outputs from the
         # previous time step
-        self.graph.forward(self.tensors.pk_lat_out, self.tensors.pk_lat_in)
+        x = self.graph.forward(self.tensors.pk_lat_out)
         #self.tensors.pk_lat_in[:,self.pos0, self.going_to] = \
         #self.tensors.pk_lat_out[:,self.coming_from, self.going_to]
+        sprint(x, "x" , exit= True)
 
         if iter_idx == 5 and t == 5:
             clock.split("Graph connections")
