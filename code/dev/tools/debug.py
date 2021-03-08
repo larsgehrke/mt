@@ -34,10 +34,10 @@ class Clock():
         self.t = time.time()
 
     def split(self, s=""):
-        print(str(s)+ ": ", str(time.time()-self.t) + " seconds")
+        print(str(s)+ ": ", str(np.round(time.time() - self.t, 6)).ljust(6, '0') + " seconds")
         self.t = time.time()
 
     def stop(self, exit = True):
-        print("Total time: " + str(time.time()-self.total))
+        print("Total time: " + str(np.round(time.time() - self.total, 6)).ljust(6, '0') + " seconds")
         if exit:
             sys.exit()
