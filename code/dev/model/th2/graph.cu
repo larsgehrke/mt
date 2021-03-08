@@ -7,7 +7,7 @@
 
 /*#include <config.h>*/
 
-#define BATCH_SIZE 10
+#define BATCH_SIZE 8
 #define PK_ROWS 16
 #define PK_COLS 16
 #define DIMS 4
@@ -51,8 +51,12 @@ namespace
         */
         const int pk_thread_id = threadIdx.y * blockDim.x + threadIdx.x;
         
-        /* TODO: Forward Pass
-        out[batch_block_id][pk_thread_id][0] = in;*/
+        /* TODO: Forward Pass */
+        for (int i = 0; i<8; i++)
+        {
+          out[batch_block_id][pk_thread_id][i][0] = in[];
+        }
+        
 
 
     }
