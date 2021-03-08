@@ -16,9 +16,9 @@ class Evaluator(BaseEvaluator):
     def __init__(self, kernel_config):
         
         tensors = KernelTensors(kernel_config)
-        net = KernelNetwork(kernel_config,self.tensors)
+        net = KernelNetwork(kernel_config, tensors)
 
-        super()__init__(tensors, net)
+        super().__init__(kernel_config,tensors, net)
         
 
     def _evaluate(self, net_input, batch_size):
