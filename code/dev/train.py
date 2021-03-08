@@ -80,10 +80,8 @@ def run_training(params):
         # Iterate through epoch
         for _iter_train in range(amount_train):
 
-            start = time.time()
             # Train the network for the given training data
             mse = distana.train(iter_idx=_iter_train)
-            print(str(_iter_train) +": "+ str(np.round(time.time() - start, 2)).ljust(5, '0') + " seconds")
 
             training_errors.append(mse)
             

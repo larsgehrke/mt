@@ -24,7 +24,7 @@ class Evaluator(BaseEvaluator):
 
     def train(self, iter_idx):
         
-        # clock = Clock("train()")
+        clock = Clock("train()")
         self.is_testing = False
 
         if self.train_filenames is None or self.optimizer is None \
@@ -51,7 +51,7 @@ class Evaluator(BaseEvaluator):
         # clock.split(" mse.backward()")
         self.optimizer.step()
         # clock.split("self.optimizer.step()")
-        # clock.stop()
+        clock.stop()
         return mse.item() # return only the number, not the th object
         
 
