@@ -4,6 +4,7 @@ import torch as th
 import model.th.pk as pk
 
 from tools.debug import sprint
+from tools.debug import Clock
 
 class KernelNetwork(th.nn.Module):
     """
@@ -30,12 +31,13 @@ class KernelNetwork(th.nn.Module):
                               device = config.device)
 
         # Variables for the PK-TK connections
-        self.pk_adj_mat = None
         self.pos0 = None
         self.coming_from = None
         self.going_to = None
 
+        c1 = Clock("kenel_net.__init__()")
         self._build_connections(config.pk_rows, config.pk_cols)
+        c1.split("_build_connections")
 
     def forward(self, dyn_in):
         """
@@ -44,20 +46,22 @@ class KernelNetwork(th.nn.Module):
 
         """
 
-
+        c1 = Clock("kenel_net.forward()")
         # Write the dynamic PK input to the corresponding tensor
         self.tensors.pk_dyn_in = dyn_in
-
+        c1.split("self.tensors.pk_dyn_in = dyn_in")
         # Set the appropriate lateral inputs to the lateral outputs from the
         # previous time step
         self.tensors.pk_lat_in[:,self.pos0, self.going_to] = \
         self.tensors.pk_lat_out[:,self.coming_from, self.going_to]
-
+        c1.split("graph connections")
        
         # Flatten last two dims: B, PK, N, Lat -> B, PK, N*Lat and concat with B, PK, Dyn
         # => B, PK, N*Lat + Dyn
-        input_ = th.cat((self.tensors.pk_dyn_in, th.flatten(self.tensors.pk_lat_in,start_dim=2)),2)
+        lat_in_flat = th.flatten(self.tensors.pk_lat_in,start_dim=2)
 
+        input_ = th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
+        c1.split("flatten input")
 
         # Forward the PK inputs through the pk_net to get the outputs and hidden
         # states of these PKs
@@ -67,24 +71,29 @@ class KernelNetwork(th.nn.Module):
             old_c= self.tensors.pk_lstm_c # Size: [B, PK,  LSTM]
         )
         # pk_output: [B, PK, DYN + N*LAT]
+        c1.split("doing forward")
 
         # Dynamic output
         pk_dyn_out = pk_output[:, :,  :self.config.pk_dyn_size]
+        c1.split("getting dyn_out")
         
 
         # Lateral output flattened
         pk_lat_out_flat = pk_output[:, :, self.config.pk_dyn_size:]
+        c1.split("getting lat_out")
 
         # Batch Size is flexibel (note end of epoch)
         pk_lat_out = pk_lat_out_flat.view(size=(-1,
             self.config.amount_pks, self.config.pk_neighbors, self.config.pk_lat_size))
+        c1.split("reshape lat_out")
 
 
         # Update the output and hidden state tensors of the PKs
         self.tensors.pk_dyn_out = pk_dyn_out
         self.tensors.pk_lat_out = pk_lat_out
         self.tensors.pk_lstm_h = pk_lstm_h
-        self.tensors.pk_lstm_c = pk_lstm_c    
+        self.tensors.pk_lstm_c = pk_lstm_c 
+        c1.stop("save output values")   
 
     def reset(self, batch_size):
         self.tensors.set_batch_size_and_reset(batch_size)
@@ -93,10 +102,7 @@ class KernelNetwork(th.nn.Module):
     def _build_connections(self, rows, cols):
 
         # Initialize an adjacency matrix for the PK-TK connections
-        self.pk_adj_mat = th.zeros(size=(2,
-                                         rows * cols,
-                                         rows * cols),
-                                   device=self.config.device)
+        pk_adj_mat = np.zeros((2, rows*cols,rows*cols))
 
         # Define a dictionary that maps directions to numbers
         # direction_dict = {"top": 1, "left": 2, "right": 3, "bottom": 4}
@@ -142,8 +148,8 @@ class KernelNetwork(th.nn.Module):
 
                         # Set the corresponding entry in the adjacency matrix to
                         # one
-                        self.pk_adj_mat[0, pk_id_running, neighbor_idx] = 1
-                        self.pk_adj_mat[1, pk_id_running, neighbor_idx] = \
+                        pk_adj_mat[0, pk_id_running, neighbor_idx] = 1
+                        pk_adj_mat[1, pk_id_running, neighbor_idx] = \
                             direction_dict[neighbor_direction]
 
                 pk_id_running += 1
@@ -151,11 +157,11 @@ class KernelNetwork(th.nn.Module):
         #
         # Set up vectors that describe which lateral output goes to which
         # lateral input
-        a = np.where(self.pk_adj_mat[0].cpu().detach().numpy() == 1)
+        a = np.where(pk_adj_mat[0] == 1)
 
         # PK indexes that are to be considered in the lateral update
         self.pos0 = th.from_numpy(a[0]).to(dtype=th.long)
         # Define matrix from where the lateral inputs come and where they go
         self.coming_from = th.from_numpy(a[1]).to(dtype=th.long)
-        self.going_to = (self.pk_adj_mat[1][a] - 1).to(dtype=th.long)
+        self.going_to = th.from_numpy(pk_adj_mat[1][a] - 1).to(dtype=th.long)
 

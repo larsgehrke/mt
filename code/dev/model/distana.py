@@ -12,8 +12,10 @@ class DISTANA():
             params["batch_size"] = 1
         elif params["model_name"] == "th":
             import model.th.run as model
-        elif params["model_name"] == "cuda":
-            import model.cuda.run as model
+        elif params["model_name"] == "th2":
+            import model.th2.run as model
+        else:
+            raise ValueError("Model name is not valid.")
 
         self.model = model.Evaluator(KernelConfig(params))
 
