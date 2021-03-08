@@ -92,7 +92,7 @@ std::vector<torch::Tensor> graph_cuda_forward(
 
   AT_DISPATCH_FLOATING_TYPES(out.type(), "graph_forward_kernel", ([&] {
     graph_forward_kernel<scalar_t><<<blocks, threads>>>(
-        in.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
+        input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
         out.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>()
         );
   }));
