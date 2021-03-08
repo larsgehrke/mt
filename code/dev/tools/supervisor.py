@@ -6,7 +6,6 @@
 
 import time
 import matplotlib.pyplot as plt
-import torch as th
 import numpy as np
 import os
 
@@ -14,6 +13,12 @@ import tools.visualize as visualize
 
 import tools.debug as debug
 
+'''
+    =============================================
+    Supervisor (View) for the training of DISTANA
+    =============================================
+
+'''
 class TrainSupervisor():
 
     def __init__(self, epochs, trainable_params, saver = None):
@@ -117,8 +122,6 @@ class TestSupervisor():
         # forward_pass_duration = time.time() - time_start
 
         # print("\tForward pass took:", forward_pass_duration, "seconds.")
-
-        net_outputs = net_outputs.detach().numpy()
 
         # Plot the wave activity
         fig, axes = plt.subplots(2, 2, figsize=[10, 10], sharex="all")

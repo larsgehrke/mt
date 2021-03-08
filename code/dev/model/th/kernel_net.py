@@ -1,10 +1,9 @@
 import numpy as np
 import torch as th
 
-from tools.debug import sprint
-
 import model.th.pk as pk
 
+from tools.debug import sprint
 
 class KernelNetwork(th.nn.Module):
     """
@@ -47,12 +46,7 @@ class KernelNetwork(th.nn.Module):
 
 
         # Write the dynamic PK input to the corresponding tensor
-        if isinstance(dyn_in, th.Tensor):
-            self.tensors.pk_dyn_in = dyn_in
-        else:
-            self.tensors.pk_dyn_in = th.from_numpy(
-                dyn_in
-            ).to(device=self.config.device)
+        self.tensors.pk_dyn_in = dyn_in
 
         # Set the appropriate lateral inputs to the lateral outputs from the
         # previous time step

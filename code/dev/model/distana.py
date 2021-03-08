@@ -39,5 +39,5 @@ class DISTANA():
     def train(self, iter_idx):
         return self.model.train(iter_idx)
 
-    def test(self, iter_idx):
-        return self.model.test(iter_idx)
+    def test(self, iter_idx, return_only_error = True):
+        return self.model.test(iter_idx, return_only_error)

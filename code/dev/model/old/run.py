@@ -55,12 +55,9 @@ class Evaluator():
         # Set the gradients back to zero
         self.optimizer.zero_grad()
 
-        net_outputs = self._evaluate(net_input)
+        net_outputs = self._evaluate(self._np_to_th(net_input))
 
-        # sprint(net_outputs, "net_outputs")
-        # sprint(net_label, "net_label")
-
-        mse = self.train_criterion(net_outputs, th.from_numpy(net_label))
+        mse = self.train_criterion(net_outputs, self._np_to_th(net_label))
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
 
@@ -71,7 +68,7 @@ class Evaluator():
         return mse.item() # return only the number, not the th object
 
 
-    def test(self, iter_idx):
+    def test(self, iter_idx, return_only_error=True):
         self.is_testing = True
 
         if self.test_filenames is None or self.test_criterion is None \
@@ -80,13 +77,22 @@ class Evaluator():
 
         net_input, net_label = self._set_up_batch(iter_idx = iter_idx)
 
-        net_outputs = self._evaluate(net_input)
+        net_outputs = self._evaluate(self._np_to_th(net_input))
 
-        mse = self.test_criterion(net_outputs, th.from_numpy(net_label))
+        mse = self.test_criterion(net_outputs, self._np_to_th(net_label))
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
 
-        return mse.item(), net_outputs, net_label, net_input
+        if return_only_error:
+            return mse.item()
+        else:
+            # Convert outgoing objects from PyTorch to NumPy
+            net_outputs = self._th_to_np(net_outputs)
+
+            # This model cannot handle batches, so we need to manually add a batch dimension
+            # with batch size = 1 for the further processing
+            return mse.item(), np.expand_dims(net_outputs,0), 
+                np.expand_dims(net_label), np.expand_dims(net_input)
 
     def _evaluate(self, net_input):
 
@@ -98,7 +104,8 @@ class Evaluator():
         # Set up an array of zeros to store the network outputs
         net_outputs = th.zeros(size=(seq_len,                              
                                      amount_pks,
-                                     pk_dyn_size))
+                                     pk_dyn_size),
+                              device=self.config.device)
 
         
         # Reset the network to clear the previous sequence
@@ -113,7 +120,7 @@ class Evaluator():
                 #
                 # Closed loop - receiving the output of the last time step as
                 # input
-                dyn_net_in_step = net_outputs[t-1,:,:pk_dyn_size].detach().numpy()
+                dyn_net_in_step = net_outputs[t-1,:,:pk_dyn_size]
                 
             else:
                 #
@@ -142,10 +149,9 @@ class Evaluator():
 
     def _set_up_batch(self, iter_idx):
         """
-            Training:
-                Create the batch data for the current training iteration in the epoch.
-            Testing:
-                Create a batch of all test data samples.
+            Create the batch data for the current training/testing iteration in the epoch.
+
+            Returns NumPy objects
 
         """
         
@@ -214,6 +220,12 @@ class Evaluator():
     def _get_iters(self, filenames):
         # Return amount of iterations per epoch
         return len(filenames)
+
+    def _np_to_th(self, x_np):
+        return th.from_numpy(x_np).to(self.config.device)
+
+    def _th_to_np(self, x_th):
+        return x_th.cpu().detach().numpy()
 
 
 

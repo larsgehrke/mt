@@ -55,9 +55,9 @@ class Evaluator():
         # Set the gradients back to zero
         self.optimizer.zero_grad()
 
-        net_outputs = self._evaluate(net_input, batch_size)
+        net_outputs = self._evaluate(self._np_to_th(net_input), batch_size)
 
-        mse = self.train_criterion(net_outputs, net_label)
+        mse = self.train_criterion(net_outputs, self._np_to_th(net_label))
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
 
@@ -68,7 +68,7 @@ class Evaluator():
         return mse.item() # return only the number, not the th object
 
 
-    def test(self, iter_idx):
+    def test(self, iter_idx, return_only_error=True):
         self.is_testing = True
 
         if self.test_filenames is None or self.test_criterion is None \
@@ -77,13 +77,19 @@ class Evaluator():
 
         net_input, net_label, batch_size = self._set_up_batch(iter_idx = iter_idx)
 
-        net_outputs = self._evaluate(net_input, batch_size)
+        net_outputs = self._evaluate(self._np_to_th(net_input), batch_size)
 
-        mse = self.test_criterion(net_outputs, net_label)
+        mse = self.test_criterion(net_outputs, self._np_to_th(net_label))
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
 
-        return mse.item(), net_outputs, net_label, net_input
+        if return_only_error:
+            return mse.item()
+        else:
+            # Convert outgoing objects from PyTorch to NumPy
+            net_outputs = self._th_to_np(net_outputs)
+
+            return mse.item(), net_outputs, net_label, net_input
 
     def _evaluate(self, net_input, batch_size):
 
@@ -142,10 +148,9 @@ class Evaluator():
 
     def _set_up_batch(self, iter_idx):
         """
-            Training:
-                Create the batch data for the current training iteration in the epoch.
-            Testing:
-                Create a batch of all test data samples.
+            Create the batch data for the current training/testing iteration in the epoch.
+
+            Returns NumPy objects
 
         """
         
@@ -214,16 +219,19 @@ class Evaluator():
 
         _batch_size = len(_net_input)
 
-        # convert to th.tensor
-        _net_label = th.from_numpy(_net_label).to(self.config.device)
-
-
+        # Return NumPy objects
         return _net_input, _net_label, _batch_size
 
 
     def _get_iters(self, filenames):
         # Return amount of iterations per epoch
         return math.ceil(len(filenames)/self.config.batch_size)
+
+    def _np_to_th(self, x_np):
+        return th.from_numpy(x_np).to(self.config.device)
+
+    def _th_to_np(self, x_th):
+        return x_th.cpu().detach().numpy()
 
 
 

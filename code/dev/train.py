@@ -91,7 +91,7 @@ def run_training(params):
         for _iter_val in range(amount_val):
 
             # Test the network for the given validation data
-            mse = distana.test(iter_idx=_iter_val)[0] # get only the error
+            mse = distana.test(iter_idx=_iter_val)
 
             val_errors.append(mse)
             

@@ -59,19 +59,13 @@ def run_testing(params):
             time_start = time.time()
 
             # Evaluate the network for the given test data
-            mse, net_outputs, net_label, net_input = distana.test(iter_idx=batch_idx)
+            mse, net_outputs, net_label, net_input = distana.test(iter_idx=batch_idx, return_only_error = False)
             
             forward_pass_duration = time.time() - time_start
             print("\tForward pass for batch size ",params["batch_size"]," took: ", forward_pass_duration, " seconds.")
 
-        if params["batch_size"] == 1:
-            # when the model cannot handle batches
-            supervisor.plot_sample(net_outputs, 
-                net_label, net_input)
-        else:
-            # when the model is able to handle batches
-            supervisor.plot_sample(net_outputs[sample_idx], 
-                net_label[sample_idx], net_input[sample_idx])
+        supervisor.plot_sample(net_outputs[sample_idx], 
+            net_label[sample_idx], net_input[sample_idx])
 
         # Retrieve user input to continue or quit the testing
         x = input("Press 1 to see another example, anything else to quit.")
