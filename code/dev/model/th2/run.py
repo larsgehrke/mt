@@ -24,7 +24,7 @@ class Evaluator(BaseEvaluator):
 
     def train(self, iter_idx):
         
-        clock = Clock("train()")
+        # clock = Clock("train()")
         self.is_testing = False
 
         if self.train_filenames is None or self.optimizer is None \
@@ -32,26 +32,26 @@ class Evaluator(BaseEvaluator):
                 raise ValueError("Missing the training configuration: Data File names, Optimizer and/or Criterion.")
 
         net_input, net_label, batch_size = self._set_up_batch(iter_idx = iter_idx)
-        clock.split("_set_up_batch")
+        # clock.split("_set_up_batch")
 
         # Set the gradients back to zero
         self.optimizer.zero_grad()
-        clock.split("self.optimizer.zero_grad()")
+        # clock.split("self.optimizer.zero_grad()")
 
         net_outputs = self._evaluate(self._np_to_th(net_input), batch_size)
-        clock.split("self._evaluate")
+        # clock.split("self._evaluate")
 
         mse = self.train_criterion(net_outputs, self._np_to_th(net_label))
-        clock.split("self.train_criterion")
+        # clock.split("self.train_criterion")
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_outputs - th.from_numpy(net_label), 2))
 
         # backward pass
         mse.backward()
-        clock.split(" mse.backward()")
+        # clock.split(" mse.backward()")
         self.optimizer.step()
-        clock.split("self.optimizer.step()")
-        clock.stop()
+        # clock.split("self.optimizer.step()")
+        # clock.stop()
         return mse.item() # return only the number, not the th object
         
 
