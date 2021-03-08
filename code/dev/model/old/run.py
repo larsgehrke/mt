@@ -91,8 +91,7 @@ class Evaluator():
 
             # This model cannot handle batches, so we need to manually add a batch dimension
             # with batch size = 1 for the further processing
-            return mse.item(), np.expand_dims(net_outputs,0), 
-                np.expand_dims(net_label), np.expand_dims(net_input)
+            return mse.item(), np.expand_dims(net_outputs,0), np.expand_dims(net_label), np.expand_dims(net_input)
 
     def _evaluate(self, net_input):
 
