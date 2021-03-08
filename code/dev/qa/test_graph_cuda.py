@@ -18,7 +18,7 @@ def test_graph():
     input_zeros = th.zeros(size=(8,                              
                                  pk_rows * pk_cols,
                                  pk_dyn_size),
-                              device="gpu")
+                              device="cuda")
 
     out = g.forward(input_zeros)
     print(out)
