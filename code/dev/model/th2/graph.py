@@ -16,14 +16,14 @@ class GraphFunction(th.autograd.Function):
     @staticmethod
     def forward(ctx, input_):
 
-        rearranged_in = graph_cuda.forward(input_)
+        rearranged_in = graph_cuda.forward(input_)[0]
 
         return rearranged_in
 
     @staticmethod
     def backward(ctx, grad_rearranged_in):
 
-        d_input_ = graph_cuda.backward(grad_rearranged_in.contiguous())
+        d_input_ = graph_cuda.backward(grad_rearranged_in.contiguous())[0]
 
         return d_input_
 
