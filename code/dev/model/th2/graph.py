@@ -1,104 +1,40 @@
-import numpy as np
+import math
 import torch as th
-
-from model.th2.pk import PK
-from model.th2.graph import Graph
+import numpy as np
 
 from tools.debug import sprint
-from tools.debug import Clock
 
-class KernelNetwork(th.nn.Module):
-    """
-    This class contains the kernelized network topology for the spatio-temporal
-    propagation of information
-    """
 
-    def __init__(self, config, tensors):
-
-        super(KernelNetwork, self).__init__()
-
-        self.config = config
-        self.tensors = tensors
-
-        #
-        # Prediction Kernels
-
-        # Initialize the shared Prediction Kernel (PK) network that will do the
-        # PK calculations 
-        self.pk_net = PK(batch_size= config.batch_size,
-                              amount_pks= config.amount_pks, 
-                              input_size = config.pk_neighbors * config.pk_lat_size + config.pk_dyn_size, 
-                              lstm_size = config.pk_num_lstm_cells,
-                              device = config.device)
+class Graph(th.nn.Module):
+    def __init__(self, pk_rows, pk_cols):
+        super(Graph, self).__init__()
 
         # Variables for the PK-TK connections
         self.pos0 = None
         self.going_to = None
         self.coming_from = None
 
-        #self._build_connections(config.pk_rows, config.pk_cols)
-        self.graph = Graph(config.pk_rows, config.pk_cols)
+        self._build_connections(pk_rows, pk_cols)
 
 
-    def forward(self, dyn_in, iter_idx, t):
-        """
-        Runs the forward pass of all PKs and TKs, respectively, in parallel 
-        for a given input
+    def forward(self, input_ , output):
+        '''
+            Implementing the lateral connections (graph edges) of DISTANA
+            
+            :param input_flat: 
+                The input for the PKs where dynamical input is concatenated with flattened dynamical input.
+                Size is [B, PK, DYN + N*LAT] with batch size B, amount of PKs PK, dynamical input size DYN,
+                Neighbors N and lateral input size LAT.
 
-        """
-        
-        # Write the dynamic PK input to the corresponding tensor
-        self.tensors.pk_dyn_in = dyn_in
-        
-        if iter_idx == 5 and t == 5:
-            clock = Clock("kernel_net.forward()")
+        '''
+
 
         # Set the appropriate lateral inputs to the lateral outputs from the
         # previous time step
-        self.graph.forward(self.tensors.pk_lat_out, self.tensors.pk_lat_in)
-        #self.tensors.pk_lat_in[:,self.pos0, self.going_to] = \
-        #self.tensors.pk_lat_out[:,self.coming_from, self.going_to]
+        output[:,self.pos0, self.going_to] = \
+        input_[:,self.coming_from, self.going_to]
 
-        if iter_idx == 5 and t == 5:
-            clock.split("Graph connections")
-       
-        # Flatten last two dims: B, PK, N, Lat -> B, PK, N*Lat and concat with B, PK, Dyn
-        # => B, PK, N*Lat + Dyn
-        lat_in_flat = th.flatten(self.tensors.pk_lat_in,start_dim=2)
-
-        input_ = th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
-
-        # Forward the PK inputs through the pk_net to get the outputs and hidden
-        # states of these PKs
-        pk_output, pk_lstm_h, pk_lstm_c = self.pk_net.forward(
-            input_flat= input_, # Size: [B, PK,  N*Lat + Dyn]
-            old_h= self.tensors.pk_lstm_h,  # Size: [B, PK,  LSTM]
-            old_c= self.tensors.pk_lstm_c # Size: [B, PK,  LSTM]
-        )
-        # pk_output: [B, PK, DYN + N*LAT]
-
-        # Dynamic output
-        pk_dyn_out = pk_output[:, :,  :self.config.pk_dyn_size]
-        
-
-        # Lateral output flattened
-        pk_lat_out_flat = pk_output[:, :, self.config.pk_dyn_size:]
-
-        # Batch Size is flexibel (note end of epoch)
-        pk_lat_out = pk_lat_out_flat.view(size=(-1,
-            self.config.amount_pks, self.config.pk_neighbors, self.config.pk_lat_size))
-
-
-        # Update the output and hidden state tensors of the PKs
-        self.tensors.pk_dyn_out = pk_dyn_out
-        self.tensors.pk_lat_out = pk_lat_out
-        self.tensors.pk_lstm_h = pk_lstm_h
-        self.tensors.pk_lstm_c = pk_lstm_c 
-         
-
-    def reset(self, batch_size):
-        self.tensors.set_batch_size_and_reset(batch_size)
-        self.pk_net.set_batch_size(batch_size)
+        return output
 
     def _build_connections(self, rows, cols):
 
@@ -166,6 +102,3 @@ class KernelNetwork(th.nn.Module):
         # Define matrix from where the lateral inputs come and where they go
         self.coming_from = th.from_numpy(a[1]).to(dtype=th.long)
         self.going_to = th.from_numpy(pk_adj_mat[1][a] - 1).to(dtype=th.long)
-
-   
-
