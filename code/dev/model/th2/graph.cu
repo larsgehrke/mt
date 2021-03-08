@@ -97,7 +97,8 @@ std::vector<torch::Tensor> graph_cuda_forward(
         );
   }));
 
-  return out;
+  return {out};
+
 }
 
 std::vector<torch::Tensor> graph_cuda_backward(
@@ -116,6 +117,5 @@ std::vector<torch::Tensor> graph_cuda_backward(
   }));
 
 
-
-  return d_in;
+  return {d_in};
 }
