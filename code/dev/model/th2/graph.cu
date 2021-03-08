@@ -54,7 +54,7 @@ namespace
         /* TODO: Forward Pass */
         for (int i = 0; i<8; i++)
         {
-          out[batch_block_id][pk_thread_id][i][0] += in[batch_block_id][pk_thread_id][i][0];
+          out[batch_block_id][pk_thread_id][i][0] = 13 + i; /*in[batch_block_id][pk_thread_id][i][0];*/
         }
         
 
