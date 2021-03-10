@@ -23,9 +23,9 @@ def test_graph():
     lat_in = th.ones(size=(8, 256, 1),
                               device="cuda")
 
-    input_ = input_zeros + 1 
+    
     start = time.time()
-    out = g.forward(input_)
+    out = g.forward(dyn_in, lat_in)
     stop = time.time()
     print(out)
     sprint(out, "out")
