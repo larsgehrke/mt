@@ -11,7 +11,7 @@
 #define PK_ROWS 16
 #define PK_COLS 16
 #define DIMS 3
-#define NEIGHBORS 4
+#define NEIGHBORS 8
 #define LAT_SIZE 1
 #define DYN_SIZE 1
 
@@ -66,78 +66,113 @@ namespace
       const int top = pk_thread_id - PK_COLS;
       const int bottom = pk_thread_id + PK_COLS;
       
+
+      /* TOP LEFT */
+      if (threadIdx.y > 0 && threadIdx.x > 0)
+      {
+        for (int lat = 0; lat < LAT_SIZE; lat++)
+        {
+          out[batch_block_id][pk_thread_id][DYN_SIZE + lat] = lat_input[batch_block_id][top-1][lat];
+        }
+
+      }
+      
+      /* TOP CENTER */
       if (threadIdx.y > 0)
       {
-        /* TOP CENTER */
         for (int lat = 0; lat < LAT_SIZE; lat++)
         {
-          out[batch_block_id][pk_thread_id][DYN_SIZE + lat] = lat_input[batch_block_id][top][lat];
+          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE + lat] = lat_input[batch_block_id][top][lat];
         }
 
       }
 
-      if (threadIdx.y < PK_ROWS - 1)
-      {
-        /* BOTTOM CENTER */
+      /* TOP RIGHT */
+      if (threadIdx.y > 0 && threadIdx.x < PK_COLS - 1)
+      {        
         for (int lat = 0; lat < LAT_SIZE; lat++)
         {
-          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE + lat] = lat_input[batch_block_id][bottom][lat];
+          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 2 + lat] = lat_input[batch_block_id][top+1][lat];
         }
+
       }
 
+      /* LEFT */
       if(threadIdx.x > 0)
       {
-        /* LEFT */
         for (int lat = 0; lat < LAT_SIZE; lat++)
         {
-          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE*2 + lat] = lat_input[batch_block_id][pk_thread_id-1][lat];
+          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 3 + lat] = lat_input[batch_block_id][pk_thread_id-1][lat];
         }
       }
 
+      /* RIGHT */
       if(threadIdx.x < PK_COLS -1)
       {
-        /* RIGHT */
         for (int lat = 0; lat < LAT_SIZE; lat++)
         {
-          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE* 3 + lat] = lat_input[batch_block_id][pk_thread_id+1][lat];
+          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 4 + lat] = lat_input[batch_block_id][pk_thread_id+1][lat];
         }
       }
-      
 
-      /* TOP CENTER */
-      /* TOP RIGHT */
-      /* LEFT */
-      /* RIGHT */
       /* BOTTOM LEFT */
+      if (threadIdx.y < PK_ROWS - 1 && threadIdx.x > 0)
+      {        
+        for (int lat = 0; lat < LAT_SIZE; lat++)
+        {
+          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 5 + lat] = lat_input[batch_block_id][bottom-1][lat];
+        }
+      }
+
       /* BOTTOM CENTER */
+      if (threadIdx.y < PK_ROWS - 1)
+      {        
+        for (int lat = 0; lat < LAT_SIZE; lat++)
+        {
+          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 6 + lat] = lat_input[batch_block_id][bottom][lat];
+        }
+      }
+
       /* BOTTOM RIGHT */
-      
-        
-      
+      if (threadIdx.y < PK_ROWS - 1 && threadIdx.x < PK_COLS - 1)
+      {
+        for (int lat = 0; lat < LAT_SIZE; lat++)
+        {
+          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 7 + lat] = lat_input[batch_block_id][bottom+1][lat];
+        }
+      }
+
 
     }
 
     template <typename scalar_t>
     __global__ void graph_backward_kernel(
-      torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_out,
+      const torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_out,
         torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_dyn_input,
         torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_lat_input) 
     {
 
         /*
-          Calculating block index: 
-          row no (blockIdx.y) * length of row (gridDim.x) + row position (blockIdx.x)
-        */
-        const int batch_block_id = blockIdx.y * gridDim.x + blockIdx.x;
+        Calculating block index: 
+        row no (blockIdx.y) * length of row (gridDim.x) + row position (blockIdx.x)
+      */
+      const int batch_block_id = blockIdx.y * gridDim.x + blockIdx.x;
 
-        /*
-          Calculating thread index:
-          like block_id, see above
-        */
-        const int pk_thread_id = threadIdx.y * blockDim.x + threadIdx.x;
-        
-        /* TODO: Backward Pass
-        out[batch_block_id][pk_thread_id][0] = in;*/
+      /*
+        Calculating thread index:
+        like block_id, see above
+      */
+      const int pk_thread_id = threadIdx.y * blockDim.x + threadIdx.x;
+
+
+      for (int dyn = 0; dyn < DYN_SIZE; dyn++)
+      {
+        d_dyn_input[batch_block_id][pk_thread_id][dyn] = out[batch_block_id][pk_thread_id][dyn];
+        d_lat_input[batch_block_id][pk_thread_id][dyn] = out[batch_block_id][pk_thread_id][dyn];
+      } 
+
+      const int top = pk_thread_id - PK_COLS;
+      const int bottom = pk_thread_id + PK_COLS;
 
     }
 
