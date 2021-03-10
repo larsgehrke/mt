@@ -32,7 +32,7 @@ class KernelNetwork(th.nn.Module):
                               device = config.device)
 
         
-        if False:#self.config.use_gpu:            
+        if self.config.use_gpu:            
             # import the custom CUDA kernel
             from model.th2.graph import Graph
             self.graph = Graph(config.pk_rows, config.pk_cols)
@@ -50,7 +50,7 @@ class KernelNetwork(th.nn.Module):
         Implementing the graph connections of DISTANA.
         '''
 
-        if False:#self.config.use_gpu: 
+        if self.config.use_gpu: 
             # Use the custom CUDA kernel
             input_ =  self.graph.forward(self.tensors.pk_dyn_in, self.tensors.pk_lat_out)
         else:
@@ -92,19 +92,19 @@ class KernelNetwork(th.nn.Module):
         clock.split("pk.forward")
 
         # Dynamic output
-        pk_dyn_out = pk_output[:, :,  :self.config.pk_dyn_size]
+        # pk_dyn_out = 
 
 
         # Lateral output flattened
-        pk_lat_out = pk_output[:, :, self.config.pk_dyn_size:]
-        clock.split("Assignments 1")
+        # pk_lat_out = 
+        # clock.split("Assignments 1")
 
         # Update the output and hidden state tensors of the PKs
-        self.tensors.pk_dyn_out = pk_dyn_out
-        self.tensors.pk_lat_out = pk_lat_out
+        self.tensors.pk_dyn_out = pk_output[:, :,  :self.config.pk_dyn_size]
+        self.tensors.pk_lat_out = pk_output[:, :, self.config.pk_dyn_size:]
         self.tensors.pk_lstm_h = pk_lstm_h
         self.tensors.pk_lstm_c = pk_lstm_c 
-        clock.split("Assignments 2")
+        clock.split("Assignments")
 
     def reset(self, batch_size):
         self.tensors.set_batch_size_and_reset(batch_size)
