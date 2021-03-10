@@ -79,6 +79,8 @@ class KernelNetwork(th.nn.Module):
         
         input_ = self._graph_connections()
 
+        sprint(input_, "input_")
+
         # Forward the PK inputs through the pk_net to get the outputs and hidden
         # states of these PKs
         pk_output, pk_lstm_h, pk_lstm_c = self.pk_net.forward(
