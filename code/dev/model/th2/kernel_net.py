@@ -51,10 +51,10 @@ class KernelNetwork(th.nn.Module):
         Implementing the graph connections of DISTANA.
         '''
         
-        # DEV MODE: Reset Clock
-        self.clock.reset()
         sprint(self.tensors.pk_dyn_in, "self.tensors.pk_dyn_in")
         sprint(self.tensors.pk_lat_out, "self.tensors.pk_lat_out")
+        # DEV MODE: Reset Clock
+        self.clock.reset()
 
         if self.config.device == "cuda":
             # Use the custom CUDA kernel
