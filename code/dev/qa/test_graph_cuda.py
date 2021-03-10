@@ -37,6 +37,14 @@ def test_graph():
       s += "\n"
 
     print(s)
+
+    print(out[0][0].cpu().detach().numpy())
+    print(out[0][5].cpu().detach().numpy())
+    print(out[0][15].cpu().detach().numpy())
+    print(out[0][16].cpu().detach().numpy())
+    print(out[0][17].cpu().detach().numpy())
+    print(out[0][255].cpu().detach().numpy())
+    
     sprint(out, "out")
     print(stop-start)
     
