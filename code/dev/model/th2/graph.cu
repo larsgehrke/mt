@@ -65,84 +65,64 @@ namespace
 
       const int top = pk_thread_id - PK_COLS;
       const int bottom = pk_thread_id + PK_COLS;
-      
+      const bool y_gt_0 = threadIdx.y > 0
+      const bool x_gt_0 = threadIdx.x > 0
+      const bool y_lt_max = threadIdx.y < PK_ROWS - 1
+      const bool x_lt_max = threadIdx.x < PK_COLS - 1
 
-      /* TOP LEFT */
-      if (threadIdx.y > 0 && threadIdx.x > 0)
+      for (int lat = 0; lat < LAT_SIZE; lat++)
       {
-        for (int lat = 0; lat < LAT_SIZE; lat++)
+        /* TOP GROUP */
+        if (y_gt_0)
         {
-          out[batch_block_id][pk_thread_id][DYN_SIZE + lat] = lat_input[batch_block_id][top-1][lat];
-        }
+           /* TOP LEFT */
+          if (x_gt_0)
+          {
+            out[batch_block_id][pk_thread_id][DYN_SIZE + lat] = lat_input[batch_block_id][top-1][lat];
+          }
 
-      }
-      
-      /* TOP CENTER */
-      if (threadIdx.y > 0)
-      {
-        for (int lat = 0; lat < LAT_SIZE; lat++)
-        {
+          /* TOP CENTER */
           out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE + lat] = lat_input[batch_block_id][top][lat];
+      
+          /* TOP RIGHT */
+          if (x_lt_max)
+          {
+            out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 2 + lat] = lat_input[batch_block_id][top+1][lat];
+          }
         }
-
-      }
-
-      /* TOP RIGHT */
-      if (threadIdx.y > 0 && threadIdx.x < PK_COLS - 1)
-      {        
-        for (int lat = 0; lat < LAT_SIZE; lat++)
-        {
-          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 2 + lat] = lat_input[batch_block_id][top+1][lat];
-        }
-
-      }
-
-      /* LEFT */
-      if(threadIdx.x > 0)
-      {
-        for (int lat = 0; lat < LAT_SIZE; lat++)
+  
+        /* LEFT */
+        if(threadIdx.x > 0)
         {
           out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 3 + lat] = lat_input[batch_block_id][pk_thread_id-1][lat];
         }
-      }
 
-      /* RIGHT */
-      if(threadIdx.x < PK_COLS -1)
-      {
-        for (int lat = 0; lat < LAT_SIZE; lat++)
+        /* RIGHT */
+        if(threadIdx.x < PK_COLS -1)
         {
           out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 4 + lat] = lat_input[batch_block_id][pk_thread_id+1][lat];
         }
-      }
 
-      /* BOTTOM LEFT */
-      if (threadIdx.y < PK_ROWS - 1 && threadIdx.x > 0)
-      {        
-        for (int lat = 0; lat < LAT_SIZE; lat++)
+        /* BOTTOM GROUP */
+        if (y_lt_max)
         {
-          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 5 + lat] = lat_input[batch_block_id][bottom-1][lat];
-        }
-      }
-
-      /* BOTTOM CENTER */
-      if (threadIdx.y < PK_ROWS - 1)
-      {        
-        for (int lat = 0; lat < LAT_SIZE; lat++)
-        {
+          /* BOTTOM LEFT */
+          if (x_gt_0)
+          { 
+            out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 5 + lat] = lat_input[batch_block_id][bottom-1][lat];
+          }
+          /* BOTTOM CENTER */
           out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 6 + lat] = lat_input[batch_block_id][bottom][lat];
-        }
+          
+          /* BOTTOM RIGHT */
+          if (x_lt_max)
+          {
+            out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 7 + lat] = lat_input[batch_block_id][bottom+1][lat];
+          }
+        } 
+        /* end of for loop for lateral connections*/
       }
-
-      /* BOTTOM RIGHT */
-      if (threadIdx.y < PK_ROWS - 1 && threadIdx.x < PK_COLS - 1)
-      {
-        for (int lat = 0; lat < LAT_SIZE; lat++)
-        {
-          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 7 + lat] = lat_input[batch_block_id][bottom+1][lat];
-        }
-      }
-
-
+      /* end of forward pass*/
     }
 
     template <typename scalar_t>
@@ -172,85 +152,71 @@ namespace
 
       const int top = pk_thread_id - PK_COLS;
       const int bottom = pk_thread_id + PK_COLS;
+      const int top = pk_thread_id - PK_COLS;
+      const int bottom = pk_thread_id + PK_COLS;
+      const bool y_gt_0 = threadIdx.y > 0
+      const bool x_gt_0 = threadIdx.x > 0
+      const bool y_lt_max = threadIdx.y < PK_ROWS - 1
+      const bool x_lt_max = threadIdx.x < PK_COLS - 1
 
-      /* TOP LEFT */
-      if (threadIdx.y > 0 && threadIdx.x > 0)
+      for (int lat = 0; lat < LAT_SIZE; lat++)
       {
-        for (int lat = 0; lat < LAT_SIZE; lat++)
+        /* TOP GROUP */
+        if (y_gt_0)
         {
-          d_lat_input[batch_block_id][top-1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + lat];
-        }
+           /* TOP LEFT */
+          if (x_gt_0)
+          {
+            d_lat_input[batch_block_id][top-1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + lat];
+          }
 
-      }
-      
-      /* TOP CENTER */
-      if (threadIdx.y > 0)
-      {
-        for (int lat = 0; lat < LAT_SIZE; lat++)
-        {
+          /* TOP CENTER */
           d_lat_input[batch_block_id][top][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE + lat];
+      
+          /* TOP RIGHT */
+          if (x_lt_max)
+          {
+            d_lat_input[batch_block_id][top+1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 2 + lat];
+          }
         }
-
-      }
-
-      /* TOP RIGHT */
-      if (threadIdx.y > 0 && threadIdx.x < PK_COLS - 1)
-      {        
-        for (int lat = 0; lat < LAT_SIZE; lat++)
-        {
-          d_lat_input[batch_block_id][top+1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 2 + lat];
-        }
-
-      }
-
-      /* LEFT */
-      if(threadIdx.x > 0)
-      {
-        for (int lat = 0; lat < LAT_SIZE; lat++)
+  
+        /* LEFT */
+        if(threadIdx.x > 0)
         {
           d_lat_input[batch_block_id][pk_thread_id-1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 3 + lat];
         }
-      }
 
-      /* RIGHT */
-      if(threadIdx.x < PK_COLS -1)
-      {
-        for (int lat = 0; lat < LAT_SIZE; lat++)
+        /* RIGHT */
+        if(threadIdx.x < PK_COLS -1)
         {
           d_lat_input[batch_block_id][pk_thread_id+1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 4 + lat];
         }
-      }
 
-      /* BOTTOM LEFT */
-      if (threadIdx.y < PK_ROWS - 1 && threadIdx.x > 0)
-      {        
-        for (int lat = 0; lat < LAT_SIZE; lat++)
+        /* BOTTOM GROUP */
+        if (y_lt_max)
         {
-          d_lat_input[batch_block_id][bottom-1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 5 + lat];
-        }
-      }
-
-      /* BOTTOM CENTER */
-      if (threadIdx.y < PK_ROWS - 1)
-      {        
-        for (int lat = 0; lat < LAT_SIZE; lat++)
-        {
+          /* BOTTOM LEFT */
+          if (x_gt_0)
+          { 
+            d_lat_input[batch_block_id][bottom-1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 5 + lat];
+          }
+          /* BOTTOM CENTER */
           d_lat_input[batch_block_id][bottom][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 6 + lat];
-        }
+          
+          /* BOTTOM RIGHT */
+          if (x_lt_max)
+          {
+            d_lat_input[batch_block_id][bottom+1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 7 + lat];
+          }
+        } 
+        /* end of for loop for lateral connections*/
       }
-
-      /* BOTTOM RIGHT */
-      if (threadIdx.y < PK_ROWS - 1 && threadIdx.x < PK_COLS - 1)
-      {
-        for (int lat = 0; lat < LAT_SIZE; lat++)
-        {
-          d_lat_input[batch_block_id][bottom+1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 7 + lat];
-        }
-      }
-
+      
+      /* end of backward pass */
     }
 
-} // namespace
+/* end of namespace */
+} 
 
 std::vector<torch::Tensor> graph_cuda_forward(
     torch::Tensor dyn_input,

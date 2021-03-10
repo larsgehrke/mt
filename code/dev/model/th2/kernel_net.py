@@ -73,13 +73,11 @@ class KernelNetwork(th.nn.Module):
         for a given input
 
         """ 
-        clock = Clock("kenel_net.forward")
+        
         # Write the dynamic PK input to the corresponding tensor
         self.tensors.pk_dyn_in = dyn_in
-        clock.split("self.tensors.pk_dyn_in = dyn_in")
+       
         input_ = self._graph_connections()
-        clock.split("input_ = self._graph_connections()")
-
 
         # Forward the PK inputs through the pk_net to get the outputs and hidden
         # states of these PKs
@@ -89,22 +87,19 @@ class KernelNetwork(th.nn.Module):
             old_c= self.tensors.pk_lstm_c # Size: [B, PK, LSTM]
         )
         # pk_output: [B, PK, DYN + N*LAT]
-        clock.split("pk.forward")
 
         # Dynamic output
-        # pk_dyn_out = 
-
+        pk_dyn_out = pk_output[:, :,  :self.config.pk_dyn_size]
 
         # Lateral output flattened
-        # pk_lat_out = 
-        # clock.split("Assignments 1")
+        pk_lat_out = pk_output[:, :, self.config.pk_dyn_size:]
 
         # Update the output and hidden state tensors of the PKs
-        self.tensors.pk_dyn_out = pk_output[:, :,  :self.config.pk_dyn_size]
-        self.tensors.pk_lat_out = pk_output[:, :, self.config.pk_dyn_size:]
+        self.tensors.pk_dyn_out = pk_dyn_out
+        self.tensors.pk_lat_out = pk_lat_out
         self.tensors.pk_lstm_h = pk_lstm_h
         self.tensors.pk_lstm_c = pk_lstm_c 
-        clock.split("Assignments")
+        
 
     def reset(self, batch_size):
         self.tensors.set_batch_size_and_reset(batch_size)
