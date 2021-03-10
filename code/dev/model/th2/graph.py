@@ -14,18 +14,18 @@ graph_cuda = load(
 class GraphFunction(th.autograd.Function):
 
     @staticmethod
-    def forward(ctx, input_):
+    def forward(ctx, dyn_in, lat_in):
 
-        rearranged_in = graph_cuda.forward(input_)[0]
+        rearranged_in = graph_cuda.forward(dyn_in, lat_in)[0]
 
         return rearranged_in
 
     @staticmethod
     def backward(ctx, grad_rearranged_in):
 
-        d_input_ = graph_cuda.backward(grad_rearranged_in.contiguous())[0]
+        d_dyn_in, d_lat_in = graph_cuda.backward(grad_rearranged_in.contiguous())[0]
 
-        return d_input_
+        return d_input_, d_lat_in
 
 
 class Graph(th.nn.Module):
@@ -40,7 +40,7 @@ class Graph(th.nn.Module):
         self._build_connections(pk_rows, pk_cols)
 
 
-    def forward(self, input_):
+    def forward(self, dyn_in, lat_in):
         '''
             Implementing the lateral connections (graph edges) of DISTANA
             
@@ -55,9 +55,8 @@ class Graph(th.nn.Module):
         # previous time step
         # output[:,self.pos0, self.going_to] = \
         # input_[:,self.coming_from, self.going_to]
-        sprint(input_, "input_")
 
-        return GraphFunction.apply(input_)
+        return GraphFunction.apply(dyn_in, lat_in)
 
     def _build_connections(self, rows, cols):
 

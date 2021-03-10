@@ -17,11 +17,12 @@ def test_graph():
 
     g = Graph(pk_rows,pk_cols)
 
-    input_zeros = th.zeros(size=(8,                              
-                                 pk_rows * pk_cols,
-                                 pk_neighbors,
-                                 pk_neighbor_size),
+    dyn_in = th.zeros(size=(8, 256, 1),
                               device="cuda")
+
+    lat_in = th.ones(size=(8, 256, 1),
+                              device="cuda")
+
     input_ = input_zeros + 1 
     start = time.time()
     out = g.forward(input_)
