@@ -40,7 +40,7 @@ class KernelNetwork(th.nn.Module):
 
         print(self.config.device)
 
-        if self.config.device == "cuda":
+        if self.config.device == 'cuda':
             print("cuda is used")
             # import the custom CUDA kernel
             from model.th2.graph import Graph
