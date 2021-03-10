@@ -62,7 +62,7 @@ def run_testing(params):
             mse, net_outputs, net_label, net_input = distana.test(iter_idx=batch_idx, return_only_error = False)
             
             forward_pass_duration = time.time() - time_start
-            print("\tForward pass for batch size ",params["batch_size"]," took: ", forward_pass_duration, " seconds.")
+            print("\tForward pass for batch size ",params["batch_size_test"]," took: ", forward_pass_duration, " seconds.")
 
         supervisor.plot_sample(net_outputs[sample_idx], 
             net_label[sample_idx], net_input[sample_idx])
