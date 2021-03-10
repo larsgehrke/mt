@@ -5,7 +5,8 @@
 // CUDA forward declarations
 
 std::vector<torch::Tensor> graph_cuda_forward(
-    torch::Tensor input);
+    torch::Tensor dyn_input,
+    torch::Tensor lat_input);
 
 std::vector<torch::Tensor> graph_cuda_backward(
     torch::Tensor d_out);
@@ -17,10 +18,13 @@ std::vector<torch::Tensor> graph_cuda_backward(
 #define CHECK_INPUT(x) CHECK_CUDA(x); CHECK_CONTIGUOUS(x)
 
 std::vector<torch::Tensor> graph_forward(
-    torch::Tensor input) {
-  CHECK_INPUT(input);
+    torch::Tensor dyn_input,
+    torch::Tensor lat_input) {
+  CHECK_INPUT(dyn_input);
+  CHECK_INPUT(lat_input);
 
-  return graph_cuda_forward(input);
+
+  return graph_cuda_forward(dyn_input, lat_input);
 }
 
 std::vector<torch::Tensor> graph_backward(
