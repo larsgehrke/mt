@@ -11,7 +11,7 @@
 #define PK_ROWS 16
 #define PK_COLS 16
 #define DIMS 3
-#define NEIGHBORS 8
+#define NEIGHBORS 4
 #define LAT_SIZE 1
 #define DYN_SIZE 1
 
