@@ -57,6 +57,8 @@ namespace
       */
       const int pk_thread_id = threadIdx.y * blockDim.x + threadIdx.x;
 
+      out[batch_block_id][pk_thread_id][0] = -17;
+
 
       for (int dyn = 0; dyn < DYN_SIZE; dyn++)
       {
