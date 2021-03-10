@@ -30,27 +30,29 @@ def test_graph():
     stop = time.time()
 
     s = ""
+    for b in range(8):
+        print(f"\n\n ==== BATCH {str(b)} ==== \n")
 
-    for y in range(pk_rows):
-      for x in range(pk_cols):
-        s += str(np.sum(out[0][y*pk_cols + x].cpu().detach().numpy())) + " "
-      s += "\n"
+        for y in range(pk_rows):
+          for x in range(pk_cols):
+            s += str(np.sum(out[0][y*pk_cols + x].cpu().detach().numpy())) + " "
+          s += "\n"
 
-    print(s)
+        print(s)
 
-    print("out[0][0]")
-    print(out[0][0].cpu().detach().numpy())
-    print("out[0][5]")
-    print(out[0][5].cpu().detach().numpy())
-    print("out[0][15]")
-    print(out[0][15].cpu().detach().numpy())
-    print("out[0][16]")
-    print(out[0][16].cpu().detach().numpy())
-    print("out[0][17]")
-    print(out[0][17].cpu().detach().numpy())
-    print("out[0][255]")
-    print(out[0][255].cpu().detach().numpy())
-    
+        print("out[0][0]")
+        print(out[0][0].cpu().detach().numpy())
+        print("out[0][5]")
+        print(out[0][5].cpu().detach().numpy())
+        print("out[0][15]")
+        print(out[0][15].cpu().detach().numpy())
+        print("out[0][16]")
+        print(out[0][16].cpu().detach().numpy())
+        print("out[0][17]")
+        print(out[0][17].cpu().detach().numpy())
+        print("out[0][255]")
+        print(out[0][255].cpu().detach().numpy())
+        
     sprint(out, "out")
     print(stop-start)
     

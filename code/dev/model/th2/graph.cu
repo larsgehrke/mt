@@ -168,11 +168,85 @@ namespace
       for (int dyn = 0; dyn < DYN_SIZE; dyn++)
       {
         d_dyn_input[batch_block_id][pk_thread_id][dyn] = d_out[batch_block_id][pk_thread_id][dyn];
-        d_lat_input[batch_block_id][pk_thread_id][dyn] = d_out[batch_block_id][pk_thread_id][dyn];
       } 
 
       const int top = pk_thread_id - PK_COLS;
       const int bottom = pk_thread_id + PK_COLS;
+
+      /* TOP LEFT */
+      if (threadIdx.y > 0 && threadIdx.x > 0)
+      {
+        for (int lat = 0; lat < LAT_SIZE; lat++)
+        {
+          lat_input[batch_block_id][top-1][lat] = out[batch_block_id][pk_thread_id][DYN_SIZE + lat];
+        }
+
+      }
+      
+      /* TOP CENTER */
+      if (threadIdx.y > 0)
+      {
+        for (int lat = 0; lat < LAT_SIZE; lat++)
+        {
+          lat_input[batch_block_id][top][lat] = out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE + lat];
+        }
+
+      }
+
+      /* TOP RIGHT */
+      if (threadIdx.y > 0 && threadIdx.x < PK_COLS - 1)
+      {        
+        for (int lat = 0; lat < LAT_SIZE; lat++)
+        {
+          lat_input[batch_block_id][top+1][lat] = out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 2 + lat];
+        }
+
+      }
+
+      /* LEFT */
+      if(threadIdx.x > 0)
+      {
+        for (int lat = 0; lat < LAT_SIZE; lat++)
+        {
+          lat_input[batch_block_id][pk_thread_id-1][lat] = out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 3 + lat];
+        }
+      }
+
+      /* RIGHT */
+      if(threadIdx.x < PK_COLS -1)
+      {
+        for (int lat = 0; lat < LAT_SIZE; lat++)
+        {
+          lat_input[batch_block_id][pk_thread_id+1][lat] = out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 4 + lat];
+        }
+      }
+
+      /* BOTTOM LEFT */
+      if (threadIdx.y < PK_ROWS - 1 && threadIdx.x > 0)
+      {        
+        for (int lat = 0; lat < LAT_SIZE; lat++)
+        {
+          lat_input[batch_block_id][bottom-1][lat] = out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 5 + lat];
+        }
+      }
+
+      /* BOTTOM CENTER */
+      if (threadIdx.y < PK_ROWS - 1)
+      {        
+        for (int lat = 0; lat < LAT_SIZE; lat++)
+        {
+          lat_input[batch_block_id][bottom][lat] = out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 6 + lat];
+        }
+      }
+
+      /* BOTTOM RIGHT */
+      if (threadIdx.y < PK_ROWS - 1 && threadIdx.x < PK_COLS - 1)
+      {
+        for (int lat = 0; lat < LAT_SIZE; lat++)
+        {
+          lat_input[batch_block_id][bottom+1][lat] = out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 7 + lat];
+        }
+      }
 
     }
 
