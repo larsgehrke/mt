@@ -18,7 +18,7 @@ def test_graph():
     g = Graph(pk_rows,pk_cols)
 
     dyn_in = th.zeros(size=(8, 256, 1),
-                              device="cuda")+55
+                              device="cuda")
 
     lat_in = th.ones(size=(8, 256, 1),
                               device="cuda")
@@ -27,8 +27,14 @@ def test_graph():
     start = time.time()
     out = g.forward(dyn_in, lat_in)
     stop = time.time()
-    print(out)
-    print(out[0][20][0])
+
+    s = ""
+
+    for y in range(pk_rows):
+      for x in range(pk_cols):
+        s += str(np.sum(out[0][y*pk_cols + x].cpu().detach().numpy())) + " "
+      print()
+
     sprint(out, "out")
     print(stop-start)
     
