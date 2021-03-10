@@ -60,11 +60,11 @@ namespace
 
       for (int dyn = 0; dyn < DYN_SIZE; dyn++)
       {
-        out[batch_block_id][pk_thread_id][dyn] = dyn_input[batch_block_id][pk_thread_id][dyn]
+        out[batch_block_id][pk_thread_id][dyn] = dyn_input[batch_block_id][pk_thread_id][dyn];
       } 
 
-      const int top = pk_thread_id - PK_COLS
-      const int bottom = pk_thread_id + PK_COLS
+      const int top = pk_thread_id - PK_COLS;
+      const int bottom = pk_thread_id + PK_COLS;
       
       if (threadIdx.y > 0)
       {
