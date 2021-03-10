@@ -9,6 +9,7 @@ class KernelConfig:
         #
         # System parameters
         self.device = params["device"]
+        self.use_gpu = params["use_gpu"]
 
         self.batch_size_train = int(params["batch_size_train"])
         self.batch_size_test = int(params["batch_size_test"])
