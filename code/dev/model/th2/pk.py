@@ -5,7 +5,7 @@ from tools.debug import sprint
 
 
 class PK(th.nn.Module):
-    def __init__(self, batch_size, amount_pks, input_size, lstm_size, device):
+    def __init__(self, batch_size, amount_pks, input_size, lstm_size, output_size, device):
         super(PK, self).__init__()
         self.amount_pks = amount_pks
         self.input_size = input_size
@@ -23,7 +23,7 @@ class PK(th.nn.Module):
 
         # ending fc layer weights
         self.W_output = th.nn.Parameter(
-            th.Tensor(lstm_size,input_size))
+            th.Tensor(lstm_size,output_size))
 
 
         self.reset_parameters()
@@ -83,7 +83,7 @@ class PK(th.nn.Module):
 
         y_hat_ = th.matmul(h_t, self.W_output)
         y_hat = th.tanh(y_hat_)
-        # => th.Size([B, PK, DYN + N*LAT])
+        # => th.Size([B, PK, DYN + LAT])
 
 
         return y_hat, h_t, C_t

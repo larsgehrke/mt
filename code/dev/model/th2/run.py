@@ -34,7 +34,7 @@ class Evaluator(BaseEvaluator):
         # Set the gradients back to zero
         self.optimizer.zero_grad()
 
-        net_outputs = self._evaluate(self._np_to_th(net_input), batch_size, iter_idx)
+        net_outputs = self._evaluate(self._np_to_th(net_input), batch_size)
 
         mse = self.train_criterion(net_outputs, self._np_to_th(net_label))
         # Alternatively, the mse can be calculated 'manually'
@@ -47,7 +47,7 @@ class Evaluator(BaseEvaluator):
         return mse.item() # return only the number, not the th object
         
 
-    def _evaluate(self, net_input, batch_size, iter_idx):
+    def _evaluate(self, net_input, batch_size):
 
         seq_len = self.config.seq_len
         amount_pks = self.config.amount_pks
@@ -87,7 +87,7 @@ class Evaluator(BaseEvaluator):
                 # [B, PK, DYN]
 
             # Forward the input through the network
-            self.net.forward(dyn_in=dyn_net_in_step, iter_idx=iter_idx, t=t)
+            self.net.forward(dyn_in=dyn_net_in_step, t=t)
 
             # Just saving the output of the current time step
             net_outputs[:,t,:,:] = self.tensors.pk_dyn_out

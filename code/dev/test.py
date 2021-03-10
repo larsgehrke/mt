@@ -72,7 +72,7 @@ def run_testing(params):
         
         sample_idx += 1
         
-        if sample_idx >= params["batch_size"]:
+        if sample_idx >= params["batch_size_test"]:
             batch_idx += 1 
             sample_idx = 0 
 

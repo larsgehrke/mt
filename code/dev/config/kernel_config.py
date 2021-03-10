@@ -10,7 +10,8 @@ class KernelConfig:
         # System parameters
         self.device = params["device"]
 
-        self.batch_size = int(params["batch_size"])
+        self.batch_size_train = int(params["batch_size_train"])
+        self.batch_size_test = int(params["batch_size_test"])
 
         #
         # General network parameters

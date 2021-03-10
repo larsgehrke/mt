@@ -7,7 +7,7 @@ class KernelTensors:
 
     def __init__(self, config):
         self.config = config
-        self.batch_size = config.batch_size
+        self.batch_size = config.batch_size_train
 
         # Initialize the tensors by calling the reset method (this may not be
         # clean code style, yet it spares lots of lines :p)

@@ -192,7 +192,7 @@ class Evaluator():
 
         # Split the data into inputs (where some noise is added) and labels
         # Add noise to all timesteps except very last one
-        noise = 0 if self.is_testing else self.config.data_noise
+        noise = self.config.data_noise # it does not matter if it is train, val or test!
         _net_input = np.array(
             data[:-1] + np.random.normal(0, noise, np.shape(data[:-1])),
             dtype=np.float32

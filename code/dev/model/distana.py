@@ -9,7 +9,10 @@ class DISTANA():
 
         if params["model_name"] == "old":
             import model.old.run as model
-            params["batch_size"] = 1
+            params = self._disable_batch(params)
+        elif params["model_name"] == "old2":
+            import model.old2.run as model
+            params = self._disable_batch(params)
         elif params["model_name"] == "th":
             import model.th.run as model
         elif params["model_name"] == "th2":
@@ -41,5 +44,11 @@ class DISTANA():
     def train(self, iter_idx):
         return self.model.train(iter_idx)
 
-    def test(self, iter_idx, return_only_error = True):
+    def test(self, iter_idx, return_only_error=True):
         return self.model.test(iter_idx, return_only_error)
+
+    def _disable_batch(self, params):
+        params["batch_size_train"] = 1
+        params["batch_size_test"] = 1
+
+        return params

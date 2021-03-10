@@ -2,15 +2,18 @@ import math
 import numpy as np
 import torch as th
 
+from model.old2.kernel_net import KernelNetwork
+from model.old2.kernel_tensors import KernelTensors
+
 from tools.debug import sprint
 
 
-class BaseEvaluator():
+class Evaluator():
 
-    def __init__(self, kernel_config, tensors, network):
+    def __init__(self, kernel_config):
         self.config = kernel_config
-        self.tensors = tensors
-        self.net = network
+        self.tensors = KernelTensors(kernel_config)
+        self.net = KernelNetwork(kernel_config,self.tensors)
 
         # Train or Test mode
         self.is_testing = False
@@ -31,14 +34,14 @@ class BaseEvaluator():
         self.optimizer = optimizer
         self.train_criterion = criterion
 
-        return math.ceil(len(train_filenames)/self.config.batch_size_train)
+        return self._get_iters(train_filenames)
 
     def set_testing(self, test_filenames, criterion, teacher_forcing_steps):
         self.test_filenames = test_filenames
         self.test_criterion = criterion
         self.teacher_forcing_steps = teacher_forcing_steps
 
-        return math.ceil(len(test_filenames)/self.config.batch_size_test)
+        return self._get_iters(test_filenames)
 
     def train(self, iter_idx):
         self.is_testing = False
@@ -47,12 +50,12 @@ class BaseEvaluator():
             or self.train_criterion is None:
                 raise ValueError("Missing the training configuration: Data File names, Optimizer and/or Criterion.")
 
-        net_input, net_label, batch_size = self._set_up_batch(iter_idx = iter_idx)
+        net_input, net_label = self._set_up_batch(iter_idx = iter_idx)
 
         # Set the gradients back to zero
         self.optimizer.zero_grad()
 
-        net_outputs = self._evaluate(self._np_to_th(net_input), batch_size)
+        net_outputs = self._evaluate(self._np_to_th(net_input))
 
         mse = self.train_criterion(net_outputs, self._np_to_th(net_label))
         # Alternatively, the mse can be calculated 'manually'
@@ -72,9 +75,9 @@ class BaseEvaluator():
             or self.teacher_forcing_steps is None:
             raise ValueError("Missing the testing configuration: Data File names, Criterion and/or Amount teacher forcing steps.")
 
-        net_input, net_label, batch_size = self._set_up_batch(iter_idx = iter_idx)
+        net_input, net_label = self._set_up_batch(iter_idx = iter_idx)
 
-        net_outputs = self._evaluate(self._np_to_th(net_input), batch_size)
+        net_outputs = self._evaluate(self._np_to_th(net_input))
 
         mse = self.test_criterion(net_outputs, self._np_to_th(net_label))
         # Alternatively, the mse can be calculated 'manually'
@@ -86,26 +89,26 @@ class BaseEvaluator():
             # Convert outgoing objects from PyTorch to NumPy
             net_outputs = self._th_to_np(net_outputs)
 
-            return mse.item(), net_outputs, net_label, net_input
+            # This model cannot handle batches, so we need to manually add a batch dimension
+            # with batch size = 1 for the further processing
+            return mse.item(), np.expand_dims(net_outputs,0), np.expand_dims(net_label), np.expand_dims(net_input)
 
-    def _evaluate(self, net_input, batch_size):
+    def _evaluate(self, net_input):
 
         seq_len = self.config.seq_len
         amount_pks = self.config.amount_pks
         pk_dyn_size = self.config.pk_dyn_size
 
 
-
         # Set up an array of zeros to store the network outputs
-        net_outputs = th.zeros(size=(batch_size,
-                                     seq_len,                              
+        net_outputs = th.zeros(size=(seq_len,                              
                                      amount_pks,
                                      pk_dyn_size),
                               device=self.config.device)
 
         
         # Reset the network to clear the previous sequence
-        self.net.reset(batch_size)
+        self.net.reset()
 
         # Iterate over the whole sequence of the training example and perform a
         # forward pass
@@ -116,14 +119,14 @@ class BaseEvaluator():
                 #
                 # Closed loop - receiving the output of the last time step as
                 # input
-                dyn_net_in_step = net_outputs[:,t-1,:,:pk_dyn_size]
+                dyn_net_in_step = net_outputs[t-1,:,:pk_dyn_size]
                 
             else:
                 #
                 # Teacher forcing
                 #
                 # Set the dynamic input for this iteration
-                dyn_net_in_step = net_input[:, t, :, :pk_dyn_size]
+                dyn_net_in_step = net_input[t, :, :pk_dyn_size]
 
                 # [B, PK, DYN]
 
@@ -131,7 +134,7 @@ class BaseEvaluator():
             self.net.forward(dyn_in=dyn_net_in_step)
 
             # Just saving the output of the current time step
-            net_outputs[:,t,:,:] = self.tensors.pk_dyn_out
+            net_outputs[t,:,:] = self.tensors.pk_dyn_out
 
         return net_outputs
 
@@ -165,52 +168,40 @@ class BaseEvaluator():
         else:
             data_all = self.train_filenames
 
-
-        batch_size = None
-
-        if self.is_testing:
-            batch_size = self.config.batch_size_test
-        else:
-            batch_size = self.config.batch_size_train
-
         seq_len = self.config.seq_len
         pks = self.config.amount_pks
 
-        first_sample = batch_size * iter_idx
-
-        # Handling also last batch
-        last_sample_excl = min(first_sample + batch_size, len(data_all))
+        first_sample = iter_idx
   
   
         data = np.load(data_all[first_sample])[:seq_len + 1]
-        # Expand Dim for batch 
-        data = data[np.newaxis, :]
-
-        for file in data_all[first_sample+1:last_sample_excl]:
-            data_file = np.load(file)[:seq_len + 1]
-            # Expand Dim for batch 
-            data_file = data_file[np.newaxis, :]
-            data = np.append(data, data_file, axis=0)
-
 
         # Get first and second dimension of data
-        dim0, dim1, dim2 = np.shape(data)[:3]
+        dim0, dim1 = np.shape(data)[:2]
+
+       
 
         # Reshape the data array to have the kernels on one dimension
-        data = np.reshape(data, [dim0, dim1, dim2, pks])
+        data = np.reshape(data, [dim0, dim1, self.config.pk_rows * self.config.pk_cols])
+        # data.shape = (41, 2, 256)
+        
 
-        # Swap the third and fourth dimension of the data
-        data = np.swapaxes(data, axis1=2, axis2=3)
+        # Swap the second and third dimension of the data
+        data = np.swapaxes(data, axis1=1, axis2=2)
+        # shape = (41, 256, 2)
 
         # Split the data into inputs (where some noise is added) and labels
         # Add noise to all timesteps except very last one
         noise = self.config.data_noise # it does not matter if it is train, val or test!
         _net_input = np.array(
-            data[:,:-1] + np.random.normal(0, noise, np.shape(data[:,:-1])),
+            data[:-1] + np.random.normal(0, noise, np.shape(data[:-1])),
             dtype=np.float32
         )
+        # shape: (40, 256, 2)
 
-        _net_label = np.array(data[:,1:, :, 0:1], dtype=np.float32)
+        _net_label = np.array(data[1:, :, 0:1], dtype=np.float32)
+        # shape: (40, 256, 1)
+        
 
         if not self.is_testing:
             # Set the dynamic inputs with a certain probability to zero to force
@@ -221,11 +212,13 @@ class BaseEvaluator():
                 dtype=np.float32
             )
 
-        _batch_size = len(_net_input)
+        return _net_input, _net_label
 
-        # Return NumPy objects
-        return _net_input, _net_label, _batch_size
 
+
+    def _get_iters(self, filenames):
+        # Return amount of iterations per epoch
+        return len(filenames)
 
     def _np_to_th(self, x_np):
         return th.from_numpy(x_np).to(self.config.device)

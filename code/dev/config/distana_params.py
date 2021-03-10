@@ -42,13 +42,17 @@ class DISTANAParams(Params):
             "epochs": 20,
             "seq_len": 140,
             "learning_rate": 0.001,
-            "batch_size": 8,
+            "batch_size_train": 8, # depends on learning behavior
+            
+            # Validation and Testing
+            "batch_size_test": 100, # can be much higher than for training
 
             #
             # Testing parameters
 
             "teacher_forcing_steps": 15,
             "closed_loop_steps": 135,
+
 
             #
             # PK specific configurations    
@@ -208,8 +212,11 @@ class DISTANAParams(Params):
         parser.add_argument('-l','--learning-rate', type=float, 
             help='Specify the learning rate for the training.')
 
-        parser.add_argument('-b','--batch-size', type=int, 
+        parser.add_argument('-b','--batch-size-train', type=int, 
             help='Specify the batch size for the training.')
+
+        parser.add_argument('-v','--batch-size-test', type=int, 
+            help='Specify the batch size for the validation phase.')
 
         return parser
 
@@ -232,7 +239,7 @@ class DISTANAParams(Params):
         parser.add_argument('--closed-loop-steps', type=int, 
             help='Amount of time steps for the closed loop.')
 
-        parser.add_argument('-b','--batch-size', type=int, 
+        parser.add_argument('-b','--batch-size-test', type=int, 
             help='Specify the batch size for the test run.')
 
         return parser

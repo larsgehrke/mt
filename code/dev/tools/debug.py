@@ -32,9 +32,24 @@ class Clock():
         print("Starting the clock at "+ str(s))
         self.total = time.time()
         self.t = time.time()
+        self.times = []
+        self.counter = 0
 
     def split(self, s=""):
-        print(str(s)+ ": ", str(np.round(time.time() - self.t, 6)).ljust(6, '0') + " seconds")
+        diff = time.time() - self.t
+        print(str(s)+ ": ", str(np.round(diff, 6)).ljust(6, '0') + " seconds")
+        self.t = time.time()
+        return diff
+
+    def split_means(self):
+        diff = time.time() - self.t
+        self.counter += 1
+        self.times.append(diff)
+        if self.counter % 1000 == 0:
+            print(np.mean(self.times))
+        self.t = time.time()
+
+    def reset(self):
         self.t = time.time()
 
     def stop(self, exit = True):
