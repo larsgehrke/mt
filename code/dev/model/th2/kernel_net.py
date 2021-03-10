@@ -71,10 +71,12 @@ class KernelNetwork(th.nn.Module):
             
             input_ = th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
 
-        sprint(input_, "input_", exit = True)
-
         # DEV MODE: Print mean values
         self.clock.split_means()
+
+        sprint(input_, "input_", exit = True)
+
+        
 
         return input_
 
