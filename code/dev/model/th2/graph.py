@@ -23,9 +23,9 @@ class GraphFunction(th.autograd.Function):
     @staticmethod
     def backward(ctx, grad_rearranged_in):
 
-        d_dyn_in, d_lat_in = graph_cuda.backward(grad_rearranged_in.contiguous())[0]
+        d_dyn_in, d_lat_in = graph_cuda.backward(grad_rearranged_in.contiguous())
 
-        return d_input_, d_lat_in
+        return d_dyn_in, d_lat_in
 
 
 class Graph(th.nn.Module):
@@ -37,7 +37,7 @@ class Graph(th.nn.Module):
         self.going_to = None
         self.coming_from = None
 
-        self._build_connections(pk_rows, pk_cols)
+        #self._build_connections(pk_rows, pk_cols)
 
 
     def forward(self, dyn_in, lat_in):
