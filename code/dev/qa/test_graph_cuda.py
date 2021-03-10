@@ -27,9 +27,9 @@ def test_graph():
     start = time.time()
     out = g.forward(dyn_in, lat_in)
     stop = time.time()
-    #print(out)
-    #print(out[0][20][0])
-    #sprint(out, "out")
+    print(out)
+    print(out[0][20][0])
+    sprint(out, "out")
     print(stop-start)
     
     
