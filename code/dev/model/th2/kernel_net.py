@@ -50,7 +50,7 @@ class KernelNetwork(th.nn.Module):
         Implementing the graph connections of DISTANA.
         '''
 
-        if True: #self.config.device == "cuda":
+        if False: #self.config.device == "cuda":
             # Use the custom CUDA kernel
             input_ =  self.graph.forward(self.tensors.pk_dyn_in, self.tensors.pk_lat_out)
         else:
