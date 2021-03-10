@@ -21,9 +21,9 @@ namespace
 
     template <typename scalar_t>
     __global__ void graph_forward_kernel(
-        const torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> dyn_input,
-        const torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> lat_input,
-        torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> out) {
+        const torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits, size_t> dyn_input,
+        const torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits, size_t> lat_input,
+        torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits, size_t> out) {
 
       /*
 
@@ -119,9 +119,9 @@ namespace
 
     template <typename scalar_t>
     __global__ void graph_backward_kernel(
-      torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_out,
-        torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_dyn_input,
-        torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_lat_input) 
+      torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits, size_t> d_out,
+        torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits, size_t> d_dyn_input,
+        torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits, size_t> d_lat_input) 
     {
 
         /*
@@ -155,9 +155,9 @@ std::vector<torch::Tensor> graph_cuda_forward(
 
   AT_DISPATCH_FLOATING_TYPES(out.type(), "graph_forward_kernel", ([&] {
     graph_forward_kernel<scalar_t><<<blocks, threads>>>(
-        dyn_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
-        lat_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
-        out.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>()
+        dyn_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits, size_t>(),
+        lat_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits, size_t>(),
+        out.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits, size_t>()
         );
   }));
 
@@ -177,9 +177,9 @@ std::vector<torch::Tensor> graph_cuda_backward(
 
   AT_DISPATCH_FLOATING_TYPES(d_dyn_input.type(), "graph_backward_kernel", ([&] {
     graph_backward_kernel<scalar_t><<<blocks, threads>>>(
-        d_out.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
-        d_dyn_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
-        d_lat_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>());
+        d_out.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits, size_t>(),
+        d_dyn_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits, size_t>(),
+        d_lat_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits, size_t>());
   }));
 
 

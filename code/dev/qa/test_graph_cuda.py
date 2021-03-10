@@ -17,7 +17,7 @@ def test_graph():
 
     g = Graph(pk_rows,pk_cols)
 
-    dyn_in = th.zeros(size=(8, 256, 1),
+    dyn_in = th.one(size=(8, 256, 1),
                               device="cuda")
 
     lat_in = th.ones(size=(8, 256, 1),
