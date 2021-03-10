@@ -16,7 +16,9 @@ class GraphFunction(th.autograd.Function):
     @staticmethod
     def forward(ctx, dyn_in, lat_in):
 
-        rearranged_in = graph_cuda.forward(dyn_in, lat_in)[0]
+        out = th.zeros((8, 256, 9))
+
+        rearranged_in = graph_cuda.forward(dyn_in, lat_in, out)[0]
 
         return rearranged_in
 

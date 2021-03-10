@@ -12,7 +12,7 @@
 #define PK_COLS 16
 #define DIMS 3
 #define NEIGHBORS 8
-#define LAT_SIZE 0
+#define LAT_SIZE 1
 #define DYN_SIZE 1
 
 
@@ -57,12 +57,10 @@ namespace
       */
       const int pk_thread_id = threadIdx.y * blockDim.x + threadIdx.x;
 
-      out[batch_block_id][pk_thread_id][0] = -17;
-
 
       for (int dyn = 0; dyn < DYN_SIZE; dyn++)
       {
-        out[batch_block_id][pk_thread_id][dyn] = -17; /*dyn_input[batch_block_id][pk_thread_id][dyn];*/
+        out[batch_block_id][pk_thread_id][dyn] = dyn_input[batch_block_id][pk_thread_id][dyn];
       } 
 
       const int top = pk_thread_id - PK_COLS;
@@ -149,10 +147,8 @@ std::vector<torch::Tensor> graph_cuda_forward(
     torch::Tensor dyn_input,
     torch::Tensor lat_input) {
 
-  /*auto out = torch::zeros({BATCH_SIZE, PK_ROWS * PK_COLS, 
-    DYN_SIZE + NEIGHBORS * LAT_SIZE});*/
-
-  auto out = torch::zeros_like(dyn_input);
+  auto out = torch::zeros(dyn_input, {BATCH_SIZE, PK_ROWS * PK_COLS, 
+    DYN_SIZE + NEIGHBORS * LAT_SIZE});
 
 
   const dim3 threads(PK_COLS, PK_ROWS);
