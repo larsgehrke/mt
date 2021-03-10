@@ -79,7 +79,7 @@ def run_training(params):
 
         # Iterate through epoch
         for _iter_train in range(amount_train):
-
+            print(f"Doing training iterations {str(_iter_train)} from {str(amount_train)}")
             # Train the network for the given training data
             mse = distana.train(iter_idx=_iter_train)
 
@@ -89,7 +89,7 @@ def run_training(params):
 
         # Iterate through epoch
         for _iter_val in range(amount_val):
-
+            print(f"Doing validation iterations {str(_iter_val)} from {str(amount_val)}")
             # Test the network for the given validation data
             mse = distana.test(iter_idx=_iter_val)
 
