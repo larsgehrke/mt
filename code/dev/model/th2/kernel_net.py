@@ -38,13 +38,11 @@ class KernelNetwork(th.nn.Module):
 
         self._build_connections(config.pk_rows, config.pk_cols)
 
-        print(self.config.device)
-
-        if self.config.device == 'cuda':
-            print("cuda is used")
-            # import the custom CUDA kernel
-            from model.th2.graph import Graph
-            self.graph = Graph(config.pk_rows, config.pk_cols)
+        
+        print("cuda is used")
+        # import the custom CUDA kernel
+        from model.th2.graph import Graph
+        self.graph = Graph(config.pk_rows, config.pk_cols)
 
 
     def _graph_connections(self):
@@ -52,7 +50,7 @@ class KernelNetwork(th.nn.Module):
         Implementing the graph connections of DISTANA.
         '''
 
-        if self.config.device == "cuda":
+        if True: #self.config.device == "cuda":
             # Use the custom CUDA kernel
             input_ =  self.graph.forward(self.tensors.pk_dyn_in, self.tensors.pk_lat_out)
         else:
