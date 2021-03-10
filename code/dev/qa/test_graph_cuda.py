@@ -6,6 +6,7 @@
 
 from model.th2.graph import Graph
 import torch as th
+import numpy as np
 
 import time
 
