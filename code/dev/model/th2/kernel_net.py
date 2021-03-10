@@ -43,18 +43,11 @@ class KernelNetwork(th.nn.Module):
             from model.th2.graph import Graph
             self.graph = Graph(config.pk_rows, config.pk_cols)
 
-        # DEV MODE: MEASURE TIME
-        self.clock = Clock("")
 
     def _graph_connections(self):
         '''
         Implementing the graph connections of DISTANA.
         '''
-        
-        sprint(self.tensors.pk_dyn_in, "self.tensors.pk_dyn_in")
-        sprint(self.tensors.pk_lat_out, "self.tensors.pk_lat_out")
-        # DEV MODE: Reset Clock
-        self.clock.reset()
 
         if self.config.device == "cuda":
             # Use the custom CUDA kernel
@@ -71,16 +64,9 @@ class KernelNetwork(th.nn.Module):
             
             input_ = th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
 
-        # DEV MODE: Print mean values
-        self.clock.split()
-
-        sprint(input_, "input_", exit = True)
-
-        
-
         return input_
 
-    def forward(self, dyn_in, t):
+    def forward(self, dyn_in):
         """
         Runs the forward pass of all PKs and TKs, respectively, in parallel 
         for a given input

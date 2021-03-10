@@ -87,7 +87,7 @@ class Evaluator(BaseEvaluator):
                 # [B, PK, DYN]
 
             # Forward the input through the network
-            self.net.forward(dyn_in=dyn_net_in_step, t=t)
+            self.net.forward(dyn_in=dyn_net_in_step)
 
             # Just saving the output of the current time step
             net_outputs[:,t,:,:] = self.tensors.pk_dyn_out
