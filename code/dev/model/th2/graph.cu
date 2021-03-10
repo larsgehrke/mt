@@ -147,7 +147,7 @@ std::vector<torch::Tensor> graph_cuda_forward(
     torch::Tensor dyn_input,
     torch::Tensor lat_input) {
 
-  auto out = torch::zeros(dyn_input, {BATCH_SIZE, PK_ROWS * PK_COLS, 
+  auto out = torch::zeros_like(dyn_input, {BATCH_SIZE, PK_ROWS * PK_COLS, 
     DYN_SIZE + NEIGHBORS * LAT_SIZE});
 
 
