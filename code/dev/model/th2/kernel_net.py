@@ -33,12 +33,10 @@ class KernelNetwork(th.nn.Module):
 
         
         if self.config.use_gpu:            
-            print("cuda is used")
             # import the custom CUDA kernel
             from model.th2.graph import Graph
             self.graph = Graph(config.pk_rows, config.pk_cols)
         else:
-            print("cpu is used")
             # Variables for the PK-TK connections
             self.pos0 = None
             self.going_to = None
@@ -47,14 +45,15 @@ class KernelNetwork(th.nn.Module):
             self._build_connections(config.pk_rows, config.pk_cols)
 
 
-    def _graph_connections(self):
+    def _graph_connections(self, dyn_in):
         '''
         Implementing the graph connections of DISTANA.
         '''
+        
 
         if self.config.use_gpu: 
             # Use the custom CUDA kernel
-            input_ =  self.graph.forward(self.tensors.pk_dyn_in, self.tensors.pk_lat_out)
+            return  self.graph.forward(dyn_in, self.tensors.pk_lat_out)
         else:
             # Set the appropriate lateral inputs to the lateral outputs from the
             # previous time step
@@ -65,9 +64,8 @@ class KernelNetwork(th.nn.Module):
             # => B, PK, Dyn + N*Lat 
             lat_in_flat = th.flatten(self.tensors.pk_lat_in,start_dim=2)
             
-            input_ = th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
+            return th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
 
-        return input_
 
     def forward(self, dyn_in):
         """
@@ -77,9 +75,9 @@ class KernelNetwork(th.nn.Module):
         """ 
 
         # Write the dynamic PK input to the corresponding tensor
-        self.tensors.pk_dyn_in = dyn_in
+        #self.tensors.pk_dyn_in = dyn_in
         
-        input_ = self._graph_connections()
+        input_ = self._graph_connections(dyn_in)
 
 
         # Forward the PK inputs through the pk_net to get the outputs and hidden
