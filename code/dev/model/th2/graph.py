@@ -55,7 +55,7 @@ class Graph(th.nn.Module):
         # previous time step
         # output[:,self.pos0, self.going_to] = \
         # input_[:,self.coming_from, self.going_to]
-
+        print("Yes!")
         return GraphFunction.apply(dyn_in, lat_in)
 
     def _build_connections(self, rows, cols):
