@@ -77,7 +77,7 @@ class KernelNetwork(th.nn.Module):
         # Write the dynamic PK input to the corresponding tensor
         self.tensors.pk_dyn_in = dyn_in
         
-        input_ = self._graph_connections(dyn_in)
+        input_ = self._graph_connections()
 
 
         # Forward the PK inputs through the pk_net to get the outputs and hidden
