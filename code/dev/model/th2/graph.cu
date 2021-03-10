@@ -147,7 +147,7 @@ std::vector<torch::Tensor> graph_cuda_forward(
     torch::Tensor dyn_input,
     torch::Tensor lat_input) {
 
-  auto options = torch::TensorOptions().device(torch::kCUDA, 1).requires_grad(true);
+  auto options = torch::TensorOptions().device(torch::kCUDA).requires_grad(true);
 
   auto out = torch::zeros({BATCH_SIZE, PK_ROWS * PK_COLS, 
     DYN_SIZE + NEIGHBORS * LAT_SIZE}, options);
