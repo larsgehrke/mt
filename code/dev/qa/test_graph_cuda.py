@@ -29,8 +29,9 @@ def test_graph():
     out = g.forward(dyn_in, lat_in)
     stop = time.time()
 
-    s = ""
+    
     for b in range(8):
+        s = ""
         print(f"\n\n ==== BATCH {str(b)} ==== \n")
 
         for y in range(pk_rows):
