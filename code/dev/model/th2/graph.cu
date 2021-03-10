@@ -12,7 +12,7 @@
 #define PK_COLS 16
 #define DIMS 3
 #define NEIGHBORS 8
-#define LAT_SIZE 1
+#define LAT_SIZE 0
 #define DYN_SIZE 1
 
 
@@ -149,8 +149,11 @@ std::vector<torch::Tensor> graph_cuda_forward(
     torch::Tensor dyn_input,
     torch::Tensor lat_input) {
 
-  auto out = torch::zeros({BATCH_SIZE, PK_ROWS * PK_COLS, 
-    DYN_SIZE + NEIGHBORS * LAT_SIZE});
+  /*auto out = torch::zeros({BATCH_SIZE, PK_ROWS * PK_COLS, 
+    DYN_SIZE + NEIGHBORS * LAT_SIZE});*/
+
+  auto out = torch::zeros_like(dyn_input);
+
 
   const dim3 threads(PK_COLS, PK_ROWS);
   const dim3 blocks(BATCH_SIZE);
