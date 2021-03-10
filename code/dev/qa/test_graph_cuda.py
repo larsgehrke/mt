@@ -38,11 +38,17 @@ def test_graph():
 
     print(s)
 
+    print("out[0][0]")
     print(out[0][0].cpu().detach().numpy())
+    print("out[0][5]")
     print(out[0][5].cpu().detach().numpy())
+    print("out[0][15]")
     print(out[0][15].cpu().detach().numpy())
+    print("out[0][16]")
     print(out[0][16].cpu().detach().numpy())
+    print("out[0][17]")
     print(out[0][17].cpu().detach().numpy())
+    print("out[0][255]")
     print(out[0][255].cpu().detach().numpy())
     
     sprint(out, "out")
