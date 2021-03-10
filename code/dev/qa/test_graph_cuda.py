@@ -34,8 +34,9 @@ def test_graph():
     for y in range(pk_rows):
       for x in range(pk_cols):
         s += str(np.sum(out[0][y*pk_cols + x].cpu().detach().numpy())) + " "
-      print()
+      s += "\n"
 
+    print(s)
     sprint(out, "out")
     print(stop-start)
     
