@@ -16,7 +16,7 @@ class GraphFunction(th.autograd.Function):
     @staticmethod
     def forward(ctx, dyn_in, lat_in):
 
-        rearranged_in = graph_cuda.forward(dyn_in, lat_in)[0]
+        rearranged_in = graph_cuda.forward(dyn_in.contiguous(), lat_in.contiguous())[0]
 
         return rearranged_in
 
@@ -55,7 +55,7 @@ class Graph(th.nn.Module):
         # previous time step
         # output[:,self.pos0, self.going_to] = \
         # input_[:,self.coming_from, self.going_to]
-        print("Yes!")
+       
         return GraphFunction.apply(dyn_in, lat_in)
 
     def _build_connections(self, rows, cols):
