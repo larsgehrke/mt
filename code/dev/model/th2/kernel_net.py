@@ -52,7 +52,7 @@ class KernelNetwork(th.nn.Module):
 
         if self.config.use_gpu: 
             # Use the custom CUDA kernel
-            return  self.graph.forward(self.tensors.pk_dyn_in, self.tensors.pk_lat_out)
+            input_ =  self.graph.forward(self.tensors.pk_dyn_in, self.tensors.pk_lat_out)
         else:
             # Set the appropriate lateral inputs to the lateral outputs from the
             # previous time step
@@ -63,9 +63,9 @@ class KernelNetwork(th.nn.Module):
             # => B, PK, Dyn + N*Lat 
             lat_in_flat = th.flatten(self.tensors.pk_lat_in,start_dim=2)
             
-            return th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
+            input_ = th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
 
-        
+        return input_
 
     def forward(self, dyn_in):
         """
@@ -73,11 +73,12 @@ class KernelNetwork(th.nn.Module):
         for a given input
 
         """ 
-
+        clock = Clock("kenel_net.forward")
         # Write the dynamic PK input to the corresponding tensor
         self.tensors.pk_dyn_in = dyn_in
-        
+        clock.split("self.tensors.pk_dyn_in = dyn_in")
         input_ = self._graph_connections()
+        clock.split("input_ = self._graph_connections()")
 
 
         # Forward the PK inputs through the pk_net to get the outputs and hidden
@@ -88,20 +89,22 @@ class KernelNetwork(th.nn.Module):
             old_c= self.tensors.pk_lstm_c # Size: [B, PK, LSTM]
         )
         # pk_output: [B, PK, DYN + N*LAT]
+        clock.split("pk.forward")
 
         # Dynamic output
         pk_dyn_out = pk_output[:, :,  :self.config.pk_dyn_size]
 
+
         # Lateral output flattened
         pk_lat_out = pk_output[:, :, self.config.pk_dyn_size:]
-
+        clock.split("Assignments 1")
 
         # Update the output and hidden state tensors of the PKs
         self.tensors.pk_dyn_out = pk_dyn_out
         self.tensors.pk_lat_out = pk_lat_out
         self.tensors.pk_lstm_h = pk_lstm_h
         self.tensors.pk_lstm_c = pk_lstm_c 
-         
+        clock.split("Assignments 2")
 
     def reset(self, batch_size):
         self.tensors.set_batch_size_and_reset(batch_size)
