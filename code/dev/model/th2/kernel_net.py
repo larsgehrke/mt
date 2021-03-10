@@ -52,6 +52,7 @@ class KernelNetwork(th.nn.Module):
 
         if True: #self.config.device == "cuda":
             # Use the custom CUDA kernel
+            print("first forward")
             input_ =  self.graph.forward(self.tensors.pk_dyn_in, self.tensors.pk_lat_out)
         else:
             # Set the appropriate lateral inputs to the lateral outputs from the
