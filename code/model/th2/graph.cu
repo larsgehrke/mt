@@ -152,8 +152,6 @@ namespace
 
       const int top = pk_thread_id - PK_COLS;
       const int bottom = pk_thread_id + PK_COLS;
-      const int top = pk_thread_id - PK_COLS;
-      const int bottom = pk_thread_id + PK_COLS;
       const bool y_gt_0 = threadIdx.y > 0;
       const bool x_gt_0 = threadIdx.x > 0;
       const bool y_lt_max = threadIdx.y < PK_ROWS - 1;
