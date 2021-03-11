@@ -110,7 +110,6 @@ class KernelNetwork(th.nn.Module):
 
     def reset(self, batch_size):
         self.tensors.set_batch_size_and_reset(batch_size)
-        self.pk_net.set_batch_size(batch_size)
 
     def _build_connections(self, rows, cols):
 
