@@ -18,6 +18,7 @@ graph_cuda = load(
 
 class GraphFunction(th.autograd.Function):
 
+
     @staticmethod
     def forward(ctx, dyn_in, lat_in):
 

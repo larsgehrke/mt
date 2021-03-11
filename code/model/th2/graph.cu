@@ -215,12 +215,14 @@ std::vector<torch::Tensor> graph_cuda_forward(
 
   auto options = torch::TensorOptions().device(torch::kCUDA).requires_grad(true);
 
-  auto out = torch::zeros({BATCH_SIZE, PK_ROWS * PK_COLS, 
+  const auto batch_size = dyn_input.size(0);
+
+  auto out = torch::zeros({batch_size, PK_ROWS * PK_COLS, 
     DYN_SIZE + NEIGHBORS * LAT_SIZE}, options);
 
 
   const dim3 threads(PK_COLS, PK_ROWS);
-  const dim3 blocks(BATCH_SIZE);
+  const dim3 blocks(batch_size);
 
   AT_DISPATCH_FLOATING_TYPES(out.type(), "graph_forward_kernel", ([&] {
     graph_forward_kernel<scalar_t><<<blocks, threads>>>(
@@ -237,13 +239,14 @@ std::vector<torch::Tensor> graph_cuda_forward(
 std::vector<torch::Tensor> graph_cuda_backward(
     torch::Tensor d_out) 
 {
+  const auto batch_size = d_out.size(0);
   auto options = torch::TensorOptions().device(torch::kCUDA).requires_grad(true);
 
-  auto d_dyn_input = torch::zeros({BATCH_SIZE, PK_ROWS * PK_COLS, DYN_SIZE}, options);
-  auto d_lat_input = torch::zeros({BATCH_SIZE, PK_ROWS * PK_COLS, LAT_SIZE}, options);
+  auto d_dyn_input = torch::zeros({batch_size, PK_ROWS * PK_COLS, DYN_SIZE}, options);
+  auto d_lat_input = torch::zeros({batch_size, PK_ROWS * PK_COLS, LAT_SIZE}, options);
 
   const dim3 threads(PK_ROWS, PK_COLS);
-  const dim3 blocks(BATCH_SIZE);
+  const dim3 blocks(batch_size);
 
   AT_DISPATCH_FLOATING_TYPES(d_dyn_input.type(), "graph_backward_kernel", ([&] {
     graph_backward_kernel<scalar_t><<<blocks, threads>>>(

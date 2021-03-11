@@ -41,10 +41,22 @@ class KernelNetwork(th.nn.Module):
             self._build_connections(config.pk_rows, config.pk_cols)
         else:
             self.graph = None
+            self._compile_cuda_extension()
 
     def _compile_cuda_extension(self):
+        cpp_config_file = os.path.join('model', 'th2', 'include','config.h')
+
+        with open(cpp_config_file, 'w') as conf_file:
+            conf_file.write("#define PK_ROWS " + str(self.config.pk_rows) + os.linesep)
+            conf_file.write("#define PK_COLS " + str(self.config.pk_cols) + os.linesep)
+            conf_file.write("#define DIMS 3" + os.linesep)
+            conf_file.write("#define NEIGHBORS 8" + os.linesep)
+            conf_file.write("#define LAT_SIZE " + str(self.config.pk_lat_size) + os.linesep)
+            conf_file.write("#define DYN_SIZE " + str(self.config.pk_dyn_size) + os.linesep)
+
         # import the custom CUDA kernel
         from model.th2.graph import Graph
+
         self.graph = Graph(self.config.pk_rows, self.config.pk_cols)
 
     def _graph_connections(self):
@@ -53,8 +65,6 @@ class KernelNetwork(th.nn.Module):
         '''
 
         if self.config.use_gpu: 
-            if self.graph is None:
-                self._compile_cuda_extension()
             # Use the custom CUDA kernel
             input_ =  self.graph.forward(self.tensors.pk_dyn_in, self.tensors.pk_lat_out)
         else:
