@@ -9,6 +9,7 @@ from model.abstract_evaluator import AbstractEvaluator
 from model.th2.kernel_net import KernelNetwork
 from model.th2.kernel_tensors import KernelTensors
 
+from tools.debug import sprint
 
 class Evaluator(AbstractEvaluator):
 
@@ -31,6 +32,10 @@ class Evaluator(AbstractEvaluator):
         if self.config.use_gpu and not self.cuda_is_compiled:
             self._save_cpp_config()
             self.cuda_is_compiled = True
+
+        # DEV ONLY
+        if batch_size < 8:
+            sprint(net_input, "net_input (batch_size < 8", exit = True)
 
         # Set up an array of zeros to store the network outputs
         net_outputs = th.zeros(size=(batch_size,
@@ -60,7 +65,6 @@ class Evaluator(AbstractEvaluator):
                 #
                 # Set the dynamic input for this iteration
                 dyn_net_in_step = net_input[:, t, :, :pk_dyn_size]
-
                 # [B, PK, DYN]
 
             # Forward the input through the network

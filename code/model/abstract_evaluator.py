@@ -49,7 +49,7 @@ class AbstractEvaluator():
 
         if self.train_filenames is None or self.optimizer is None \
             or self.train_criterion is None:
-                raise ValueError("Missing the training configuration: Data File names, Optimizer and/or Criterion.")
+                raise ValueError("Missing the training configuration: data file names, optimizer and/or criterion.")
 
         return self._train(iter_idx)
 
@@ -59,7 +59,7 @@ class AbstractEvaluator():
 
         if self.test_filenames is None or self.test_criterion is None \
             or self.teacher_forcing_steps is None:
-            raise ValueError("Missing the testing configuration: Data File names, Criterion and/or Amount teacher forcing steps.")
+            raise ValueError("Missing the testing configuration: data file names, criterion and/or amount teacher forcing steps.")
 
         return self._test(iter_idx, return_only_error)
 

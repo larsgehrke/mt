@@ -80,9 +80,6 @@ class KernelNetwork(th.nn.Module):
         
         # Write the dynamic PK input to the corresponding tensor
         self.tensors.pk_dyn_in = dyn_in
-
-        if dyn_in.size()[0]<8:
-            sprint(dyn_in, "dyn_in", exit=True)
        
         input_ = self._graph_connections()
 
