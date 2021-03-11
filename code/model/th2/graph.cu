@@ -65,10 +65,10 @@ namespace
 
       const int top = pk_thread_id - PK_COLS;
       const int bottom = pk_thread_id + PK_COLS;
-      const bool y_gt_0 = threadIdx.y > 0
-      const bool x_gt_0 = threadIdx.x > 0
-      const bool y_lt_max = threadIdx.y < PK_ROWS - 1
-      const bool x_lt_max = threadIdx.x < PK_COLS - 1
+      const bool y_gt_0 = threadIdx.y > 0;
+      const bool x_gt_0 = threadIdx.x > 0;
+      const bool y_lt_max = threadIdx.y < PK_ROWS - 1;
+      const bool x_lt_max = threadIdx.x < PK_COLS - 1;
 
       for (int lat = 0; lat < LAT_SIZE; lat++)
       {
@@ -154,10 +154,10 @@ namespace
       const int bottom = pk_thread_id + PK_COLS;
       const int top = pk_thread_id - PK_COLS;
       const int bottom = pk_thread_id + PK_COLS;
-      const bool y_gt_0 = threadIdx.y > 0
-      const bool x_gt_0 = threadIdx.x > 0
-      const bool y_lt_max = threadIdx.y < PK_ROWS - 1
-      const bool x_lt_max = threadIdx.x < PK_COLS - 1
+      const bool y_gt_0 = threadIdx.y > 0;
+      const bool x_gt_0 = threadIdx.x > 0;
+      const bool y_lt_max = threadIdx.y < PK_ROWS - 1;
+      const bool x_lt_max = threadIdx.x < PK_COLS - 1;
 
       for (int lat = 0; lat < LAT_SIZE; lat++)
       {
