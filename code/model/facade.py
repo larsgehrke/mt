@@ -1,26 +1,24 @@
 import torch as th
 from config.kernel_config import KernelConfig
 
-
-class DISTANA():
-
+class Facade():
 
     def __init__(self, params):
 
         if params["model_name"] == "old":
-            import model.old.run as model
-            params = self._disable_batch(params)
+            import model.old.evaluator as model
         elif params["model_name"] == "old2":
-            import model.old2.run as model
-            params = self._disable_batch(params)
+            import model.old2.evaluator as model
         elif params["model_name"] == "th":
-            import model.th.run as model
+            import model.th.evaluator as model
         elif params["model_name"] == "th2":
-            import model.th2.run as model
+            import model.th2.evaluator as model
         else:
             raise ValueError("Model name is not valid.")
 
-        self.model = model.Evaluator(KernelConfig(params))
+        config = KernelConfig(params)
+
+        self.model = model.Evaluator(config)
 
     def set_training(self, train_data, optimizer, criterion):
         return self.model.set_training(train_data,optimizer, criterion)
@@ -32,11 +30,7 @@ class DISTANA():
         return self.model.net
 
     def get_trainable_params(self):
-        # Count number of trainable parameters
-        pytorch_total_params = sum(
-            p.numel() for p in self.net().parameters() if p.requires_grad
-        )
-        return pytorch_total_params
+        return self.model.get_trainable_params()
 
     def set_weights(self,loaded_weights, is_training):
         self.model.set_weights(loaded_weights,is_training)
@@ -47,8 +41,22 @@ class DISTANA():
     def test(self, iter_idx, return_only_error=True):
         return self.model.test(iter_idx, return_only_error)
 
-    def _disable_batch(self, params):
-        params["batch_size_train"] = 1
-        params["batch_size_test"] = 1
 
-        return params
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

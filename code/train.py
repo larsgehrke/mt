@@ -14,12 +14,13 @@ description = '''
  parameterized by dynamic and optional static input
 
 '''
+
 import os
 import time
 import numpy as np
 import torch as th 
 
-from model.distana import DISTANA
+from model.facade import Facade
 from config.distana_params import DISTANAParams
 from config.params import Params
 from tools.persistence import FileManager
@@ -29,15 +30,14 @@ import tools.torch_tools as th_tools
 
 
 
-
 def run_training(params):
 
     # Create and set up the network
-    distana = DISTANA(params)
+    model = Facade(params)
     
     #
     # Set up the optimizer and the criterion (loss)
-    optimizer = th.optim.Adam(distana.net().parameters(), lr=params['learning_rate'])
+    optimizer = th.optim.Adam(model.net().parameters(), lr=params['learning_rate'])
     criterion = th.nn.MSELoss() 
 
     # Get the training and validation data
@@ -46,8 +46,8 @@ def run_training(params):
 
     # Set the training parameters for the model 
     # and get the amount of iterations for one epoch
-    amount_train = distana.set_training(train_data_files, optimizer, criterion)
-    amount_val = distana.set_testing(val_data_files, criterion, params['teacher_forcing_steps'])
+    amount_train = model.set_training(train_data_files, optimizer, criterion)
+    amount_val = model.set_testing(val_data_files, criterion, params['teacher_forcing_steps'])
 
     model_saver = None
     if params["save_model"]:
@@ -55,12 +55,12 @@ def run_training(params):
             model_src_path=params['model_folder'],
             model_name = params['model_name'],
             cfg_file=Params.to_string(params), 
-            net=distana.net())
+            net=model.net())
     
-    supervisor = TrainSupervisor(params['epochs'], distana.get_trainable_params(), model_saver)
+    view = TrainSupervisor(params['epochs'], model.get_trainable_params(), model_saver)
 
     if params["continue_training"]:
-        distana.set_weights(th_tools.load_model(params),is_training=True)
+        model.set_weights(th_tools.load_model(params),is_training=True)
 
     """
     TRAINING
@@ -80,26 +80,26 @@ def run_training(params):
         # Iterate through epoch
         for _iter_train in range(amount_train):
             # Train the network for the given training data
-            mse = distana.train(iter_idx=_iter_train)
+            mse = model.train(iter_idx=_iter_train)
 
             training_errors.append(mse)
             
-        supervisor.finished_training(training_errors)
+        view.finished_training(training_errors)
 
         # Iterate through epoch
         for _iter_val in range(amount_val):
             # Test the network for the given validation data
-            mse = distana.test(iter_idx=_iter_val)
+            mse = model.test(iter_idx=_iter_val)
 
             val_errors.append(mse)
             
-        supervisor.finished_validation(val_errors)
+        view.finished_validation(val_errors)
         
 
-        supervisor.finished_epoch(epoch, epoch_start_time)
+        view.finished_epoch(epoch, epoch_start_time)
 
 
-    supervisor.finished(training_start_time)
+    view.finished(training_start_time)
     
 
 
