@@ -75,7 +75,7 @@ class Evaluator(AbstractEvaluator):
         cpp_config_file = os.path.join('model', 'th2', 'include','config.h')
 
         batch_size = 1
-        if self.config.is_testing:
+        if self.is_testing:
             batch_size = self.config.batch_size_test
         else:
             batch_size = self.config.batch_size_train
