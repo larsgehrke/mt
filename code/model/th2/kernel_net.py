@@ -32,18 +32,20 @@ class KernelNetwork(th.nn.Module):
                               device = config.device)
 
         
-        if self.config.use_gpu:            
-            # import the custom CUDA kernel
-            from model.th2.graph import Graph
-            self.graph = Graph(config.pk_rows, config.pk_cols)
-        else:
+        if not self.config.use_gpu:            
             # Variables for the PK-TK connections
             self.pos0 = None
             self.going_to = None
             self.coming_from = None
 
             self._build_connections(config.pk_rows, config.pk_cols)
+        else:
+            self.graph = None
 
+    def _compile_cuda_extension(self):
+        # import the custom CUDA kernel
+        from model.th2.graph import Graph
+        self.graph = Graph(config.pk_rows, config.pk_cols)
 
     def _graph_connections(self):
         '''
@@ -51,6 +53,8 @@ class KernelNetwork(th.nn.Module):
         '''
 
         if self.config.use_gpu: 
+            if self.graph is None:
+                self._compile_cuda_extension()
             # Use the custom CUDA kernel
             input_ =  self.graph.forward(self.tensors.pk_dyn_in, self.tensors.pk_lat_out)
         else:
@@ -76,6 +80,9 @@ class KernelNetwork(th.nn.Module):
         
         # Write the dynamic PK input to the corresponding tensor
         self.tensors.pk_dyn_in = dyn_in
+
+        if dyn_in.size()[0]<8:
+            sprint(dyn_in, "dyn_in", exit=True)
        
         input_ = self._graph_connections()
 

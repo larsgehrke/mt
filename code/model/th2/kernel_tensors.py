@@ -12,8 +12,7 @@ class KernelTensors:
         # can be overwritten with self.set_batch_size_and_reset(batch_size)
         self.batch_size = config.batch_size_train 
 
-        # Initialize the tensors by calling the reset method (this may not be
-        # clean code style, yet it spares lots of lines :p)
+        # Initialize the tensors by calling the reset method 
         self.reset()
 
     def set_batch_size_and_reset(self, batch_size):

@@ -11,8 +11,6 @@ class PK(th.nn.Module):
         self.input_size = input_size
         self.lstm_size = lstm_size
 
-        self.set_batch_size(batch_size)
-
         # starting fc layer weights
         self.W_input = th.nn.Parameter(
             th.Tensor(input_size,4)) 
@@ -34,12 +32,6 @@ class PK(th.nn.Module):
         stdv = 1.0 / math.sqrt(self.lstm_size)
         for weight in self.parameters():
             weight.data.uniform_(-stdv, +stdv)
-
-    def set_batch_size(self, batch_size):
-        self.lstm_h = th.zeros(batch_size,self.amount_pks,self.lstm_size)
-        self.lstm_c = th.zeros(batch_size,self.amount_pks,self.lstm_size)
-
-        self.batch_size = batch_size
 
 
     def forward(self, input_flat, old_c, old_h):
@@ -87,3 +79,5 @@ class PK(th.nn.Module):
 
 
         return y_hat, h_t, C_t
+
+        

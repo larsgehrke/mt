@@ -16,8 +16,9 @@ class Evaluator(AbstractEvaluator):
         self.tensors = KernelTensors(kernel_config)
 
         net = KernelNetwork(kernel_config, self.tensors)
-        batch_processing = True
-        super().__init__(kernel_config, net, batch_processing)
+        super().__init__(kernel_config, net, batch_processing = True)
+
+        self.cuda_is_compiled = False
         
 
     def _evaluate(self, net_input, batch_size):
@@ -26,7 +27,9 @@ class Evaluator(AbstractEvaluator):
         amount_pks = self.config.amount_pks
         pk_dyn_size = self.config.pk_dyn_size
 
-
+        if self.config.use_gpu and not self.cuda_is_compiled:
+            self._save_cpp_config()
+            self.cuda_is_compiled = True
 
         # Set up an array of zeros to store the network outputs
         net_outputs = th.zeros(size=(batch_size,
@@ -66,6 +69,24 @@ class Evaluator(AbstractEvaluator):
             net_outputs[:,t,:,:] = self.tensors.pk_dyn_out
 
         return net_outputs
+
+    def _save_cpp_config(self):
+        cpp_config_file = os.path.join('model', 'th2', 'include','config.h')
+
+        batch_size = 1
+        if self.config.is_testing:
+            batch_size = self.config.batch_size_test
+        else:
+            batch_size = self.config.batch_size_train
+
+        with open(cpp_config_file, 'w') as conf_file:
+            conf_file.write("#define BATCH_SIZE " + str(batch_size) + os.linesep)
+            conf_file.write("#define PK_ROWS " + str(self.config.pk_rows) + os.linesep)
+            conf_file.write("#define PK_COLS " + str(self.config.pk_cols) + os.linesep)
+            conf_file.write("#define DIMS 3" + os.linesep)
+            conf_file.write("#define NEIGHBORS 8" + os.linesep)
+            conf_file.write("#define LAT_SIZE " + str(self.config.pk_lat_size) + os.linesep)
+            conf_file.write("#define DYN_SIZE " + str(self.config.pk_dyn_size) + os.linesep)
     
 
 

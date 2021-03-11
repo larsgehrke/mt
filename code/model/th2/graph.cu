@@ -5,15 +5,8 @@
 
 #include <vector>
 
-/*#include <config.h>*/
-
-#define BATCH_SIZE 8
-#define PK_ROWS 16
-#define PK_COLS 16
-#define DIMS 3
-#define NEIGHBORS 8
-#define LAT_SIZE 1
-#define DYN_SIZE 1
+/* Custom config file written by Python code*/
+#include <config.h>
 
 
 namespace 
