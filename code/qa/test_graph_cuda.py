@@ -52,7 +52,7 @@ def test_graph():
 
     out = out.cpu().detach().numpy()
     # lateral output
-    out = [:,:,1:]
+    out = out[:,:,1:]
 
     if np.sum(out[:,:,0]) == 0:
         print("Test successful for dynamical input")
