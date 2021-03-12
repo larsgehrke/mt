@@ -81,7 +81,7 @@ def test_graph():
             print(s)
             sprint(out, "out")
 
-        if a.all(out[b, 0] == np.array([0,0,0,0,1,0,1,1])):
+        if np.all(out[b, 0] == np.array([0,0,0,0,1,0,1,1])):
             print("Test successful for node 0 in batch " + str(b))
         else:
             print("Test not successful for node 0 in batch " + str(b))
