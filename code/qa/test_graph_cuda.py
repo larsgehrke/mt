@@ -39,14 +39,15 @@ def test_graph():
             expect[i] = 5
 
     # The 4 corners have only 3 incoming values
-    expect[:,0] = 3
-    expect[:,pk_cols-1] = 3
-    expect[:,total - pk_cols] = 3
-    expect[:,total-1] = 3
+    expect[0] = 3
+    expect[pk_cols-1] = 3
+    expect[total - pk_cols] = 3
+    expect[total-1] = 3
 
 
     start = time.time()
     out = g.forward(dyn_in, lat_in)
+    sprint(out, "out", exit=True)
     out = out.cpu().detach().numpy()
     stop = time.time()
     print("forward pass took " + str(stop-start) + " seconds")
