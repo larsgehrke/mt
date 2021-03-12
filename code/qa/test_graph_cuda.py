@@ -25,7 +25,7 @@ def test_graph():
     dyn_in = th.zeros(size=(8, total, 1),
                               device="cuda")
 
-    lat_in = th.ones(size=(total, 1),
+    lat_in = th.ones(size=(8, total, 1),
                               device="cuda")
 
     # Most of the nodes have 8 incoming values
