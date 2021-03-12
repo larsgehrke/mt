@@ -85,13 +85,13 @@ namespace
         }
   
         /* LEFT */
-        if(threadIdx.x > 0)
+        if(x_gt_0)
         {
           out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 3 + lat] = lat_input[batch_block_id][pk_thread_id-1][lat];
         }
 
         /* RIGHT */
-        if(threadIdx.x < PK_COLS -1)
+        if(x_lt_max)
         {
           out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 4 + lat] = lat_input[batch_block_id][pk_thread_id+1][lat];
         }
@@ -172,13 +172,13 @@ namespace
         }
   
         /* LEFT */
-        if(threadIdx.x > 0)
+        if(x_gt_0)
         {
           d_lat_input[batch_block_id][pk_thread_id-1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 3 + lat];
         }
 
         /* RIGHT */
-        if(threadIdx.x < PK_COLS -1)
+        if(x_lt_max)
         {
           d_lat_input[batch_block_id][pk_thread_id+1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 4 + lat];
         }
