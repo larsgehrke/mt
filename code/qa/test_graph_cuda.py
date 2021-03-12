@@ -51,13 +51,20 @@ def test_graph():
     print("forward pass took " + str(stop-start) + " seconds")
 
     out = out.cpu().detach().numpy()
+    # lateral output
+    out = [:,:,1:]
+
+    if np.sum(out[:,:,0]) == 0:
+        print("Test successful for dynamical input")
+    else:
+        print("Test not successful for dynamical input")
     
     for b in range(8):
         
         current = np.reshape(np.array([np.sum(x) for x in out[b,:]]), (256,1))
         
         if np.sum(current-expect) == 0:
-            print("Test successful for batch " + str(b))
+            print("Test successful for sum of lateral input in batch " + str(b))
         else:
             print("Test not successful for batch " + str(b))
             print(sum(out[b]))
@@ -74,6 +81,12 @@ def test_graph():
             print(s)
             sprint(out, "out")
 
+        if out[b, 0] == np.array([0,0,0,0,1,0,1,1]):
+            print("Test successful for node 0 in batch " + str(b))
+        else:
+            print("Test not successful for node 0 in batch " + str(b))
+
+
         # print("out[0][0]")
         # print(out[0][0].cpu().detach().numpy())
         # print("out[0][5]")
@@ -87,8 +100,6 @@ def test_graph():
         # print("out[0][255]")
         # print(out[0][255].cpu().detach().numpy())
         
-    
-    print(stop-start)
     
     
 
