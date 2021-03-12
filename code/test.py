@@ -19,7 +19,7 @@ import time
 import numpy as np
 import torch as th 
 
-from model.distana import DISTANA
+from model.facade import Facade
 from config.distana_params import DISTANAParams
 from config.params import Params
 from tools.persistence import FileManager
@@ -28,24 +28,22 @@ from tools.supervisor import TestSupervisor
 import tools.torch_tools as th_tools
 
 
-
-
 def run_testing(params):
 
     # Create and set up the network
-    distana = DISTANA(params)
+    model = Facade(params)
 
     criterion = th.nn.MSELoss() 
 
     # Load the trained weights from file
-    distana.set_weights(th_tools.load_model(params), is_training=False)
+    model.set_weights(th_tools.load_model(params), is_training=False)
     
     # Get the test data
     test_data_files = get_data_filenames(os.path.join(params['data_folder'],'test',''))
     # Save the test configuration and data in the model class
-    amount_test = distana.set_testing(test_data_files,criterion, params['teacher_forcing_steps'])
+    amount_test = model.set_testing(test_data_files,criterion, params['teacher_forcing_steps'])
     # Create the view object 
-    supervisor = TestSupervisor(params,distana.get_trainable_params())
+    view = TestSupervisor(params,model.get_trainable_params())
 
     
 
@@ -59,12 +57,12 @@ def run_testing(params):
             time_start = time.time()
 
             # Evaluate the network for the given test data
-            mse, net_outputs, net_label, net_input = distana.test(iter_idx=batch_idx, return_only_error = False)
+            mse, net_outputs, net_label, net_input = model.test(iter_idx=batch_idx, return_only_error = False)
             
             forward_pass_duration = time.time() - time_start
             print("\tForward pass for batch size ",params["batch_size_test"]," took: ", forward_pass_duration, " seconds.")
 
-        supervisor.plot_sample(net_outputs[sample_idx], 
+        view.plot_sample(net_outputs[sample_idx], 
             net_label[sample_idx], net_input[sample_idx])
 
         # Retrieve user input to continue or quit the testing
@@ -76,7 +74,7 @@ def run_testing(params):
             batch_idx += 1 
             sample_idx = 0 
 
-    supervisor.finished()
+    view.finished()
 
 
 
