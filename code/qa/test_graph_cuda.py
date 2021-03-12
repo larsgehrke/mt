@@ -47,15 +47,15 @@ def test_graph():
 
     start = time.time()
     out = g.forward(dyn_in, lat_in)
-    sprint(out, "out", exit=True)
-    out = out.cpu().detach().numpy()
     stop = time.time()
     print("forward pass took " + str(stop-start) + " seconds")
+
+    out = out.cpu().detach().numpy()
     
     for b in range(8):
         
         
-        if np.sum(out[b]-expect) == 0:
+        if np.sum(sum(out[b])-sum(expect)) == 0:
             print("Test successful for batch " + str(b))
         else:
             print("Test not successful for batch " + str(b))
