@@ -29,7 +29,7 @@ def test_graph():
                               device="cuda")
 
     # Most of the nodes have 8 incoming values
-    expect = np.zeros((8, total, 1)) + 8
+    expect = np.zeros((total, 1)) + 8
 
 
     # Most of the edge nodes have only 5 incoming values
