@@ -54,8 +54,9 @@ def test_graph():
     
     for b in range(8):
         
+        current = np.reshape(np.array([np.sum(x) for x in out[b,:]]), (256,1))
         
-        if np.sum(sum(out[b])-sum(expect)) == 0:
+        if np.sum(current-expect) == 0:
             print("Test successful for batch " + str(b))
         else:
             print("Test not successful for batch " + str(b))
