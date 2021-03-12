@@ -63,6 +63,8 @@ def test_graph():
         success = False
     
     for b in range(8):
+
+        print(" === BATCH "+ str(b) + " ===")
         
         current = np.reshape(np.array([np.sum(x) for x in out[b,:]]), (256,1))
         
@@ -123,12 +125,14 @@ def test_graph():
             success = False
             print("FAILURE: Test not successful for node 255 in batch " + str(b))
 
-
         print()
-        if success:    
-            print("===> SUCCESS")
-        else:
-            print("===> FAILURE")
+
+
+    print()
+    if success:    
+        print("===> SUCCESS")
+    else:
+        print("===> FAILURE")
         
     
     
