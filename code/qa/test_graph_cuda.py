@@ -17,6 +17,8 @@ def test_graph():
     print("This is a unit test for the cuda graph connection implementation.")
     print("Testing it with 16x16 PK grid, 8 neighbors and 1 lateral vector size.")
 
+    success = True
+
     pk_rows, pk_cols, pk_neighbors, pk_neighbor_size = 16, 16, 8, 1
     total = pk_rows * pk_cols
 
@@ -50,23 +52,25 @@ def test_graph():
     stop = time.time()
     print("forward pass took " + str(stop-start) + " seconds")
 
-    out = out.cpu().detach().numpy()
+    out_all = out.cpu().detach().numpy()
     # lateral output
-    out = out[:,:,1:]
+    out = out_all[:,:,1:]
 
-    if np.sum(out[:,:,0]) == 0:
-        print("Test successful for dynamical input")
+    if np.sum(out_all[:,:,0]) == 0:
+        print("SUCCESS: Test successful for dynamical input")
     else:
-        print("Test not successful for dynamical input")
+        print("FAILURE: Test not successful for dynamical input")
+        success = False
     
     for b in range(8):
         
         current = np.reshape(np.array([np.sum(x) for x in out[b,:]]), (256,1))
         
         if np.sum(current-expect) == 0:
-            print("Test successful for sum of lateral input in batch " + str(b))
+            print("SUCCESS:Test successful for sum of lateral input in batch " + str(b))
         else:
-            print("Test not successful for batch " + str(b))
+            success = False
+            print("FAILURE: Test not successful for batch " + str(b))
             print(sum(out[b]))
             print(sum(expect))
 
@@ -82,23 +86,49 @@ def test_graph():
             sprint(out, "out")
 
         if np.all(out[b, 0] == np.array([0,0,0,0,1,0,1,1])):
-            print("Test successful for node 0 in batch " + str(b))
+            print("SUCCESS:Test successful for node 0 in batch " + str(b))
         else:
-            print("Test not successful for node 0 in batch " + str(b))
+            success = False
+            print("FAILURE: Test not successful for node 0 in batch " + str(b))
+
+        if np.all(out[b, 5] == np.array([0,0,0,1,1,1,1,1])):
+            print("SUCCESS:Test successful for node 5 in batch " + str(b))
+        else:
+            success = False
+            print("FAILURE: Test not successful for node 5 in batch " + str(b))
 
 
-        # print("out[0][0]")
-        # print(out[0][0].cpu().detach().numpy())
-        # print("out[0][5]")
-        # print(out[0][5].cpu().detach().numpy())
-        # print("out[0][15]")
-        # print(out[0][15].cpu().detach().numpy())
-        # print("out[0][16]")
-        # print(out[0][16].cpu().detach().numpy())
-        # print("out[0][17]")
-        # print(out[0][17].cpu().detach().numpy())
-        # print("out[0][255]")
-        # print(out[0][255].cpu().detach().numpy())
+        if np.all(out[b, 15] == np.array([0,0,0,1,0,1,1,0])):
+            print("SUCCESS:Test successful for node 15 in batch " + str(b))
+        else:
+            success = False
+            print("FAILURE: Test not successful for node 15 in batch " + str(b))
+
+
+        if np.all(out[b, 16] == np.array([0,1,1,0,1,0,1,1])):
+            print("SUCCESS:Test successful for node 16 in batch " + str(b))
+        else:
+            success = False
+            print("FAILURE: Test not successful for node 16 in batch " + str(b))
+
+        if np.all(out[b, 17] == np.array([1,1,1,1,1,1,1,1])):
+            print("SUCCESS:Test successful for node 17 in batch " + str(b))
+        else:
+            success = False
+            print("FAILURE: Test not successful for node 17 in batch " + str(b))
+
+        if np.all(out[b, 255] == np.array([1,1,0,1,0,0,0,0])):
+            print("SUCCESS:Test successful for node 255 in batch " + str(b))
+        else:
+            success = False
+            print("FAILURE: Test not successful for node 255 in batch " + str(b))
+
+
+        print()
+        if success:    
+            print("===> SUCCESS")
+        else:
+            print("===> FAILURE")
         
     
     
