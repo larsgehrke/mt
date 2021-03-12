@@ -129,6 +129,7 @@ def test_graph():
 
 
     print()
+    print("IN TOTAL:")
     if success:    
         print("===> SUCCESS")
     else:
