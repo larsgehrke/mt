@@ -59,6 +59,8 @@ def test_graph():
             print("Test successful for batch " + str(b))
         else:
             print("Test not successful for batch " + str(b))
+            print(sum(out[b]))
+            print(sum(expect))
 
             # Visualize PK grid
             s = ""
