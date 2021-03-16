@@ -69,7 +69,13 @@ class AbstractEvaluator():
         # Set the gradients back to zero
         self.optimizer.zero_grad()
 
-        net_output, net_label, _ = self._load_and_evaluate(iter_idx)
+        net_output = None
+        if self.batch_processing:
+            net_input, net_label, batch_size = self._load_data(iter_idx = iter_idx)
+            net_output = self._evaluate(self._np_to_th(net_input), batch_size)
+        else:
+            net_input, net_label = self._load_data(iter_idx = iter_idx)
+            net_output = self._evaluate(self._np_to_th(net_input))
 
         mse = self.train_criterion(net_output, self._np_to_th(net_label))
         # Alternatively, the mse can be calculated 'manually'
@@ -84,7 +90,13 @@ class AbstractEvaluator():
 
     def _test(self, iter_idx, return_only_error):
 
-        net_output, net_label, net_input = self._load_and_evaluate(iter_idx)
+        net_output = None
+        if self.batch_processing:
+            net_input, net_label, batch_size = self._load_data(iter_idx = iter_idx)
+            net_output = self._evaluate(self._np_to_th(net_input), batch_size)
+        else:
+            net_input, net_label = self._load_data(iter_idx = iter_idx)
+            net_output = self._evaluate(self._np_to_th(net_input))
 
         mse = self.test_criterion(net_output, self._np_to_th(net_label))
         # Alternatively, the mse can be calculated 'manually'
@@ -102,16 +114,6 @@ class AbstractEvaluator():
                 # The model cannot handle batches, so we need to manually add a batch dimension
                 # with batch size = 1 for the further processing
                 return mse.item(), np.expand_dims(net_output,0), np.expand_dims(net_label), np.expand_dims(net_input)
-
-    def _load_and_evaluate(self, iter_idx):
-        if self.batch_processing:
-            net_input, net_label, batch_size = self._load_data(iter_idx = iter_idx)
-            net_output = self._evaluate(self._np_to_th(net_input), batch_size)
-        else:
-            net_input, net_label = self._load_data(iter_idx = iter_idx)
-            net_output = self._evaluate(self._np_to_th(net_input))
-
-        return net_output, net_label, net_input
 
 
     def _evaluate(self, iter_idx):
