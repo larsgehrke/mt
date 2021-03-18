@@ -13,6 +13,8 @@ class Facade():
             import model.th.evaluator as model
         elif params["model_name"] == "th2":
             import model.th2.evaluator as model
+        elif params["model_name"] == "th3":
+            import model.th3.evaluator as model
         else:
             raise ValueError("Model name is not valid.")
 
