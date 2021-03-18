@@ -59,14 +59,29 @@ namespace
         out[batch_block_id][pk_thread_id][dyn] = dyn_input[batch_block_id][pk_thread_id][dyn];
       } 
 
+      int counter = 0;
+      int from = connections[pk_thread_id][counter][0];
+      int to = connections[pk_thread_id][counter][1];
+      int max_len = connections.size(1)
 
-
-      for (int lat = 0; lat < LAT_SIZE; lat++)
+      while (counter < max_len && from >= 0) 
       {
-        
-        
-        /* end of for loop for lateral connections*/
+        for (int lat = 0; lat < LAT_SIZE; lat++)
+        {
+          out[batch_block_id][pk_thread_id][LAT_SIZE * to + lat] = lat_input[batch_block_id][from][lat];
+        }
+
+        counter++;
+
+        if(counter < max_len)
+        {
+          from = connections[pk_thread_id][counter][0];
+          to = connections[pk_thread_id][counter][1];
+        }
       }
+
+
+      
       /* end of forward pass*/
     }
 
@@ -77,6 +92,44 @@ namespace
         torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_dyn_input,
         torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_lat_input) 
     {
+       /*
+        Calculating block index: 
+        row no (blockIdx.y) * length of row (gridDim.x) + row position (blockIdx.x)
+      */
+      const int batch_block_id = blockIdx.y * gridDim.x + blockIdx.x;
+
+      /*
+        Calculating thread index:
+        like block_id, see above
+      */
+      const int pk_thread_id = threadIdx.y * blockDim.x + threadIdx.x;
+
+
+      for (int dyn = 0; dyn < DYN_SIZE; dyn++)
+      {
+        d_dyn_input[batch_block_id][pk_thread_id][dyn] = d_out[batch_block_id][pk_thread_id][dyn];
+      } 
+
+      int counter = 0;
+      int from = connections[pk_thread_id][counter][0];
+      int to = connections[pk_thread_id][counter][1];
+      int max_len = connections.size(1)
+
+      while (counter < max_len && from >= 0) 
+      {
+        for (int lat = 0; lat < LAT_SIZE; lat++)
+        {
+          d_lat_input[batch_block_id][from][lat] = d_out[batch_block_id][pk_thread_id][LAT_SIZE * to + lat];
+        }
+
+        counter++;
+
+        if(counter < max_len)
+        {
+          from = connections[pk_thread_id][counter][0];
+          to = connections[pk_thread_id][counter][1];
+        }
+      }
       
       /* end of backward pass */
     }
