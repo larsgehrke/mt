@@ -147,13 +147,15 @@ def _build_connections(rows=16, cols=16):
                                 rows * cols),
                             device=device_str)
 
-    # Define a dictionary that maps directions to numbers
+    
+    # Old encoding:
     # direction_dict = {"top": 1, "left top": 2, "left": 3, "left bottom": 4,
     #                   "bottom": 5, "right bottom": 6, "right": 7,
     #                   "right top": 8}
-    direction_dict = {"top": 2, "left top": 1, "left": 4, "left bottom": 6,
-                      "bottom": 7, "right bottom": 8, "right": 5,
-                      "right top": 3}
+    
+    # Define a dictionary that maps directions to numbers
+    direction_dict = {"left top": 1, "top": 2, "right top": 3, "left": 4, "right": 5,
+                        "left bottom": 6, "bottom": 7, "right bottom": 8}
     
 
     # Running index to pass a distinct id to each PK
@@ -221,8 +223,7 @@ def _prepare_connections(pos0, coming_from, going_to):
 
     connections = th.zeros((16*16, length, 2)).to(device = device_str)-1
 
-    idx_counts = th.zeros((16*16)).to(device = device_str, 
-                                                            dtype = th.long)
+    idx_counts = th.zeros((16*16)).to(device = device_str, dtype = th.long)
 
     for k,v in enumerate(pos0):
         

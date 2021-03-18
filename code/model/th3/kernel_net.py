@@ -126,10 +126,14 @@ class KernelNetwork(th.nn.Module):
                                     rows * cols),
                                 device=self.config.device)
 
+        # Old encoding:
+        # direction_dict = {"top": 1, "left top": 2, "left": 3, "left bottom": 4,
+        #                   "bottom": 5, "right bottom": 6, "right": 7,
+        #                   "right top": 8}
+        
         # Define a dictionary that maps directions to numbers
-        direction_dict = {"top": 1, "left top": 2, "left": 3, "left bottom": 4,
-                          "bottom": 5, "right bottom": 6, "right": 7,
-                          "right top": 8}
+        direction_dict = {"left top": 1, "top": 2, "right top": 3, "left": 4, "right": 5,
+                        "left bottom": 6, "bottom": 7, "right bottom": 8}
 
         # Running index to pass a distinct id to each PK
         pk_id_running = 0
