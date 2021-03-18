@@ -69,7 +69,7 @@ namespace
       {
         for (int lat = 0; lat < LAT_SIZE; lat++)
         {
-          out[batch_block_id][pk_thread_id][LAT_SIZE * to + lat] = lat_input[batch_block_id][from][lat];
+          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * to + lat] = lat_input[batch_block_id][from][lat];
         }
 
         counter++;
@@ -120,7 +120,7 @@ namespace
       {
         for (int lat = 0; lat < LAT_SIZE; lat++)
         {
-          d_lat_input[batch_block_id][from][lat] = d_out[batch_block_id][pk_thread_id][LAT_SIZE * to + lat];
+          d_lat_input[batch_block_id][from][lat] = d_out[batch_block_id][pk_thread_id][ DYN_SIZE + LAT_SIZE * to + lat];
         }
 
         counter++;
