@@ -64,8 +64,6 @@ namespace
       int to = connections[pk_thread_id][counter][1];
       int max_len = connections.size(1);
 
-      /* TEST if error is visible */
-      int error = connections[2323][2323][23223];
 
       while (counter < max_len && from >= 0) 
       {
