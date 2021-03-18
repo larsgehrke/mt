@@ -44,7 +44,7 @@ class KernelNetwork(th.nn.Module):
             self._compile_cuda_extension()
 
     def _compile_cuda_extension(self):
-        cpp_config_file = os.path.join('model', 'th2', 'include','config.h')
+        cpp_config_file = os.path.join('model', 'th3', 'include','config.h')
 
         with open(cpp_config_file, 'w') as conf_file:
             conf_file.write("#define PK_ROWS " + str(self.config.pk_rows) + os.linesep)
