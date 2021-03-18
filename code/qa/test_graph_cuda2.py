@@ -12,6 +12,8 @@ import time
 
 from tools.debug import sprint
 
+device_str = 'cpu'
+
 def test_graph():
 
     print("This is a unit test for the cuda graph connection implementation.")
@@ -25,10 +27,10 @@ def test_graph():
     g = Graph(_build_connections())
 
     dyn_in = th.zeros(size=(8, total, 1),
-                              device="cuda")
+                              device=device_str)
 
     lat_in = th.ones(size=(8, total, 1),
-                              device="cuda")
+                              device=device_str)
 
     # Most of the nodes have 8 incoming values
     expect = np.zeros((total, 1)) + 8
@@ -83,6 +85,10 @@ def test_graph():
               for x in range(pk_cols):
                 s += str(np.sum(out[b][y*pk_cols + x])) + " "
               s += "\n"
+
+            print("Printing out values of PK 17")
+            for x in out[b][17]:
+                print(x)
 
             print(s)
             sprint(out, "out")
@@ -142,7 +148,7 @@ def _build_connections(rows=16, cols=16):
     pk_adj_mat = th.zeros(size=(2,
                                 rows * cols,
                                 rows * cols),
-                            device='cuda')
+                            device=device_str)
 
     # Define a dictionary that maps directions to numbers
     direction_dict = {"top": 1, "left top": 2, "left": 3, "left bottom": 4,
@@ -195,14 +201,16 @@ def _build_connections(rows=16, cols=16):
     a = np.where(pk_adj_mat[0].cpu().detach().numpy() == 1)
 
     # PKs that are to be considered in the lateral update
-    pos0 = th.from_numpy(a[0]).to(device='cuda', dtype=th.long)
+    pos0 = th.from_numpy(a[0]).to(device=device_str, dtype=th.long)
     # PK lateral outputs that will be sent to the lateral inputs
-    coming_from = th.from_numpy(a[1]).to(device='cuda',
+    coming_from = th.from_numpy(a[1]).to(device=device_str,
                                               dtype=th.long)
     # PK lateral input neurons that will get inputs from the previous time
     # step's lateral output
-    going_to = (pk_adj_mat[1][a] - 1).to(device='cuda',
+    going_to = (pk_adj_mat[1][a] - 1).to(device=device_str,
                                                    dtype=th.long)
+    
+
     return _prepare_connections(pos0, coming_from, going_to)
 
 def _prepare_connections(pos0, coming_from, going_to):
@@ -210,9 +218,9 @@ def _prepare_connections(pos0, coming_from, going_to):
     bincount = th.bincount(pos0)
     length = th.max(bincount).item()
 
-    connections = th.zeros((16*16, length, 2)).to(device = 'cuda')-1
+    connections = th.zeros((16*16, length, 2)).to(device = device_str)-1
 
-    idx_counts = th.zeros((16*16)).to(device = 'cuda', 
+    idx_counts = th.zeros((16*16)).to(device = device_str, 
                                                             dtype = th.long)
 
     for k,v in enumerate(pos0):
