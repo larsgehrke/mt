@@ -131,7 +131,7 @@ std::vector<torch::Tensor> graph_cuda_backward(
         d_out.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
         connections.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
         d_dyn_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
-        d_lat_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
+        d_lat_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>()
         );
   }));
 
