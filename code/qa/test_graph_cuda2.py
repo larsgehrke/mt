@@ -210,9 +210,9 @@ def _prepare_connections(pos0, coming_from, going_to):
     bincount = th.bincount(pos0)
     length = th.max(bincount).item()
 
-    connections = th.zeros((16, length, 2)).to(device = 'cuda')-1
+    connections = th.zeros((16*16, length, 2)).to(device = 'cuda')-1
 
-    idx_counts = th.zeros((16)).to(device = 'cuda', 
+    idx_counts = th.zeros((16*16)).to(device = 'cuda', 
                                                             dtype = th.long)
 
     for k,v in enumerate(pos0):
