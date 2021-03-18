@@ -57,7 +57,7 @@ class KernelNetwork(th.nn.Module):
 
         connections = self._prepare_connections()
 
-        self.graph = Graph(self.config.pk_rows, self.config.pk_cols, connections)
+        self.graph = Graph(connections)
 
     def _graph_connections(self):
         '''

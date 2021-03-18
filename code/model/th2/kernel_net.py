@@ -58,7 +58,7 @@ class KernelNetwork(th.nn.Module):
         # import the custom CUDA kernel
         from model.th2.graph import Graph
 
-        self.graph = Graph(self.config.pk_rows, self.config.pk_cols)
+        self.graph = Graph()
 
     def _graph_connections(self):
         '''

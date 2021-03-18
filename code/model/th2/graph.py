@@ -37,13 +37,8 @@ class GraphFunction(th.autograd.Function):
 
 
 class Graph(th.nn.Module):
-    def __init__(self, pk_rows, pk_cols):
+    def __init__(self):
         super(Graph, self).__init__()
-
-        # Variables for the PK-TK connections
-        self.pos0 = None
-        self.going_to = None
-        self.coming_from = None
 
 
     def forward(self, dyn_in, lat_in):
