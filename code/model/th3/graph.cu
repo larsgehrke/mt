@@ -64,6 +64,9 @@ namespace
       int to = connections[pk_thread_id][counter][1];
       int max_len = connections.size(1);
 
+      /* TEST if error is visible */
+      int error = connections[2423432];
+
       while (counter < max_len && from >= 0) 
       {
         for (int lat = 0; lat < LAT_SIZE; lat++)
