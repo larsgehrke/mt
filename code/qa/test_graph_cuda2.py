@@ -94,6 +94,7 @@ def test_graph():
         else:
             success = False
             print("FAILURE: Test not successful for node 0 in batch " + str(b))
+            print(out[b][0])
 
         if np.all(out[b, 5] == np.array([0,0,0,1,1,1,1,1])):
             print("SUCCESS:Test successful for node 5 in batch " + str(b))
