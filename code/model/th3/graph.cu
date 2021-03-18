@@ -65,7 +65,7 @@ namespace
       int max_len = connections.size(1);
 
       /* TEST if error is visible */
-      int error = connections[2423432];
+      int error = connections[2323][2323][23223];
 
       while (counter < max_len && from >= 0) 
       {
