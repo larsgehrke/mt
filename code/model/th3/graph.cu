@@ -62,7 +62,7 @@ namespace
       int counter = 0;
       int from = connections[pk_thread_id][counter][0];
       int to = connections[pk_thread_id][counter][1];
-      int max_len = connections.size(1)
+      int max_len = connections.size(1);
 
       while (counter < max_len && from >= 0) 
       {
@@ -113,7 +113,7 @@ namespace
       int counter = 0;
       int from = connections[pk_thread_id][counter][0];
       int to = connections[pk_thread_id][counter][1];
-      int max_len = connections.size(1)
+      int max_len = connections.size(1);
 
       while (counter < max_len && from >= 0) 
       {
