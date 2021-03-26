@@ -5,7 +5,8 @@ The code is based on the former implementation of Matthias Karlbauer (*code_arch
 ## code folder
 The code for the DISTANA implementation. Every use case (generate data, training, testing, run unit test) has its own executable script at the highest level of this folder structure. These top-level scripts work as controller in a model-view-controller fashion by reasonably combining the scripts of the different subfolders.
 
-+ **config** 
++ **config** The whole parameter management and the argument parsing from the command line is done here. For the data generation and the training/testing of DISTANA there are two different scripts which are subclasses of _params.py_. All the parameters are automatically loaded from a binary file and can by edited and saved via comman line arguments. By choosing the configuration file name "default", you can overwrite the default settings. These binary configuration files are unversioned (.gitignore: \*.pkl). Thus you can have different parameters for different execution environments and easily change them via command line.
+
 + **diagram** 
 + **diagram_gpu** 
 + **model** 
