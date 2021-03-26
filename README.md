@@ -3,16 +3,24 @@ This is the repository for Lars Gehrke writing his master's thesis about impleme
 The code is based on the former implementation of Matthias Karlbauer (*code_archive/model/distana*).
 
 ## code folder
+The code for the DISTANA implementation. Every use case (generate data, training, testing, run unit test) has its own executable script at the highest level of this folder structure. These top-level scripts work as controller in a model-view-controller fashion by reasonably combining the scripts of the different subfolders.
+
++ **config** 
++ **diagram** 
++ **diagram_gpu** 
++ **model** 
++ **qa** 
++ **tools** 
 
 
 
 ## code archive folder
-+ **code_archive/model/distana:** former implementation by Karlbauer
-+ __code_archive/model/distana*:__ first steps of code adaption
++ **code_archive/model/distana** former implementation by Karlbauer
++ __code_archive/model/distana*__ first steps of code adaption
 
-+ **code_archive/others/extension-cpp:** this is the code from the [original PyTorch CUSTOM C++ AND CUDA EXTENSIONS exampel](https://pytorch.org/tutorials/advanced/cpp_extension.html)
++ **code_archive/others/extension-cpp** this is the code from the [original PyTorch CUSTOM C++ AND CUDA EXTENSIONS exampel](https://pytorch.org/tutorials/advanced/cpp_extension.html)
 
   + this is the main resource to implement a custom CUDA kernel for your PyTorch program. Note that there is a plain PyTorch implementation (/python), a C++ implementation (/cpp) and a CUDA implementation (/cuda) of the same custom module! As the tutorial suggests, if you can program your model in plain PyTorch, it should be fine most of the time. PyTorch uses there own very fast CUDA kernels for tensor operations, so there is no need to write your own CUDA kernel most of the time.
 
-+ **code_archive/others/extension-cpp-dev:** slightly updated/changed version, to analyse (deprecated) original code and make it work on my server
++ **code_archive/others/extension-cpp-dev** slightly updated/changed version, to analyse (deprecated) original code and make it work on my server
 
