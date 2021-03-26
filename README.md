@@ -9,9 +9,9 @@ The code for the DISTANA implementation. Every use case (generate data, training
 
 + **diagram** An unversioned folder. By choosing to save the diagrams from test.py, this folder will be created automatically and all diagrams from the test run will be saved here.
 
-+ **diagram_gpu** Not important, can be deleted. This folder was just used to access the diagrams from the server test run. 
++ **diagram_gpu** Not important, can be deleted. This folder was just used to access the diagrams from the server. 
 
-+ **model** The main implementation of the different variations of DISTANA are here. 
++ **model** The different implementations of DISTANA are collected here. Each variation has its own subfolder. The facade defines the function signatures, every variation must implement and it selects the variation specified by the parameters at runtime. *abstract_evaluator* is a super class for different variations. Object-oriented programming (OOP) can be a curse or a blessing: OOP has of course many benefits, e.g. better readability, better maintainability, better expandability etc. but Python is a slow programming language and has no strong support of oop approaches. The outsourcing of code segments that are called per batch/sample or even per time step should be done as little as possible. For the management and analysis of different implementation variation, a super class can be a good choice. But if you want to optimize the speed of code execution, you should not use a superclass.
 
 + **qa** Quality assurance (qa). Folder for all unit tests. The execution of these unit tests should be selected by calling unit_test.py with the specific command line argument.
 
