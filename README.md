@@ -2,10 +2,10 @@
 This is the repository for Lars Gehrke writing his master's thesis about implementing DISTANA in a parallelized fashion on the GPU to accelerate the training and the testing.
 The code is based on the former implementation of Matthias Karlbauer (*code_archive/model/distana*).
 
-## DISTANA - design idea and functional principle
+## DISTANA - design idea and functional principle by Karlbauer
 ![DISTANA slide](./distana_slide.png)
 
-[by Karlbauer 2020](https://www.youtube.com/watch?v=63GI1ZOsumg&t=53s)
+[Source: Karlbauer's talk 2020 about DISTANA](https://www.youtube.com/watch?v=63GI1ZOsumg&t=53s)
 
 ## code folder
 The code for the DISTANA implementation. Every use case (generate data, training, testing, run unit test) has its own executable script at the highest level of this folder structure. These top-level scripts work as controller in a model-view-controller fashion by reasonably combining the scripts of the different subfolders.
