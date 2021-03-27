@@ -111,7 +111,7 @@ namespace
         d_dyn_input[batch_block_id][pk_thread_id][dyn] = d_out[batch_block_id][pk_thread_id][dyn];
       } 
 
-      /* Consistency check: please remove the comments after it
+      
       int counter = 0;
       int from = connections[pk_thread_id][counter][0];
       int to = connections[pk_thread_id][counter][1];
@@ -131,7 +131,7 @@ namespace
           from = connections[pk_thread_id][counter][0];
           to = connections[pk_thread_id][counter][1];
         }
-      }*/
+      }
       
       /* end of backward pass */
     }
