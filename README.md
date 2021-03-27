@@ -93,8 +93,9 @@ If you want to see all parameter values currently used for the execution, you ca
 ```
 python train.py -m v1b -d my_data -b 1 -v 100 -e 20 -g False
 ```
+This will take some time.
 
-Likewise we can do the training on the GPU
+Likewise we could have done the training on the GPU:
 
 ```
 python train.py -m v1b -d my_data -b 1 -v 100 -e 20 -g True
