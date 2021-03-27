@@ -30,11 +30,13 @@ The code for the DISTANA implementation. Every use case (generate data, training
   
     Based on *old*, but this implementation can process the samples of one batch (with arbitrary batch size) in parallel. The Prediction Kernel is implemented as a custom PyTorch class in Python with the usage of tensor operations realising the nn layers (fc, lstm, fc). In the last iteration per epoch the batch size will probably not fit the rest of the data samples. In this case the weight tensors are automatically adapted for this last iteration with a special batch size (amount of remaining samples).
     
-  + **v2** [batch processing; single lateral output; CUDA hard-coded lateral connections] 
+  + **v2** [batch processing; single lateral output; hard coded lateral connections in CUDA] 
   
     As *v1*, but with a custom CUDA kernel that is implementing the lateral flow between the PKs at the beginning of each time step. However, in this CUDA kernel the grid structure where each PK is laterally connected with up to 8 surrounding neighbors (cf. https://arxiv.org/pdf/1912.11141.pdf) is hard coded. 
     
   + **v3** [batch processing; single lateral output; flexible lateral connections in CUDA] 
+  
+    As *v2*, but instead of using a CUDA kernel that is hard coding the lateral connections, the CUDA kernel processes adjacency lists that contain the lateral connections. The adjacency lists are created in Python and passed as a static value to the CUDA code. 
 
 + **qa** Quality assurance (qa). Folder for all unit tests. The execution of these unit tests should be selected by calling unit_test.py with the specific command line argument.
 
@@ -50,4 +52,47 @@ The code for the DISTANA implementation. Every use case (generate data, training
   + this is the main resource to implement a custom CUDA kernel for your PyTorch program. Note that there is a plain PyTorch implementation (/python), a C++ implementation (/cpp) and a CUDA implementation (/cuda) of the same custom module! As the tutorial suggests, if you can program your model in plain PyTorch, it should be fine most of the time. PyTorch uses there own very fast CUDA kernels for tensor operations, so there is no need to write your own CUDA kernel most of the time.
 
 + **code_archive/others/extension-cpp-dev** slightly updated/changed version, to analyse (deprecated) original code and make it work on the server
+
+## Getting started
+After cloning this repository, 
+```
+git clone ...
+```
+navigate into the code folder.
+```
+cd code
+```
+Now we want to generate the 2-dimensional wave data. 
+You can check the possible options with the -h argument.
+```
+python generate_data.py -h
+```
+Lets say we want to create a training data set with 100 files and a sequence length of 150. The training data should be saved in the data subfolder *my_data*.
+```
+python generate_data.py save -d train -n my_data -f 100 -t 150
+```
+
+In the same way we create a validation and a test data set with 20 files in *my_data*.
+```
+python generate_data.py save -d val -n my_data -f 20 -t 150
+python generate_data.py save -d test -n my_data -f 20 -t 150
+```
+For the train and test script you can also check the options with the -h argument, but be warned, the list of options may be long.
+```
+python train.py -h
+```
+
+Now we can train model v1 with our data in *my_data*, a batch size for training of 8, a batch size for validation of 100 and 20 epochs on the CPU.
+If you want to see all parameter values currently used for the execution, you can print out the full list by just adding the --verbose tag.
+
+```
+python train.py -m v1 -d my_data -b 8 -v 100 -e 20 -g False
+```
+
+Likewise we can do the training on the GPU
+
+```
+python train.py -m v1 -d my_data -b 8 -v 100 -e 20 -g True
+```
+
 
