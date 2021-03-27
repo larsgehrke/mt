@@ -2,7 +2,7 @@ import os
 import numpy as np
 import torch as th
 
-from model.th2.pk import PK
+from model.v3.pk import PK
 
 from tools.debug import sprint
 from tools.debug import Clock
@@ -32,33 +32,32 @@ class KernelNetwork(th.nn.Module):
                               output_size = config.pk_dyn_size + config.pk_lat_size, 
                               device = config.device)
 
-        
-        if not self.config.use_gpu:            
-            # Variables for the PK-TK connections
-            self.pos0 = None
-            self.going_to = None
-            self.coming_from = None
+        # Variables for the PK-TK connections
+        self.pos0 = None
+        self.going_to = None
+        self.coming_from = None
 
-            self._build_connections(config.pk_rows, config.pk_cols)
-        else:
+        self._build_connections(config.pk_rows, config.pk_cols)
+        
+        if self.config.use_gpu:          
             self.graph = None
             self._compile_cuda_extension()
 
     def _compile_cuda_extension(self):
-        cpp_config_file = os.path.join('model', 'th2', 'include','config.h')
+        cpp_config_file = os.path.join('model', 'v3', 'include','config.h')
 
         with open(cpp_config_file, 'w') as conf_file:
             conf_file.write("#define PK_ROWS " + str(self.config.pk_rows) + os.linesep)
             conf_file.write("#define PK_COLS " + str(self.config.pk_cols) + os.linesep)
-            conf_file.write("#define DIMS 3" + os.linesep)
-            conf_file.write("#define NEIGHBORS 8" + os.linesep)
             conf_file.write("#define LAT_SIZE " + str(self.config.pk_lat_size) + os.linesep)
             conf_file.write("#define DYN_SIZE " + str(self.config.pk_dyn_size) + os.linesep)
 
         # import the custom CUDA kernel
-        from model.th2.graph import Graph
+        from model.v3.graph import Graph
 
-        self.graph = Graph()
+        connections = self._prepare_connections()
+
+        self.graph = Graph(connections)
 
     def _graph_connections(self):
         '''
@@ -134,7 +133,7 @@ class KernelNetwork(th.nn.Module):
         
         # Define a dictionary that maps directions to numbers
         direction_dict = {"left top": 1, "top": 2, "right top": 3, "left": 4, "right": 5,
-                            "left bottom": 6, "bottom": 7, "right bottom": 8}
+                        "left bottom": 6, "bottom": 7, "right bottom": 8}
 
         # Running index to pass a distinct id to each PK
         pk_id_running = 0
@@ -190,5 +189,34 @@ class KernelNetwork(th.nn.Module):
         # step's lateral output
         self.going_to = (pk_adj_mat[1][a] - 1).to(device=self.config.device,
                                                        dtype=th.long)
+
+
+    def _prepare_connections(self):
+
+        bincount = th.bincount(self.pos0)
+        length = th.max(bincount).item()
+
+        connections = th.zeros((self.config.amount_pks, length, 2)).to(device = self.config.device)-1
+
+        idx_counts = th.zeros((self.config.amount_pks)).to(device = self.config.device, 
+                                                                dtype = th.long)
+
+        for k,v in enumerate(self.pos0):
+            
+            pk_idx = v.item()
+           
+            position_idx = idx_counts[pk_idx]
+            connections[pk_idx][position_idx][0] = self.coming_from[k]
+            connections[pk_idx][position_idx][1] = self.going_to[k]
+            idx_counts[pk_idx] += 1
+
+        return connections
+
+
+
+
+
+
+
 
 

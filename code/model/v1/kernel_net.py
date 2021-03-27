@@ -1,7 +1,7 @@
 import numpy as np
 import torch as th
 
-import model.th.pk as pk
+import model.v1.pk as pk
 
 from tools.debug import sprint
 

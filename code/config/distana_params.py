@@ -20,12 +20,12 @@ class DISTANAParams(Params):
 
         '''
             If you add/change something here, please add also some Argparse option further below
-            and delete the current saved parameter files
+            and delete the current saved parameter files on all devices
         '''
         self.init_values = {
 
             "architecture_name": "distana",
-            "model_name": "th",
+            "model_name": "v3",
             "data_type": "tmp_data",
 
             "data_noise": 0.0, # 5e-5  # The noise that is added to the input data

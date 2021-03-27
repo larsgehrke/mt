@@ -10,9 +10,9 @@ from tools.debug import sprint
 # Load/Compile the cuda extension 
 # in the include folder is the config.h file,
 # that saves the configuration values
-cpp = os.path.join('model', 'th2', 'graph.cpp')
-cu = os.path.join('model', 'th2', 'graph.cu')
-include = os.path.join('model', 'th2', 'include')
+cpp = os.path.join('model', 'v2', 'graph.cpp')
+cu = os.path.join('model', 'v2', 'graph.cu')
+include = os.path.join('model', 'v2', 'include')
 
 graph_cuda = load(
     'graph', [cpp, cu],

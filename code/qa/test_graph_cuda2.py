@@ -4,7 +4,7 @@
 
 '''
 
-from model.th3.graph import Graph
+from model.v3.graph import Graph
 import torch as th
 import numpy as np
 

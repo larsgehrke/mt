@@ -1,27 +1,30 @@
+import math
+import numpy as np
 import torch as th
 
 from model.abstract_evaluator import AbstractEvaluator
 
-from model.th.kernel_net import KernelNetwork
-from model.th.kernel_tensors import KernelTensors
+# Important: link to the scripts in this folder!
+from model.v2.kernel_net import KernelNetwork
+from model.v2.kernel_tensors import KernelTensors
 
+from tools.debug import sprint
 
 class Evaluator(AbstractEvaluator):
 
     def __init__(self, kernel_config):
+
         self.tensors = KernelTensors(kernel_config)
 
         net = KernelNetwork(kernel_config, self.tensors)
-        batch_processing = True
-        super().__init__(kernel_config, net, batch_processing)
-       
+        super().__init__(kernel_config, net, batch_processing = True)
+        
 
     def _evaluate(self, net_input, batch_size):
 
         seq_len = self.config.seq_len
         amount_pks = self.config.amount_pks
         pk_dyn_size = self.config.pk_dyn_size
-
 
         # Set up an array of zeros to store the network outputs
         net_outputs = th.zeros(size=(batch_size,
@@ -51,7 +54,6 @@ class Evaluator(AbstractEvaluator):
                 #
                 # Set the dynamic input for this iteration
                 dyn_net_in_step = net_input[:, t, :, :pk_dyn_size]
-
                 # [B, PK, DYN]
 
             # Forward the input through the network
@@ -61,13 +63,8 @@ class Evaluator(AbstractEvaluator):
             net_outputs[:,t,:,:] = self.tensors.pk_dyn_out
 
         return net_outputs
-
+        
     
-
-
-
-
-
 
 
 

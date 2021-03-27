@@ -5,8 +5,8 @@ import torch as th
 from model.abstract_evaluator import AbstractEvaluator
 
 # Important: link to the scripts in this folder!
-from model.th3.kernel_net import KernelNetwork
-from model.th3.kernel_tensors import KernelTensors
+from model.v3.kernel_net import KernelNetwork
+from model.v3.kernel_tensors import KernelTensors
 
 from tools.debug import sprint
 
