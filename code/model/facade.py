@@ -6,15 +6,15 @@ class Facade():
     def __init__(self, params):
 
         if params["model_name"] == "old":
-            import model.no_batch_stacked_lat.evaluator as model
+            import model.old.evaluator as model
         elif params["model_name"] == "old2":
-            import model.no_batch_single_lat.evaluator as model
+            import model.old2.evaluator as model
         elif params["model_name"] == "v1":
-            import model.batch_stacked_lat.evaluator as model
+            import model.v1.evaluator as model
         elif params["model_name"] == "v2":
-            import model.batch_single_lat.evaluator as model
+            import model.v2.evaluator as model
         elif params["model_name"] == "v3":
-            import model.batch_flex_lat.evaluator as model
+            import model.v3.evaluator as model
         else:
             raise ValueError("Model name is not valid.")
 

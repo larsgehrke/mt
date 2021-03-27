@@ -68,42 +68,65 @@ class DataGenerationParams(Params):
             formatter_class=argparse.RawTextHelpFormatter)
 
         parser.add_argument('mode', choices=['show', 'save', 'show_save'], 
-            help='Shall the generated data be visualized, saved to file or both?')
+            help='''
+            Shall the generated data be visualized, saved to file or both?
+            ''')
 
         parser.add_argument('-n', '--name', type=str, 
-            help='The name of the parent folder of the generated data.')
+            help='''
+            The name of the parent folder of the generated data.
+            ''')
 
         parser.add_argument('-d','--data-set', choices=['train', 'val', 'test'], 
-            help='The name of the subfolder of the generated data.')
+            help='''
+            The name of the subfolder of the generated data.
+            ''')
 
         parser.add_argument('-f', '--files', type=int, 
-            help='The number of data files that shall be created.')
+            help='''
+            The number of data files that shall be created.
+            ''')
 
         parser.add_argument('-t', '--time-steps', type=int, 
-            help='The number of simulation steps.')
+            help='''
+            The number of simulation steps.
+            ''')
 
         parser.add_argument('--width', type=int, 
-            help='Width of the simulated field in pixels.')
+            help='''
+            Width of the simulated field in pixels.
+            ''')
         parser.add_argument('--height', type=int, 
-            help='Height of the simulated field in pixels.')
+            help='''
+            Height of the simulated field in pixels.
+            ''')
 
 
         parser.add_argument('-p','--params', type=str, 
-            help='The file name of the parameter values to load.')
+            help='''
+            The file name of the parameter values to load.
+            ''')
 
         parser.add_argument('--save-params', type=str, 
-            help='The file name where the parameter values should be stored. \
-            With the name "default" the default values will be overwritten.')
+            help='''
+            The file name where the parameter values should be stored.
+            With the name "default" the default values will be overwritten.
+            ''')
 
         parser.add_argument('-r', '--reset-params', action='store_true', 
-            help='Reset saved default parameter values to initial values.')
+            help='''
+            Reset saved default parameter values to initial values.
+            ''')
 
         options = parser.parse_args()
 
         # Constraints for the parser options
         if options.mode in ['save', 'show_save']:
             if options.data_set is None:
-                parser.error("You must define the subfolder (-d {train, val, test'}) where the generated data will be stored.")
+                parser.error('''
+                    You must define the subfolder (-d {train, val, test'}),
+                    where the generated data will be stored.
+                    ''')
         
         if options.reset_params:
             super()._reset_params() 

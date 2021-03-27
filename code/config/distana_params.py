@@ -100,19 +100,29 @@ class DISTANAParams(Params):
             formatter_class=argparse.RawTextHelpFormatter)
 
         parser.add_argument('--architecture-name', type=str, 
-            help='The name of the architecture.')
+            help='''
+            The name of the architecture.
+            ''')
 
         parser.add_argument('-m','--model-name', type=str, 
-            help='The name of the model.')
+            help='''
+            The name of the model.
+            ''')
 
         parser.add_argument('-d','--data-type', type=str, 
-            help='The type of the data. Used to load the data from this data subfolder.')
+            help='''
+            The type of the data. Used to load the data from this data subfolder.
+            ''')
 
         parser.add_argument('--data-noise', type=float, 
-            help='The noise that is added to the input data.')
+            help='''
+            The noise that is added to the input data.
+            ''')
 
         parser.add_argument('--p-zero-input', type=float, 
-            help='Probability of feeding no input to a Prediction kernel.')
+            help='''
+            Probability of feeding no input to a Prediction kernel.
+            ''')
 
         parser.add_argument('-g', '--use-gpu', type=super()._str2bool, 
             help='''
@@ -121,27 +131,41 @@ class DISTANAParams(Params):
             ''')    
 
         parser.add_argument('--pk-rows', type=int, 
-            help='Amount of PK (Prediction Kernel) rows.')      
+            help='''
+            Amount of PK (Prediction Kernel) rows.
+            ''')      
 
         parser.add_argument('--pk-cols', type=int, 
-            help='Amount of PK (Prediction Kernel) cols.')
+            help='''
+            Amount of PK (Prediction Kernel) cols.
+            ''')
 
         parser.add_argument('--pk-dyn-size', type=int, 
-            help='The dynamical input and output size of one Prediction Kernel.')
+            help='''
+            The dynamical input and output size of one Prediction Kernel.
+            ''')
 
         parser.add_argument('--pk-lat-size', type=int, 
-            help='The lateral input and output size of one Prediction Kernel.')
+            help='''
+            The lateral input and output size of one Prediction Kernel.
+            ''')
 
         parser.add_argument('--pk-pre-layer-size', type=int, 
-            help='The layer size of the first fully connected layer in the Prediction Kernel.')
+            help='''
+            The layer size of the first fully connected layer in the Prediction Kernel.
+            ''')
 
         parser.add_argument('--pk-num-lstm-cells', type=int, 
-            help='The number of LSTM cells.')
+            help='''
+            The number of LSTM cells.
+            ''')
 
 
         # Saving and Loading parameter files
         parser.add_argument('-p','--params', type=str, 
-            help='The file name of the parameter values to load.')
+            help='''
+            The file name of the parameter values to load.
+            ''')
 
         parser.add_argument('--save-params', type=str, 
             help='''
@@ -150,10 +174,14 @@ class DISTANAParams(Params):
             ''')
 
         parser.add_argument('-r', '--reset-params', action='store_true', 
-            help='Reset saved default parameter values to initial values.')
+            help='''
+            Reset saved default parameter values to initial values.
+            ''')
 
         parser.add_argument('--verbose', action='store_true', 
-            help='Set the Verbosity of the program to True.')
+            help='''
+            Set the Verbosity of the program to True.
+            ''')
 
         if is_training:
             parser = self._parse_train_params(parser)
@@ -198,25 +226,39 @@ class DISTANAParams(Params):
         # Options for training
 
         parser.add_argument('--save-model', type=super()._str2bool, 
-            help='Whether the trained neural network model should be saved.')
+            help='''
+            Whether the trained neural network model should be saved.
+            ''')
 
         parser.add_argument('--continue-training', type=super()._str2bool,
-            help='Whether the training of the neural network should be continued.')
+            help='''
+            Whether the training of the neural network should be continued.
+            ''')
 
         parser.add_argument('-e','--epochs', type=int, 
-            help='The amount of epochs for the training.')
+            help='''
+            The amount of epochs for the training.
+            ''')
 
         parser.add_argument('-s','--seq-len', type=int, 
-            help='The amount sequence length used for training.')     
+            help='''
+            The amount sequence length used for training.
+            ''')     
 
         parser.add_argument('-l','--learning-rate', type=float, 
-            help='Specify the learning rate for the training.')
+            help='''
+            Specify the learning rate for the training.
+            ''')
 
         parser.add_argument('-b','--batch-size-train', type=int, 
-            help='Specify the batch size for the training.')
+            help='''
+            Specify the batch size for the training.
+            ''')
 
         parser.add_argument('-v','--batch-size-test', type=int, 
-            help='Specify the batch size for the validation phase.')
+            help='''
+            Specify the batch size for the validation phase.
+            ''')
 
         return parser
 
@@ -228,19 +270,29 @@ class DISTANAParams(Params):
         # Options for testing
 
         parser.add_argument('-i', '--image-mode', choices=['no','show', 'save', 'show_save'], default='save', 
-            help='Shall an image of the testing result be visualized, saved to file or both?')
+            help='''
+            Shall an image of the testing result be visualized, saved to file or both?
+            ''')
 
         parser.add_argument('-v', '--video-mode', choices=['no','show', 'save', 'show_save'], default='no', 
-            help='Shall a video of the testing result be visualized, saved to file or both?')
+            help='''
+            Shall a video of the testing result be visualized, saved to file or both?
+            ''')
 
         parser.add_argument('--teacher-forcing-steps', type=int, 
-            help='Amount of time steps for the teacher forcing.')
+            help='''
+            Amount of time steps for the teacher forcing.
+            ''')
 
         parser.add_argument('--closed-loop-steps', type=int, 
-            help='Amount of time steps for the closed loop.')
+            help='''
+            Amount of time steps for the closed loop.
+            ''')
 
         parser.add_argument('-b','--batch-size-test', type=int, 
-            help='Specify the batch size for the test run.')
+            help='''
+            Specify the batch size for the test run.
+            ''')
 
         return parser
 
