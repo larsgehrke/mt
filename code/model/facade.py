@@ -9,8 +9,10 @@ class Facade():
             import model.old.evaluator as model
         elif params["model_name"] == "old2":
             import model.old2.evaluator as model
-        elif params["model_name"] == "v1":
-            import model.v1.evaluator as model
+        elif params["model_name"] == "v1a":
+            import model.v1a.evaluator as model
+        elif params["model_name"] == "v1b":
+            import model.v1b.evaluator as model
         elif params["model_name"] == "v2":
             import model.v2.evaluator as model
         elif params["model_name"] == "v3":

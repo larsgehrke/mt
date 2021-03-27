@@ -40,47 +40,7 @@ class KernelNetwork(th.nn.Module):
             self.coming_from = None
 
             self._build_connections(config.pk_rows, config.pk_cols)
-        else:
-            self.graph = None
-            self._compile_cuda_extension()
-
-    def _compile_cuda_extension(self):
-        cpp_config_file = os.path.join('model', 'v2', 'include','config.h')
-
-        with open(cpp_config_file, 'w') as conf_file:
-            conf_file.write("#define PK_ROWS " + str(self.config.pk_rows) + os.linesep)
-            conf_file.write("#define PK_COLS " + str(self.config.pk_cols) + os.linesep)
-            conf_file.write("#define DIMS 3" + os.linesep)
-            conf_file.write("#define NEIGHBORS 8" + os.linesep)
-            conf_file.write("#define LAT_SIZE " + str(self.config.pk_lat_size) + os.linesep)
-            conf_file.write("#define DYN_SIZE " + str(self.config.pk_dyn_size) + os.linesep)
-
-        # import the custom CUDA kernel
-        from model.v2.graph import Graph
-
-        self.graph = Graph()
-
-    def _graph_connections(self):
-        '''
-        Implementing the graph connections of DISTANA.
-        '''
-
-        if self.config.use_gpu: 
-            # Use the custom CUDA kernel
-            input_ =  self.graph.forward(self.tensors.pk_dyn_in, self.tensors.pk_lat_out)
-        else:
-            # Set the appropriate lateral inputs to the lateral outputs from the
-            # previous time step
-            self.tensors.pk_lat_in[:,self.pos0, self.going_to] = \
-                self.tensors.pk_lat_out[:,self.coming_from]
-
-            # Flatten last two dims: B, PK, N, Lat -> B, PK, N*Lat and concat with B, PK, Dyn
-            # => B, PK, Dyn + N*Lat 
-            lat_in_flat = th.flatten(self.tensors.pk_lat_in,start_dim=2)
-            
-            input_ = th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
-
-        return input_
+   
 
     def forward(self, dyn_in):
         """
@@ -91,8 +51,18 @@ class KernelNetwork(th.nn.Module):
         
         # Write the dynamic PK input to the corresponding tensor
         self.tensors.pk_dyn_in = dyn_in
-       
-        input_ = self._graph_connections()
+
+        # Set the appropriate lateral inputs to the lateral outputs from the
+        # previous time step
+        self.tensors.pk_lat_in[:,self.pos0, self.going_to] = \
+            self.tensors.pk_lat_out[:,self.coming_from]
+
+        # Flatten last two dims: B, PK, N, Lat -> B, PK, N*Lat and concat with B, PK, Dyn
+        # => B, PK, Dyn + N*Lat 
+        lat_in_flat = th.flatten(self.tensors.pk_lat_in,start_dim=2)
+        
+        input_ = th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
+
 
         # Forward the PK inputs through the pk_net to get the outputs and hidden
         # states of these PKs
@@ -147,6 +117,7 @@ class KernelNetwork(th.nn.Module):
                              "bottom left": [pk_row + 1, pk_col - 1],
                              "bottom": [pk_row + 1, pk_col],
                              "bottom right": [pk_row + 1, pk_col + 1]}
+                             
 
                 # Set the values of the PK adjacency matrix on true that
                 # represent a connection between the connected PKs

@@ -2,8 +2,8 @@ import torch as th
 
 from model.abstract_evaluator import AbstractEvaluator
 
-from model.v1.kernel_net import KernelNetwork
-from model.v1.kernel_tensors import KernelTensors
+from model.v1a.kernel_net import KernelNetwork
+from model.v1a.kernel_tensors import KernelTensors
 
 
 class Evaluator(AbstractEvaluator):

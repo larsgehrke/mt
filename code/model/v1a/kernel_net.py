@@ -1,7 +1,7 @@
 import numpy as np
 import torch as th
 
-import model.v1.pk as pk
+import model.v1a.pk as pk
 
 from tools.debug import sprint
 
@@ -43,7 +43,6 @@ class KernelNetwork(th.nn.Module):
         for a given input
 
         """
-
 
         # Write the dynamic PK input to the corresponding tensor
         self.tensors.pk_dyn_in = dyn_in
@@ -99,7 +98,6 @@ class KernelNetwork(th.nn.Module):
                                    device=self.config.device)
 
         # Define a dictionary that maps directions to numbers
-        # direction_dict = {"top": 1, "left": 2, "right": 3, "bottom": 4}
         direction_dict = {"top left": 1, "top": 2, "top right": 3,
                           "left": 4, "right": 5,
                           "bottom left": 6, "bottom": 7, "bottom right": 8}
@@ -120,10 +118,6 @@ class KernelNetwork(th.nn.Module):
                              "bottom left": [pk_row + 1, pk_col - 1],
                              "bottom": [pk_row + 1, pk_col],
                              "bottom right": [pk_row + 1, pk_col + 1]}
-                # neighbors = {"top": [pk_row - 1, pk_col],
-                #              "left": [pk_row, pk_col - 1],
-                #              "right": [pk_row, pk_col + 1],
-                #              "bottom": [pk_row + 1, pk_col]}
 
                 # Set the values of the PK adjacency matrix on true that
                 # represent a connection between the connected PKs

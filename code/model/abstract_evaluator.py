@@ -147,7 +147,7 @@ class AbstractEvaluator():
                 np.random.shuffle(self.train_filenames) # in place operation!
 
         data_files = None
-        # Sellect data
+        
         if self.is_testing:
             data_files = self.test_filenames
         else:

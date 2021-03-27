@@ -125,15 +125,10 @@ class KernelNetwork(th.nn.Module):
                                     rows * cols,
                                     rows * cols),
                                 device=self.config.device)
-
-        # Old encoding:
-        # direction_dict = {"top": 1, "left top": 2, "left": 3, "left bottom": 4,
-        #                   "bottom": 5, "right bottom": 6, "right": 7,
-        #                   "right top": 8}
         
         # Define a dictionary that maps directions to numbers
-        direction_dict = {"left top": 1, "top": 2, "right top": 3, "left": 4, "right": 5,
-                        "left bottom": 6, "bottom": 7, "right bottom": 8}
+        direction_dict = {"top left": 1, "top": 2, "top right": 3, "left": 4, "right": 5,
+                            "bottom left": 6, "bottom": 7, "bottom right": 8}
 
         # Running index to pass a distinct id to each PK
         pk_id_running = 0
@@ -143,15 +138,15 @@ class KernelNetwork(th.nn.Module):
             for pk_col in range(cols):
 
                 # Find the neighboring PKs to which this PK is connected
-                neighbors = {"top": [pk_row - 1, pk_col],
-                             "left top": [pk_row - 1, pk_col - 1],
+                neighbors = {"top left": [pk_row - 1, pk_col - 1],
+                             "top": [pk_row - 1, pk_col],
+                             "top right": [pk_row - 1, pk_col + 1],
                              "left": [pk_row, pk_col - 1],
-                             "left bottom": [pk_row + 1, pk_col - 1],
-                             "bottom": [pk_row + 1, pk_col],
-                             "right bottom": [pk_row + 1, pk_col + 1],
                              "right": [pk_row, pk_col + 1],
-                             "right top": [pk_row - 1, pk_col + 1]}
-
+                             "bottom left": [pk_row + 1, pk_col - 1],
+                             "bottom": [pk_row + 1, pk_col],
+                             "bottom right": [pk_row + 1, pk_col + 1]}
+                             
                 # Set the values of the PK adjacency matrix on true that
                 # represent a connection between the connected PKs
                 for neighbor_direction in neighbors:
