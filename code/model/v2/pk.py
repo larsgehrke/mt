@@ -5,7 +5,7 @@ from tools.debug import sprint
 
 
 class PK(th.nn.Module):
-    def __init__(self, batch_size, amount_pks, input_size, lstm_size, output_size, device):
+    def __init__(self, amount_pks, input_size, lstm_size, output_size, device):
         super(PK, self).__init__()
         self.amount_pks = amount_pks
         self.input_size = input_size

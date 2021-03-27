@@ -2,7 +2,7 @@ import os
 import numpy as np
 import torch as th
 
-from model.v2.pk import PK
+from model.v1b.pk import PK
 
 from tools.debug import sprint
 from tools.debug import Clock
@@ -32,14 +32,13 @@ class KernelNetwork(th.nn.Module):
                               output_size = config.pk_dyn_size + config.pk_lat_size, 
                               device = config.device)
 
-        
-        if not self.config.use_gpu:            
-            # Variables for the PK-TK connections
-            self.pos0 = None
-            self.going_to = None
-            self.coming_from = None
+                
+        # Variables for the PK-TK connections
+        self.pos0 = None
+        self.going_to = None
+        self.coming_from = None
 
-            self._build_connections(config.pk_rows, config.pk_cols)
+        self._build_connections(config.pk_rows, config.pk_cols)
    
 
     def forward(self, dyn_in):
