@@ -2,6 +2,13 @@
 This is the repository for Lars Gehrke writing his master's thesis about implementing DISTANA in a parallelized fashion on the GPU to accelerate the training and the testing.
 The code is based on the former implementation of Matthias Karlbauer (*code_archive/model/distana*).
 
+## DISTANA - design idea and functional principle
+<object data="https://github.com/CognitiveModeling/MSC-Gehrke/raw/main/distana_slide.pdf" type="application/pdf" width="700px" height="700px">
+    <embed src="https://github.com/CognitiveModeling/MSC-Gehrke/raw/main/distana_slide.pdf">
+        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="./distana_slide.pdf">Download PDF</a>.</p>
+    </embed>
+</object>
+
 ## code folder
 The code for the DISTANA implementation. Every use case (generate data, training, testing, run unit test) has its own executable script at the highest level of this folder structure. These top-level scripts work as controller in a model-view-controller fashion by reasonably combining the scripts of the different subfolders.
 
