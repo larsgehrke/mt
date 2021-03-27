@@ -15,7 +15,7 @@ The code for the DISTANA implementation. Every use case (generate data, training
 
 + **qa** Quality assurance (qa). Folder for all unit tests. The execution of these unit tests should be selected by calling unit_test.py with the specific command line argument.
 
-+ **tools** To not overstructure the code, all specific code sections that are worth outsourcing are collected here. Here are code sections responsible for persistence, pytorch specific or view specific issues.
++ **tools** To not overstructure the code, all specific code sections that are worth outsourcing are collected here, e.g. code sections responsible for persistence, pytorch specific or view specific issues.
 
 
 ## code archive folder
