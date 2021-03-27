@@ -82,17 +82,17 @@ For the train and test script you can also check the options with the -h argumen
 python train.py -h
 ```
 
-Now we can train model v1 with our data in *my_data*, a batch size for training of 8, a batch size for validation of 100 and 20 epochs on the CPU.
+Now we can train model v1b with our data in *my_data*, a batch size for training of 8, a batch size for validation of 100 and 20 epochs on the CPU.
 If you want to see all parameter values currently used for the execution, you can print out the full list by just adding the --verbose tag.
 
 ```
-python train.py -m v1 -d my_data -b 8 -v 100 -e 20 -g False
+python train.py -m v1b -d my_data -b 8 -v 100 -e 20 -g False
 ```
 
 Likewise we can do the training on the GPU
 
 ```
-python train.py -m v1 -d my_data -b 8 -v 100 -e 20 -g True
+python train.py -m v1b -d my_data -b 8 -v 100 -e 20 -g True
 ```
 
 
