@@ -91,7 +91,7 @@ Now we can train model v1b with our data in *my_data*, a batch size for training
 If you want to see all parameter values currently used for the execution, you can print out the full list by just adding the --verbose tag.
 
 ```
-python train.py -m v1b -d my_data -b 8 -v 100 -e 20 -g False
+python train.py -m v1b -d my_data -b 1 -v 100 -e 20 -g False
 ```
 
 Likewise we can do the training on the GPU
