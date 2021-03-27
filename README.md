@@ -3,7 +3,9 @@ This is the repository for Lars Gehrke writing his master's thesis about impleme
 The code is based on the former implementation of Matthias Karlbauer (*code_archive/model/distana*).
 
 ## DISTANA - design idea and functional principle
-![DISTANA slide](./distana_slide.png)png
+![DISTANA slide](./distana_slide.png)
+
+[by Karlbauer 2020](https://www.youtube.com/watch?v=63GI1ZOsumg&t=53s)
 
 ## code folder
 The code for the DISTANA implementation. Every use case (generate data, training, testing, run unit test) has its own executable script at the highest level of this folder structure. These top-level scripts work as controller in a model-view-controller fashion by reasonably combining the scripts of the different subfolders.
