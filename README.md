@@ -16,8 +16,8 @@ The code for the DISTANA implementation. Every use case (generate data, training
 
 + **diagram_gpu** Not important, can be deleted. This folder was just used to access the diagrams from the server. 
 
-+ **model** The different implementations of DISTANA are collected here. Each variation has its own subfolder. The facade defines the function signatures, every variation must implement and it selects the variation specified by the parameters at runtime. 
-*abstract_evaluator* is a super class for different variations. 
++ **model** The different implementations of DISTANA are collected here. Each version has its own subfolder. The facade defines the function signatures that every version must implement and it selects the version specified by the parameters at runtime. 
+*abstract_evaluator* is a super class for different versions. 
 [Object-oriented programming (OOP) can be a curse or a blessing: OOP has of course many benefits, e.g. better readability, better maintainability, better expandability etc. but Python is a slow programming language and has no strong support of oop approaches. The outsourcing of code segments that are called per batch/sample or even per time step should be done as little as possible. For the management and analysis of different implementation variation, a super class can be a good choice. But if you want to optimize the speed of code execution, the superclass *abstract_evaluator* costs unnecessary Python overhead.]
   + **old** [No batch; stacked lateral output] 
 
@@ -26,17 +26,22 @@ The code for the DISTANA implementation. Every use case (generate data, training
   + **old2** [No batch; single lateral output] 
   
     As *old*, but each PK produce only one lateral output for all outgoing connections.
-  + **v1** [batch processing; stacked lateral output] 
+    
+  + **v1a** [batch processing; stacked lateral output] 
   
     Based on *old*, but this implementation can process the samples of one batch (with arbitrary batch size) in parallel. The Prediction Kernel is implemented as a custom PyTorch class in Python with the usage of tensor operations realising the nn layers (fc, lstm, fc). In the last iteration per epoch the batch size will probably not fit the rest of the data samples. In this case the weight tensors are automatically adapted for this last iteration with a special batch size (amount of remaining samples).
     
+  + **v1b** [batch processing; single lateral output] 
+  
+    As *v1a*, but each PK produce only one lateral output for all outgoing connections.
+    
   + **v2** [batch processing; single lateral output; hard coded lateral connections in CUDA] 
   
-    As *v1*, but with a custom CUDA kernel that is implementing the lateral flow between the PKs at the beginning of each time step. However, in this CUDA kernel the grid structure where each PK is laterally connected with up to 8 surrounding neighbors (cf. https://arxiv.org/pdf/1912.11141.pdf) is hard coded. 
+    As *v1b*, but with a custom CUDA kernel that is implementing the lateral flow between the PKs at the beginning of each time step. However, in this CUDA kernel the grid structure where each PK is laterally connected with up to 8 surrounding neighbors (cf. https://arxiv.org/pdf/1912.11141.pdf) is hard coded. 
     
   + **v3** [batch processing; single lateral output; flexible lateral connections in CUDA] 
   
-    As *v2*, but instead of using a CUDA kernel that is hard coding the lateral connections, the CUDA kernel processes adjacency lists that contain the lateral connections. The adjacency lists are created in Python and passed as a static value to the CUDA code. 
+    As *v2*, but instead of using a CUDA kernel that is hard coding the lateral connections, the CUDA kernel processes adjacency lists that define the lateral connections. The adjacency lists are created in Python and passed as a static value to the CUDA code. 
 
 + **qa** Quality assurance (qa). Folder for all unit tests. The execution of these unit tests should be selected by calling unit_test.py with the specific command line argument.
 
@@ -45,7 +50,7 @@ The code for the DISTANA implementation. Every use case (generate data, training
 
 ## code archive folder
 + **code_archive/model/distana** former implementation by Karlbauer
-+ __code_archive/model/distana*__ first steps of code adaption
++ __code_archive/model/distana\_*__ first steps of code adaption
 
 + **code_archive/others/extension-cpp** this is the code from the [original PyTorch CUSTOM C++ AND CUDA EXTENSIONS exampel](https://pytorch.org/tutorials/advanced/cpp_extension.html)
 
