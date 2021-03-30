@@ -31,6 +31,7 @@ import tools.torch_tools as th_tools
 
 
 def run_training(params):
+    '''Running the training from top-level perspective, calling sub modules'''
 
     # Create and set up the network
     model = Facade(params)
@@ -44,34 +45,35 @@ def run_training(params):
     train_data_files = get_data_filenames(os.path.join(params['data_folder'],'train',''))
     val_data_files = get_data_filenames(os.path.join(params['data_folder'],'val',''))
 
-    # Set the training parameters for the model 
-    # and get the amount of iterations for one epoch
+    # Set the training and validation parameters for the model 
+    # and get the amount of iterations for one epoch respectively
     amount_train = model.set_training(train_data_files, optimizer, criterion)
     amount_val = model.set_testing(val_data_files, criterion, params['teacher_forcing_steps'])
 
     model_saver = None
-    if params["save_model"]:
+    if params["save_model"]: # if the model should be saved
+        # configure Saver object
         model_saver = th_tools.Saver(epochs = params["epochs"],
             model_src_path=params['model_folder'],
             model_name = params['model_name'],
             cfg_file=Params.to_string(params), 
             net=model.net())
     
+    # instantiate a view object to process training results (print to console and save model)
     view = TrainSupervisor(params['epochs'], model.get_trainable_params(), model_saver)
 
-    if params["continue_training"]:
+    if params["continue_training"]: # load model if desired
         model.set_weights(th_tools.load_model(params),is_training=True)
 
     """
     TRAINING
     """
+    training_start_time = time.time() 
 
-    training_start_time = time.time()
-
-     #
+    #
     # Start the training and iterate over all epochs
     for epoch in range(params['epochs']):
-        epoch_start_time = time.time()
+        epoch_start_time = time.time() 
 
         # save batch errors
         training_errors = []
@@ -82,8 +84,10 @@ def run_training(params):
             # Train the network for the given training data
             mse = model.train(iter_idx=_iter_train)
 
+            # collect training errors
             training_errors.append(mse)
             
+        # process training results
         view.finished_training(training_errors)
 
         # Iterate through epoch
@@ -91,28 +95,33 @@ def run_training(params):
             # Test the network for the given validation data
             mse = model.test(iter_idx=_iter_val)
 
+            # collect validation errors
             val_errors.append(mse)
             
+        # process validation results
         view.finished_validation(val_errors)
         
-
+        # print out epoch results
         view.finished_epoch(epoch, epoch_start_time)
 
-
+    # print out end of training
     view.finished(training_start_time)
     
 
 
-
 if __name__ == "__main__":
+    '''Starting point of program'''
 
+    # Get the parameter handler for the model
     param_manager = DISTANAParams(FileManager(), description)
     
+    # set PyTorch seed for reproducibility
     th.manual_seed(42)
 
-    # Load parameters from file
+    # Load train parameters from file
     params = param_manager.parse_params(is_training = True)
 
+    # print out basic information about this run
     print(f'''Run the training of architecture {
         params["architecture_name"]
         } with model {
@@ -120,6 +129,8 @@ if __name__ == "__main__":
         } and data {
         params["data_type"]
         }''')
+
+    # call main method above
     run_training(params)
 
 

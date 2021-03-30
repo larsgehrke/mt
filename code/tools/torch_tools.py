@@ -8,7 +8,7 @@ import torch as th
 from threading import Thread
 import os
 
-def determine_device(use_cuda):
+def determine_device(use_cuda: bool) -> str:
     """
     This function evaluates whether a GPU is accessible at the system and
     returns it as device to calculate on, otherwise it returns the CPU.
@@ -27,18 +27,38 @@ def determine_device(use_cuda):
         print("\tCached:   ", round(th.cuda.memory_reserved(0) / 1024 ** 3, 1),
               "GB")
         print()
+
+    print(type(device))
     return device
 
-def load_model(params):
+def load_model(params: dict):
+    '''
+    Load trained PyTorch model from file.
+    :return loaded PyTorch model
+    '''
     print('Restoring model (that is the network\'s weights) from file...')
     net = th.load(os.path.join(params['model_folder'], params['model_name'] + ".pt"),
             map_location=params['device'])
 
+    print(type(net))
+
     return net
 
 class Saver():
-
-    def __init__(self, epochs, model_src_path, model_name, cfg_file, net):
+    '''
+        Save trained PyTorch model to file.
+    '''
+    def __init__(self, epochs: int, model_src_path: str, 
+        model_name: str, cfg_file: str, net):
+        '''
+        Initialization of the Saver class.
+        :param epochs: number of epochs
+        :param model_src_path: path to folder where the model should be saved
+        :param model_name: model/version name 
+        :param cfg_file: complete configuration information
+        :param net: the PyTorch network that should be saved
+        '''
+        
         self.epochs = epochs
         self.model_save_path=model_src_path
         self.cfg_file=cfg_file
@@ -46,15 +66,22 @@ class Saver():
         self.model_name = model_name
 
 
-    def __call__(self, epoch, epoch_errors_train, epoch_errors_val):
+    def __call__(self, epoch: int, epoch_errors_train: list, epoch_errors_val: list):
+        '''
+        This class can be called to save a model to file
+        after the results of a specific epoch were satisfying.
+        :param epoch: The last epoch index 
+        :param epoch_errors_train: the training errors of the last epoch
+        :param epoch_errors_val: the validation errors of the last epoch
+        '''
 
         # Start a separate thread to save the model
         thread = Thread(target=self.save_model_to_file(epoch, 
                         epoch_errors_train,epoch_errors_val))
         thread.start()
 
-    def save_model_to_file(self, epoch, epoch_errors_train,
-                       epoch_errors_val):
+    def save_model_to_file(self, epoch: int, epoch_errors_train: list,
+                       epoch_errors_val: list):
         """
         This function writes the model weights along with the network configuration
         and current performance to file.

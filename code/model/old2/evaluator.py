@@ -25,7 +25,6 @@ class Evaluator(AbstractEvaluator):
         amount_pks = self.config.amount_pks
         pk_dyn_size = self.config.pk_dyn_size
 
-
         # Set up an array of zeros to store the network outputs
         net_outputs = th.zeros(size=(seq_len,                              
                                      amount_pks,

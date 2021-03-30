@@ -33,6 +33,7 @@ def run_testing(params):
     # Create and set up the network
     model = Facade(params)
 
+    # Set up the criterion (loss)
     criterion = th.nn.MSELoss() 
 
     # Load the trained weights from file
@@ -40,28 +41,36 @@ def run_testing(params):
     
     # Get the test data
     test_data_files = get_data_filenames(os.path.join(params['data_folder'],'test',''))
-    # Save the test configuration and data in the model class
+    # Save the test configuration and data in the model class and get max number of iterations
     amount_test = model.set_testing(test_data_files,criterion, params['teacher_forcing_steps'])
     # Create the view object 
     view = TestSupervisor(params,model.get_trainable_params())
 
     
-
+    # save unicode char 1 for the loop later
     x = u'1'
+
+    # get the current batch size
+    batch_size = model.config().batch_size_test
+
+    #
+    # creating variables for the iterations of the test loop 
     batch_idx, sample_idx = 0, 0
-    mse, net_outputs_batch, net_label_batch, net_input_batch = None, None, None, None
+    error, net_outputs_batch, net_label_batch, net_input_batch = None, None, None, None
 
-    while x == u'1' and batch_idx<amount_test:
+    # if 1 was pressed and batch index is less than max number of iterations
+    while x == u'1' and batch_idx<amount_test: 
 
-        if sample_idx == 0:
-            time_start = time.time()
+        if sample_idx == 0: # just do the forward pass once per batch
+            time_start = time.time() 
 
             # Evaluate the network for the given test data
-            mse, net_outputs, net_label, net_input = model.test(iter_idx=batch_idx, return_only_error = False)
+            error, net_outputs, net_label, net_input = model.test(iter_idx=batch_idx, 
+                return_only_error = False)
             
-            forward_pass_duration = time.time() - time_start
-            print("\tForward pass for batch size ",params["batch_size_test"]," took: ", forward_pass_duration, " seconds.")
+            view.finish_batch(time_start, batch_size, error)
 
+        # Plot or save sample if desired
         view.plot_sample(net_outputs[sample_idx], 
             net_label[sample_idx], net_input[sample_idx])
 
@@ -70,24 +79,30 @@ def run_testing(params):
         
         sample_idx += 1
         
-        if sample_idx >= params["batch_size_test"]:
+        #
+        # if current batch is finished, start new batch
+        if sample_idx >= batch_size:
             batch_idx += 1 
             sample_idx = 0 
 
+    # tell view that program is finished
     view.finished()
 
 
 
-
 if __name__ == "__main__":
+    '''Starting point of program'''
 
+    # Get the parameter handler for the model
     param_manager = DISTANAParams(FileManager(), description)
     
+    # set PyTorch seed for reproducibility
     th.manual_seed(42)
 
-    # Load parameters from file
+    # Load test parameters from file
     params = param_manager.parse_params(is_training = False)
 
+    # print out basic information about this run
     print(f'''Run the testing of architecture {
         params["architecture_name"]
         } with model {
@@ -95,6 +110,8 @@ if __name__ == "__main__":
         } and data {
         params["data_type"]
         }''')
+
+    # call main method above
     run_testing(params)
 
 

@@ -1,6 +1,10 @@
 '''
 
-    Quality Assurance: Test the cuda implementation of the graph connections 
+    Quality Assurance: Test the cuda implementation of the graph connections from model v2
+
+    This unit test checks if the graph connections implemented in the CUDA code of model v2 
+    are correctly implemented. Two groups of characteristics are checked: 
+    The amount of connections per node and the position of the connections in the lateral array.
 
 '''
 

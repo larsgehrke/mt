@@ -1,7 +1,5 @@
 '''
-
     Visualize the 2-dimensional wave data.
-
 '''
 import math
 import time

@@ -1,3 +1,7 @@
+'''
+   A collection of methods that are useful for debugging.  
+'''
+
 import numpy as np
 import torch as th
 import sys
@@ -5,6 +9,12 @@ import time
 
 
 def sprint(obj, obj_name="Object", complete=False, exit=False):
+    '''
+        "smartprint"
+        This method prints out the shape of any PyTorch or NumPy tensors,
+        optionally it prints out the complete object,
+        and it is able to directly stop the code execution.  
+    '''
     print("Printing out", obj_name)
     print(type(obj))
 
@@ -28,6 +38,10 @@ def lprint(l, exit=False):
         sys.exit()
 
 class Clock():
+    '''
+        A helpful method for measuring speed of code execution. 
+        Inspired by a stop watch.
+    '''
     def __init__(self, s):
         print("Starting the clock at "+ str(s))
         self.total = time.time()

@@ -4,14 +4,19 @@
    writing Python objects into files. 
 
 '''
+
+#
 # The glob module finds all the pathnames matching a specified pattern 
 # according to the rules used by the Unix shell, 
 # although results are returned in arbitrary order.
 import glob
 import numpy as np
 
+def get_data_filenames(path_to_dir: str) -> list:
+    '''
+        Collect the data file names of a given path.
+    '''
 
-def get_data_filenames(path_to_dir):
     #
     # Get the training and validation file names
     data_filenames = np.sort(glob.glob(path_to_dir + '*'))
@@ -25,11 +30,18 @@ import pickle
 import os
 
 class FileManager():
+    '''
+        Saves and Loads Python objects to/from files. 
+        For this the python library pickle is used, that is why the suffix is 'pkl.'.
+    '''
 
     def __init__(self):
         self.suffix = '.pkl'
 
-    def save(self,path, name, obj):
+    def save(self, path: str, name: str, obj: dict):
+        '''
+        Saves a python dictionary to file.
+        '''
         file = name + self.suffix
 
         if not os.path.exists(path):
@@ -38,14 +50,26 @@ class FileManager():
         with open(os.path.join(path,file), 'wb+') as f:
             pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
 
-    def load(self,name):
+    def load(self, name: str) -> dict:
+        '''
+        Loads a python dictionary from file.
+        '''
         with open('' + name + self.suffix, 'rb+') as f:
             return pickle.load(f)
 
-    def isfile(self, name):
+    def isfile(self, name: str) -> bool:
+        '''
+        Checks if a certain file exists.
+        '''
         return os.path.isfile(name+self.suffix)
 
-    def __call__(self, mode, path, name, obj=None):
+    def __call__(self, mode: str, path: str, name: str, obj:dict = None):
+        '''
+        This class can be called with three different modes: save, load or load_or_save.
+        - save: Saves the given object to file
+        - load: Loads a python objects specified by the given path + name
+        - load_or_save: tries to load if file exists, saves the object otherwise 
+        '''
         modes = ["save", "load", "load_or_save"]
 
         if mode not in modes:

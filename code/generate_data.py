@@ -14,14 +14,13 @@ import argparse
 from config.data_generation_params import DataGenerationParams
 from tools.persistence import FileManager
 
-
+# Parameter Handling
 param_manager = DataGenerationParams(FileManager(), description)
-# Load parameters from file
+# Load parameters from file and parse commend line arguments
 params = param_manager.parse_params()
 
 #
 # GLOBAL VARIABLES
-
 
 save_data = params["save_data"]  # Shall the generated data be saved to file
 visualize = params["visualize"]  # Create a plot and animation of the wave

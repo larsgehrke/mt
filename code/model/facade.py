@@ -33,6 +33,9 @@ class Facade():
     def net(self):
         return self.model.net
 
+    def config(self):
+        return self.model.config
+
     def get_trainable_params(self):
         return self.model.get_trainable_params()
 
