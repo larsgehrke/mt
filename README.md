@@ -18,7 +18,7 @@ The code for the DISTANA implementation. Every use case (generate data, training
 
 + **model** The different implementations of DISTANA are collected here. Each version has its own subfolder. The facade defines the function signatures that every version must implement and it selects the version specified by the parameters at runtime. 
 *abstract_evaluator* is a super class for different versions. 
-[Object-oriented programming (OOP) can be a curse or a blessing: OOP has of course many benefits, e.g. better readability, better maintainability, better expandability etc. but Python is a slow programming language and has no strong support of oop approaches. The outsourcing of code segments that are called per batch/sample or even per time step should be done as little as possible. For the management and analysis of different implementation variation, a super class can be a good choice. But if you want to optimize the speed of code execution, the superclass *abstract_evaluator* costs unnecessary Python overhead.]
+[Object-oriented programming (OOP) can be a curse or a blessing: OOP has of course many benefits, e.g. better readability, better maintainability, better expandability etc. but Python is a slow programming language and has no strong support of oop approaches. The outsourcing of code segments that are called per batch/sample or even per time step should be done as little as possible.]
   + **old** [No batch; stacked lateral output] 
 
     Basically Karlbauer's implementation embedded in this code framework. This implementation can only process the data files per sample  (batch size = 1) and each PK produce an individual lateral output for every outgoing connection. 
