@@ -1,3 +1,10 @@
+'''
+old [No batch; stacked lateral output]
+
+Basically Karlbauer's implementation embedded in this code framework. 
+This implementation can only process the data files per sample (batch size = 1) 
+and each PK produce an individual lateral output for every outgoing connection.
+'''
 import torch as th
 
 from model.abstract_evaluator import AbstractEvaluator

@@ -1,25 +1,37 @@
-'''
 
-   This script holds the settings for the 
-   data generation process.
-
-'''
 import os
 from config.params import Params 
 import argparse
 
 class DataGenerationParams(Params):
+    '''
+    Specifying the parameters and command line arguments 
+    for the use case of the data generation.
+    The superclass Params is doing the management of the parameters.
+    '''
 
-    def __init__(self, file_manager, description):
+    def __init__(self, description: str):
+        '''
+        Initialisation of DataGenerationParams.
+        :param description: descripton of use case.
+        '''
 
-        super().__init__(file_manager, folder = "data_generation_params")
+        super().__init__("data_generation_params")
 
+        # saving argument to (super) class scope
         self.description = description
-
+        
+        #
+        # defining the initial parameter values for the data generation
+        # note that these values will only be used for the very first execution.
+        # After that, the default file will always be loaded if it exists
+        # or a user specific file, if it was specified by cl arguments
+        # 
+        # if you change keys or add keys here, 
+        # please delete all created config files (.pkl) 
+        # in config/data_generation_params/ on all devices 
+        # and update cl arguments below
         self.init_values = {
-
-        # Initialisation of the default values
-        # once saved, always updated by last default config file
 
         "threshold_empty_data": 0.00,  # In 1%, an empty data set (only zeros) is created
 
@@ -61,8 +73,11 @@ class DataGenerationParams(Params):
 
         }
 
-    def parse_params(self):
-        # Parsing Options from the command line
+    def parse_params(self) -> dict:
+        ''' 
+        Parsing Options from the command line
+        :return: parameters as dictionary
+        '''
 
         parser = argparse.ArgumentParser(description=self.description, 
             formatter_class=argparse.RawTextHelpFormatter)
@@ -135,7 +150,6 @@ class DataGenerationParams(Params):
 
         #
         # Mapping from options key to params key
-
         mapping= {
 
         "data_set": "data_set",

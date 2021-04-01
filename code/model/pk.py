@@ -5,7 +5,32 @@ from tools.debug import sprint
 
 
 class PK(th.nn.Module):
-    def __init__(self, batch_size, amount_pks, input_size, lstm_size, output_size, device):
+    '''
+    Custom PyTorch class that implements the Prediction Kernel (PK) of DISTANA in a parallel fashion.
+    Note that in DISTANA the PKs share their weights.
+    All PKs from all batches should be processed in parallel. 
+    The implementation of the forward pass is based on PyTorch´s tensor operations.
+    The backward pass is automatically calculated from PyTorch´s autograd feature.
+    '''
+
+    def __init__(self, 
+        batch_size: int, 
+        amount_pks: int, 
+        input_size: int, 
+        lstm_size: int, 
+        output_size: int, 
+        device: str):
+        '''
+        The initialisation of the PK module.
+        :param batch_size: The batch size for the current run.
+        :param amount_pks: The amount of PKs in total.
+        :param input_size: The size of the input to each PK (dynamical and lateral)
+        :param lstm_size: number of LSTM nodes in the PK.
+        :param output_size: The size of the output of each PK (dynamical and lateral)
+        :param device: PyTorch specific string to select either CPU('cpu') or GPU ('cuda') for the execution
+
+        '''
+
         super(PK, self).__init__()
         self.amount_pks = amount_pks
         self.input_size = input_size
@@ -34,7 +59,7 @@ class PK(th.nn.Module):
             weight.data.uniform_(-stdv, +stdv)
 
 
-    def forward(self, input_flat, old_c, old_h):
+    def forward(self, input_flat: th.Tensor, old_c: th.Tensor, old_h: th.Tensor) -> list:
         '''
             Forward propagation for all PKs in all batches in parallel.
             
@@ -47,11 +72,18 @@ class PK(th.nn.Module):
             :param old_c: the LSTM cell values
             :param old_h: the LSTM h vector
 
+            :return: 
+                list[0]: network output for this time step (y_hat)
+                list[1]: hidden vector of the LSTM for this time step (h_t)
+                list[2]: cell state of the LSTM for this time step (C_t)
+
         '''
 
+        # first fully connected layer
         x_t = th.tanh(th.matmul(input_flat, self.W_input))
         # => th.Size([B, PK, lstm_size])
 
+        # concatination of input and hidden vector 
         X = th.cat([x_t, old_h], dim=2)
         # => th.Size([B, PK, 2*lstm_size])
 
@@ -61,7 +93,8 @@ class PK(th.nn.Module):
         # Split the combined gate weight matrix into its components.
         gates = gate_weights.chunk(4, dim=2)
 
-        # LSTM forward pass
+        #
+        # (normal) LSTM forward pass
         f_t = th.sigmoid(gates[0])
         i_t = th.sigmoid(gates[1])
         o_t = th.sigmoid(gates[2])
@@ -73,6 +106,7 @@ class PK(th.nn.Module):
         h_t = th.tanh(C_t) * o_t
         # => th.Size([B, PK, lstm_size])
 
+        # last fully connected layer
         y_hat_ = th.matmul(h_t, self.W_output)
         y_hat = th.tanh(y_hat_)
         # => th.Size([B, PK, DYN + LAT])

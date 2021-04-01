@@ -2,9 +2,16 @@
 class KernelConfig:
     """
     This class holds the parameters of the Kernel Network.
+    Thus the implementation of the model can depend on this class
+    with specific class attributs instead of a mysterious dictionary object.
+    The advantage is to have clear, transparent dependencies.
     """
 
-    def __init__(self, params):
+    def __init__(self, params: dict):
+        '''
+        Initialisation of KernelConfig.
+        :param params: parameters that are saved in this class
+        '''
 
         #
         # System parameters
@@ -27,6 +34,7 @@ class KernelConfig:
         self.pk_cols = int(params["pk_cols"]) 
         
         # Hard coded Hyperparameter: PK Neighbors
+        # needed e.g. for the calculation of the input tensor shapes
         self.pk_neighbors = 8
 
         # Input sizes (dimensions)

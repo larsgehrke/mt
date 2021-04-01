@@ -1,9 +1,4 @@
-'''
 
-   This script holds the settings for the 
-   training of DISTANA.
-
-'''
 import os
 import argparse
 
@@ -11,17 +6,33 @@ from config.params import Params
 import tools.torch_tools as th_tools
 
 class DISTANAParams(Params):
+    '''
+    Specifying the parameters and command line arguments 
+    for the DISTANA model (train and test run).
+    The superclass Params is doing the management of the parameters.
+    '''
 
-    def __init__(self, file_manager, description):
+    def __init__(self, description: str):
+        '''
+        Initialisation of DISTANAParams.
+        :param description: descripton of use case (train or test).
+        '''
 
-        super().__init__(file_manager, folder = "distana_params")
+        super().__init__("distana_params") 
 
+        # saving argument to (super) class scope
         self.description = description
 
-        '''
-            If you add/change something here, please add also some Argparse option further below
-            and delete the current saved parameter files on all devices
-        '''
+        #
+        # defining the initial parameter values for DISTANA (train+test)
+        # note that these values will only be used for the very first execution.
+        # After that, the default file will always be loaded if it exists
+        # or a user specific file, if it was specified by cl arguments
+        # 
+        # if you change keys or add keys here, 
+        # please delete all created config files (.pkl) 
+        # in config/distana_params/ on all devices 
+        # and update cl arguments below
         self.init_values = {
 
             "architecture_name": "distana",
@@ -69,7 +80,12 @@ class DISTANAParams(Params):
 
         }
 
-    def _save_paths(self, params):
+    def _save_paths(self, params: dict) -> dict:
+        '''
+        This method saves the important path strings of this code as additional parameters.
+        :param params: the parameters to be extended
+        :return: the extended parameters
+        '''
 
         # Specify Paths for this program
         # Ending with directories
@@ -80,7 +96,12 @@ class DISTANAParams(Params):
 
         return params
 
-    def _save_additional_params(self, params):
+    def _save_additional_params(self, params: dict) -> dict:
+        '''
+        Save further addditional parameters used for the model.
+        :param params: the parameters to be extended
+        :return: the extended parameters
+        '''
 
         # Hide the GPU(s) in case the user specified to use the CPU in the config file
         if not params["use_gpu"]:
@@ -95,7 +116,17 @@ class DISTANAParams(Params):
 
         return params
 
-    def parse_params(self, is_training):
+    def parse_params(self, is_training: bool) -> dict:
+        '''
+        Parinsing the command line arguments, loading and 
+        overwriting the loaded parameter values if necessary
+        saving the parameter values if specified
+        adding derived parameters
+        and returning the parameters as a dictionary.
+        :param is_training: indicates whether you are in the training or testing use case
+        :return: parameters as dictionary
+        '''
+
         parser = argparse.ArgumentParser(description=self.description, 
             formatter_class=argparse.RawTextHelpFormatter)
 
@@ -216,14 +247,15 @@ class DISTANAParams(Params):
         params = self._save_paths(params)
 
 
-
-
         return params
 
 
-    def _parse_train_params(self, parser):
-
-        # Options for training
+    def _parse_train_params(self, parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
+        '''
+        Defining and parsing the cl arguments for training.
+        :param parser: argument parser which is to be equipped with further arguments
+        :return: argument parser equipped with further arguments
+        '''
 
         parser.add_argument('--save-model', type=super()._str2bool, 
             help='''
@@ -265,9 +297,12 @@ class DISTANAParams(Params):
         
 
 
-    def _parse_test_params(self, parser):
-
-        # Options for testing
+    def _parse_test_params(self, parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
+        '''
+        Defining and parsing the cl arguments for testing.
+        :param parser: general argument parser 
+        :return: argument parser equipped with use case specific arguments
+        '''
 
         parser.add_argument('-i', '--image-mode', choices=['no','show', 'save', 'show_save'], default='save', 
             help='''

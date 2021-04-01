@@ -22,24 +22,45 @@ namespace
         torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> out) {
 
       /*
+      [Note that the out variable is the output of this function, 
+      but the content will be used later as the input of the network!]
 
-      Number of blocks in the grid:
-      gridDim.x — number of blocks in the x dimension of the grid 
-      gridDim.y — number of blocks in the y dimension of the grid
+      This kernel implements the concatination of the dynamical and lateral input of the network
+      and it implements the graph connections based on the grid of PKs
+      (creation of the lateral input from the lateral output).
+      
+      The graph connections are encoded as adjacency lists per PK. 
+      The list is implemented as a tensor initialized with -1 everywhere. 
+      Connections are defined at the beginnng until the first -1 is processed.
+      In best case, where each PK has approx. the same number of connections, 
+      the processing is optimal ( O(n/PK), good memory management).
+      In worst case, where one PK has all connections, 
+      this implementation is not optimal (O(n), extremly sparse tensor).
 
-      Number of threads in a block:
-      blockDim.x — number of threads in the x dimension if the grid 
-      blockDim.y — number of threads in the y dimension if the grid
 
-      Block Index:
-      blockIdx.x — block’s index in x dimension
-      blockIdx.y — block’s index in y dimension
+      :param dyn_input: Is the dynamical input of the current time step
+      :paran lat_input: Is actually the lateral output of the former time step, 
+          which now became the input of this kernel
+      :param out: Output of this function 
+      
+      CUDA specific information:
+        Number of blocks in the grid:
+          gridDim.x — number of blocks in the x dimension of the grid 
+          gridDim.y — number of blocks in the y dimension of the grid
 
-      Thread Index:
-      threadIdx.x — thread’s index in x dimension
-      threadIdx.y — thread’s index in y dimension
+        Number of threads in a block:
+          blockDim.x — number of threads in the x dimension if the grid 
+          blockDim.y — number of threads in the y dimension if the grid
 
+        Block Index:
+          blockIdx.x — block’s index in x dimension
+          blockIdx.y — block’s index in y dimension
+
+        Thread Index:
+          threadIdx.x — thread’s index in x dimension
+          threadIdx.y — thread’s index in y dimension
       */
+      
 
       /*
         Calculating block index: 
@@ -93,6 +114,15 @@ namespace
         torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_dyn_input,
         torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_lat_input) 
     {
+      /*
+      *
+      *
+      The same as the forward pass, only the other way round.
+      *
+      *
+      */
+
+
        /*
         Calculating block index: 
         row no (blockIdx.y) * length of row (gridDim.x) + row position (blockIdx.x)
@@ -144,17 +174,22 @@ std::vector<torch::Tensor> graph_cuda_forward(
     torch::Tensor lat_input,
     torch::Tensor connections) {
 
+   /* get the torch tensor options to specify the gpu usage later */
   auto options = torch::TensorOptions().device(torch::kCUDA).requires_grad(true);
 
+  /* set the batch size dynamically by means of the input shape*/
   const auto batch_size = dyn_input.size(0);
 
+  /* allocate enough memory space for the output of the kernel function */
   auto out = torch::zeros({batch_size, PK_ROWS * PK_COLS, 
     DYN_SIZE + NEIGHBORS * LAT_SIZE}, options);
 
-
+  /* map the grid of PKs to the grid of threads per block*/
   const dim3 threads(PK_COLS, PK_ROWS);
+  /* map batches to blocks*/
   const dim3 blocks(batch_size);
 
+  /* call the forward kernel function */
   AT_DISPATCH_FLOATING_TYPES(out.type(), "graph_forward_kernel", ([&] {
     graph_forward_kernel<scalar_t><<<blocks, threads>>>(
         dyn_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
@@ -172,15 +207,22 @@ std::vector<torch::Tensor> graph_cuda_backward(
     torch::Tensor d_out,
     torch::Tensor connections) 
 {
+  /* set the batch size dynamically by means of the input shape*/
   const auto batch_size = d_out.size(0);
+
+  /* get the torch tensor options to specify the gpu usage later */
   auto options = torch::TensorOptions().device(torch::kCUDA).requires_grad(true);
 
+  /* allocate enough memory space for the output of the kernel function */
   auto d_dyn_input = torch::zeros({batch_size, PK_ROWS * PK_COLS, DYN_SIZE}, options);
   auto d_lat_input = torch::zeros({batch_size, PK_ROWS * PK_COLS, LAT_SIZE}, options);
 
+  /* map the grid of PKs to the grid of threads per block*/
   const dim3 threads(PK_ROWS, PK_COLS);
+  /* map batches to blocks*/
   const dim3 blocks(batch_size);
 
+  /* call the backward kernel function */
   AT_DISPATCH_FLOATING_TYPES(d_dyn_input.type(), "graph_backward_kernel", ([&] {
     graph_backward_kernel<scalar_t><<<blocks, threads>>>(
         d_out.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),

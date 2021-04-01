@@ -1,12 +1,21 @@
+'''
+v2 [batch processing; single lateral output; hard coded lateral connections in CUDA]
+
+As v1b, but with a custom CUDA kernel that is implementing the lateral flow 
+between the PKs at the beginning of each time step. 
+However, in this CUDA kernel the grid structure where each PK is laterally connected 
+with up to 8 surrounding neighbors (cf. https://arxiv.org/pdf/1912.11141.pdf) is hard coded.
+'''
+
 import math
 import numpy as np
 import torch as th
 
 from model.abstract_evaluator import AbstractEvaluator
+from model.kernel_tensors import KernelTensors
 
-# Important: link to the scripts in this folder!
+# use the script in this folder
 from model.v2.kernel_net import KernelNetwork
-from model.v2.kernel_tensors import KernelTensors
 
 from tools.debug import sprint
 

@@ -39,7 +39,8 @@ def run_training(params):
     #
     # Set up the optimizer and the criterion (loss)
     optimizer = th.optim.Adam(model.net().parameters(), lr=params['learning_rate'])
-    criterion = th.nn.MSELoss() 
+    criterion = th.nn.MSELoss()
+    
 
     # Get the training and validation data
     train_data_files = get_data_filenames(os.path.join(params['data_folder'],'train',''))
@@ -113,7 +114,7 @@ if __name__ == "__main__":
     '''Starting point of program'''
 
     # Get the parameter handler for the model
-    param_manager = DISTANAParams(FileManager(), description)
+    param_manager = DISTANAParams(description)
     
     # set PyTorch seed for reproducibility
     th.manual_seed(42)

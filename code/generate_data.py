@@ -15,7 +15,7 @@ from config.data_generation_params import DataGenerationParams
 from tools.persistence import FileManager
 
 # Parameter Handling
-param_manager = DataGenerationParams(FileManager(), description)
+param_manager = DataGenerationParams(description)
 # Load parameters from file and parse commend line arguments
 params = param_manager.parse_params()
 

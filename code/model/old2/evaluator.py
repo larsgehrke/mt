@@ -1,3 +1,8 @@
+'''
+old2 [No batch; single lateral output]
+
+As old, but each PK produce only one lateral output for all outgoing connections.
+'''
 import torch as th
 
 from model.abstract_evaluator import AbstractEvaluator

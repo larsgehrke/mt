@@ -1,14 +1,14 @@
 import numpy as np
 import torch as th
 
-import model.v1a.pk as pk
+import model.pk as pk
 
 from tools.debug import sprint
 
 class KernelNetwork(th.nn.Module):
     """
     This class contains the kernelized network topology for the spatio-temporal
-    propagation of information
+    propagation of information.
     """
 
     def __init__(self, config, tensors):
@@ -21,12 +21,13 @@ class KernelNetwork(th.nn.Module):
         #
         # Prediction Kernels
 
-        # Initialize the shared Prediction Kernel (PK) network that will do the
-        # PK calculations 
+        # Initialize the shared Prediction Kernel (PK) network 
+        # that will do the PK calculations 
         self.pk_net = pk.PK(batch_size= config.batch_size_train,
                               amount_pks= config.amount_pks, 
                               input_size = config.pk_neighbors * config.pk_lat_size + config.pk_dyn_size, 
                               lstm_size = config.pk_num_lstm_cells,
+                              output_size = config.pk_neighbors * config.pk_lat_size + config.pk_dyn_size, 
                               device = config.device)
 
         # Variables for the PK-TK connections
@@ -87,7 +88,6 @@ class KernelNetwork(th.nn.Module):
 
     def reset(self, batch_size):
         self.tensors.set_batch_size_and_reset(batch_size)
-        self.pk_net.set_batch_size(batch_size)
 
     def _build_connections(self, rows, cols):
 

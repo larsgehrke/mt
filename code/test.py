@@ -94,7 +94,7 @@ if __name__ == "__main__":
     '''Starting point of program'''
 
     # Get the parameter handler for the model
-    param_manager = DISTANAParams(FileManager(), description)
+    param_manager = DISTANAParams(description)
     
     # set PyTorch seed for reproducibility
     th.manual_seed(42)

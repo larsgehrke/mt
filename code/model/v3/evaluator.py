@@ -1,12 +1,20 @@
+'''
+v3 [batch processing; single lateral output; flexible lateral connections in CUDA]
+
+As v2, but instead of using a CUDA kernel that is hard coding the lateral connections, 
+the CUDA kernel processes adjacency lists that define the lateral connections. 
+The adjacency lists are created in Python and passed as a static value to the CUDA code.
+'''
 import math
 import numpy as np
 import torch as th
 
 from model.abstract_evaluator import AbstractEvaluator
 
-# Important: link to the scripts in this folder!
+# use the script in this folder
 from model.v3.kernel_net import KernelNetwork
-from model.v3.kernel_tensors import KernelTensors
+
+from model.kernel_tensors import KernelTensors
 
 from tools.debug import sprint
 

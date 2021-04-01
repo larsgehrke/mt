@@ -8,24 +8,28 @@ from torch.utils.cpp_extension import load
 from tools.debug import sprint
 
 # Load/Compile the cuda extension 
-# in the include folder is the config.h file,
-# that saves the configuration values
+# in the include folder is the Python generated config.h file,
+# that contains the parameter/config values
 cpp = os.path.join('model', 'v3', 'graph.cpp')
 cu = os.path.join('model', 'v3', 'graph.cu')
 include = os.path.join('model', 'v3', 'include')
 
+# compile the C++ and CUDA code on the fly when this script is imported
 graph_cuda = load(
     'graph', [cpp, cu],
     extra_include_paths=[include], verbose = False)
 
 class GraphFunction(th.autograd.Function):
-
+    '''
+    Custom Pytorch autograd Function that wraps the CUDA code for the graph connections.
+    '''
+    connections = None
 
     @staticmethod
     def forward(ctx, dyn_in, lat_in):
 
         rearranged_in = graph_cuda.forward(dyn_in.contiguous(), 
-            lat_in.contiguous(), Connections.getInstance().get())[0]
+            lat_in.contiguous(), GraphFunction.connections)[0]
 
         return rearranged_in
 
@@ -33,7 +37,7 @@ class GraphFunction(th.autograd.Function):
     def backward(ctx, grad_rearranged_in):
 
         d_dyn_in, d_lat_in = graph_cuda.backward(grad_rearranged_in.contiguous(),
-            Connections.getInstance().get())
+            GraphFunction.connections)
 
         return d_dyn_in, d_lat_in
 
@@ -42,8 +46,7 @@ class Graph(th.nn.Module):
     def __init__(self, connections):
         super(Graph, self).__init__()
 
-        Connections.createInstance()
-        Connections.getInstance().set(connections)
+        GraphFunction.connections = connections
 
 
     def forward(self, dyn_in, lat_in):
@@ -57,27 +60,5 @@ class Graph(th.nn.Module):
 
         '''
         return GraphFunction.apply(dyn_in, lat_in)
-
-class Connections():
-    instance = None
-
-    def __init__(self):
-        self.connections = None
-
-    def get(self):
-        return self.connections
-
-    def set(self, connections):
-        self.connections = connections.contiguous()
-
-    @staticmethod
-    def createInstance():
-        if Connections.instance is None:
-            Connections.instance = Connections()
-
-    @staticmethod
-    def getInstance():
-        return Connections.instance
-        
 
 

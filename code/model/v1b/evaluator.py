@@ -1,12 +1,19 @@
+'''
+v1b [batch processing; single lateral output]
+
+As v1a, but each PK produce only one lateral output for all outgoing connections.
+'''
+
 import math
 import numpy as np
 import torch as th
 
 from model.abstract_evaluator import AbstractEvaluator
 
-# Important: link to the scripts in this folder!
+# use the script in this folder!
 from model.v1b.kernel_net import KernelNetwork
-from model.v1b.kernel_tensors import KernelTensors
+
+from model.kernel_tensors import KernelTensors
 
 from tools.debug import sprint
 

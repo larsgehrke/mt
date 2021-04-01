@@ -1,8 +1,10 @@
+
+
 import os
 import numpy as np
 import torch as th
 
-from model.v2.pk import PK
+from model.pk import PK
 
 from tools.debug import sprint
 from tools.debug import Clock

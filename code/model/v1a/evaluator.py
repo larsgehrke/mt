@@ -1,7 +1,20 @@
+'''
+v1a [batch processing; stacked lateral output]
+   
+Based on old, but this implementation can process the samples of one batch 
+(with arbitrary batch size) in parallel. 
+The Prediction Kernel is implemented as a custom PyTorch class in Python 
+with the usage of tensor operations realising the nn layers (fc, lstm, fc). 
+In the last iteration per epoch the batch size will probably not fit the rest of the data samples. 
+In this case the weight tensors are automatically adapted for this last iteration 
+with a special batch size (amount of remaining samples).
+'''
+
 import torch as th
 
 from model.abstract_evaluator import AbstractEvaluator
 
+# use the scripts in this folder
 from model.v1a.kernel_net import KernelNetwork
 from model.v1a.kernel_tensors import KernelTensors
 

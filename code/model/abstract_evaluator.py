@@ -2,9 +2,27 @@ import math
 import numpy as np
 import torch as th
 
-class AbstractEvaluator():
+from config.kernel_config import KernelConfig
 
-    def __init__(self, config, net, batch_processing):
+class AbstractEvaluator():
+    '''
+    This class is an abstract super class for the evaluator of the different versions.
+    This code was outsourced to reduce the amount of duplicated code, 
+    because most of the model versions shared the same implementation framework.
+    The most important difference of the model versions is, wheather the version
+    is able to process batches. Depending on this, different code segments are executed.
+    '''
+
+    def __init__(self, 
+        config: KernelConfig, 
+        net: th.nn.Module, 
+        batch_processing: bool):
+        '''
+        Initialisation of AbstractEvaluator.
+        :param config: container object with all important configuration values
+        :param net: the network class
+        :param batch_processing: wheater the model is able to process batches
+        '''
 
         self.config = config
         self.net = net
@@ -65,7 +83,6 @@ class AbstractEvaluator():
 
 
     def _train(self, iter_idx):
-
         # Set the gradients back to zero
         self.optimizer.zero_grad()
 
@@ -274,6 +291,7 @@ class AbstractEvaluator():
 
 
     def get_trainable_params(self):
+        
         # Count number of trainable parameters
         pytorch_total_params = sum(
             p.numel() for p in self.net.parameters() if p.requires_grad
