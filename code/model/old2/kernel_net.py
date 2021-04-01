@@ -1,8 +1,6 @@
 import numpy as np
 import torch as th
 
-from tools.debug import sprint
-
 import model.old2.prediction_kernel as pk
 
 
@@ -45,19 +43,11 @@ class KernelNetwork(th.nn.Module):
         
         # Write the dynamic PK input to the corresponding tensor
         self.tensors.pk_dyn_in = dyn_in
-
-        
+    
         # Set the appropriate lateral inputs to the lateral outputs from the
         # previous time step
         self.tensors.pk_lat_in[self.pos0, self.going_to] =\
             self.tensors.pk_lat_out[self.coming_from]
-
-        # sprint(self.tensors.pk_lat_in,"self.tensors.pk_lat_in")
-        # sprint(self.going_to,"self.going_to")
-        # sprint(self.pos0, "self.pos0")
-        # sprint(self.coming_from, "self.coming_from")
-        # sprint(self.tensors.pk_lat_in[self.pos0, self.going_to], "self.tensors.pk_lat_in[self.pos0, self.going_to]", exit=True)
-
         
         # Forward the PK inputs through the pk_net to get the outputs and hidden
         # states of these PKs

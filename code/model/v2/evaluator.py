@@ -17,7 +17,6 @@ from model.kernel_tensors import KernelTensors
 # use the script in this folder
 from model.v2.kernel_net import KernelNetwork
 
-from tools.debug import sprint
 
 class Evaluator(AbstractEvaluator):
 

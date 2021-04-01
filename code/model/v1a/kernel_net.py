@@ -3,8 +3,6 @@ import torch as th
 
 import model.pk as pk
 
-from tools.debug import sprint
-
 class KernelNetwork(th.nn.Module):
     """
     This class contains the kernelized network topology for the spatio-temporal

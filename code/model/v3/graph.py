@@ -5,8 +5,6 @@ import numpy as np
 
 from torch.utils.cpp_extension import load
 
-from tools.debug import sprint
-
 # Load/Compile the cuda extension 
 # in the include folder is the Python generated config.h file,
 # that contains the parameter/config values

@@ -15,7 +15,6 @@ from model.v1b.kernel_net import KernelNetwork
 
 from model.kernel_tensors import KernelTensors
 
-from tools.debug import sprint
 
 class Evaluator(AbstractEvaluator):
 
