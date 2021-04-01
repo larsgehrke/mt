@@ -274,7 +274,7 @@ class DISTANAParams(Params):
 
         parser.add_argument('-s','--seq-len', type=int, 
             help='''
-            The amount sequence length used for training.
+            The sequence length used for training.
             ''')     
 
         parser.add_argument('-l','--learning-rate', type=float, 
