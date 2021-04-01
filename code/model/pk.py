@@ -13,8 +13,7 @@ class PK(th.nn.Module):
     The backward pass is automatically calculated from PyTorch´s autograd feature.
     '''
 
-    def __init__(self, 
-        batch_size: int, 
+    def __init__(self,  
         amount_pks: int, 
         input_size: int, 
         lstm_size: int, 
@@ -22,7 +21,6 @@ class PK(th.nn.Module):
         device: str):
         '''
         The initialisation of the PK module.
-        :param batch_size: The batch size for the current run.
         :param amount_pks: The amount of PKs in total.
         :param input_size: The size of the input to each PK (dynamical and lateral)
         :param lstm_size: number of LSTM nodes in the PK.
