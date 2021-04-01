@@ -85,7 +85,6 @@ class Facade():
         :param loaded_weights: the network weights which should be loaded
         :param is_training: choose training or testing mode
         '''
-        print("type(loaded_weights)", type(loaded_weights))
         self.model.set_weights(loaded_weights,is_training)
 
     def train(self, iter_idx:int) -> float:
