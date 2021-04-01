@@ -130,7 +130,7 @@ class AbstractEvaluator():
             else:
                 # The model cannot handle batches, so we need to manually add a batch dimension
                 # with batch size = 1 for the further processing
-                return mse.item(), np.expand_dims(net_output,0), np.expand_dims(net_label), np.expand_dims(net_input)
+                return mse.item(), np.expand_dims(net_output,0), np.expand_dims(net_label,0), np.expand_dims(net_input,0)
 
 
     def _evaluate(self, iter_idx):
