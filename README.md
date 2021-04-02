@@ -108,5 +108,36 @@ python test.py -m v1b -d my_data -b 20 -g False
 ```
 In this loop you can press as many '1's as you want. Every 1 will result in another diagram saved to *code/diagram*.
 
+## Parameter management
+Instead of editing a file each time you want to change the parameters, you can use the command line (cl) interface of changing the parameters. 
+When you want to add a new parameter for DISTANA or change the initial default values of the parameters you can do that in *config/distana_params.py*.
+The drawback is, that when you change the initial parameter dictionary, you need to delete the config files in *config/distana_params/\*.pkl* on all devices and you should update the cl interface *config/distana_params.py*.
+Note that the *init_values* dictionary is only specifying the initial default values, when there is no *default.pkl* file in *config/distana_params/*. If there is a *default.pkl* file, the *init_values* dictionary will be ignored and the default parameters will be loaded from file.
 
+If you are on the server and want to have gpu execution enabled by default, then you can do the following:
+```
+python train.py -g True --save-params default
+```
+In this way the default file will be overwritten with the temporary parameter configuration.
 
+You can also save a specifc configuration in a separate file (without overwriting the default values)
+```
+python train.py -m v1b -e 10 -s 100 -g True --save-params my_usecase
+```
+and use it later
+```
+python train.py -p my_usecase
+```
+If you want to reset the (maybe overwritten) default parameter values in default.pkl with the *init_values* dictionary, 
+then you can use *-r*
+```
+python train.py -r
+```
+To list all parameters, you can add *--verbose* at the end
+```
+python train.py --verbose
+```
+and to get see full information about the cl interface, you can use the *-h* or the *--help* tag
+```
+python train.py --verbose
+```
