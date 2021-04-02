@@ -11,8 +11,10 @@ The code is based on the former implementation of Matthias Karlbauer (*code_arch
 The code for the DISTANA implementation. Every use case (generate data, training, testing, run unit test) has its own executable script at the highest level of this folder structure. These top-level scripts work as controller in a model-view-controller fashion by reasonably combining the scripts of the different subfolders.
 
 + **config** The whole parameter management and the argument parsing from the command line is done here. For the data generation and the training/testing of DISTANA there are two different scripts which are subclasses of _params.py_. All the parameters are automatically loaded from a binary file and can be edited and saved via command line arguments. By choosing the configuration file name "default", you can overwrite the default settings. These binary configuration files are unversioned (.gitignore: \*.pkl). Thus you can have different parameters for different execution environments (server, local) and easily change them via command line.
+  + **data_generation_params** [unversioned] In this folder the default and custom parameter dictionaries for the data generation are saved as binary files. 
+  + **distana_params** [unversioned] In this folder the default and custom parameter dictionaries for DISTANA are saved as binary files. 
 
-+ **diagram** An unversioned folder. By choosing to save the diagrams from test.py, this folder will be created automatically and all diagrams from the test run will be saved here.
++ **diagram** [unversioned] By choosing to save the diagrams from test.py, this folder will be created automatically and all diagrams from the test run will be saved here.
 
 + **diagram_gpu** Not important, can be deleted. This folder was just used to access the diagrams from the server. 
 
@@ -29,7 +31,7 @@ The code for the DISTANA implementation. Every use case (generate data, training
     
   + **v1a** [batch processing; stacked lateral output] 
   
-    Based on *old*, but this implementation can process the samples of one batch (with arbitrary batch size) in parallel. The Prediction Kernel is implemented as a custom PyTorch class in Python with the usage of tensor operations realising the nn layers (fc, lstm, fc). In the last iteration per epoch the batch size will probably not fit the rest of the data samples. In this case the weight tensors are automatically adapted for this last iteration with a special batch size (amount of remaining samples).
+    Based on *old*, but this implementation can process the samples of one batch (with arbitrary batch size) in parallel. The Prediction Kernel is implemented as a custom PyTorch class in Python with the usage of tensor operations realising the nn layers (fc, lstm, fc). In the last iteration of an epoch the batch size will probably not fit the rest of the data samples. In this case the weight tensors are automatically adapted for this last iteration with a special batch size (amount of remaining samples).
     
   + **v1b** [batch processing; single lateral output] 
   
@@ -111,7 +113,7 @@ In this loop you can press as many '1's as you want. Every 1 will result in anot
 ## Parameter management
 Instead of editing a file each time you want to change the parameters, you can use the command line (cl) interface of changing the parameters. 
 When you want to add a new parameter for DISTANA or change the initial default values of the parameters you can do that in *config/distana_params.py*.
-The drawback is, that when you change the initial parameter dictionary, you need to delete the config files in *config/distana_params/\*.pkl* on all devices and you should update the cl interface *config/distana_params.py*.
+The drawback is, that when you change the initial parameter dictionary, you need to delete the config files in *config/distana_params/\*.pkl* on all devices and you should update the cl interface in *config/distana_params.py*.
 Note that the *init_values* dictionary is only specifying the initial default values, when there is no *default.pkl* file in *config/distana_params/*. If there is a *default.pkl* file, the *init_values* dictionary will be ignored and the default parameters will be loaded from file.
 
 If you are on the server and want to have gpu execution enabled by default, then you can do the following:
@@ -146,6 +148,7 @@ python train.py -h
 ## Further notes
 Only because the command line interface offers you the ability to change all the parameters, you should be very aware of what you change! The command line arguments are just a representation of all parameters used in the code. They heavily dependend on the existing data. 
 In fact, for now it cannot be guaranteed that all parameter configurations will work well. Not all possible configurations were tested yet.
+Note that with model saving enabled and continue training disabled by default, any training progress of the past will be automatically overwritten.
 
 To get the diagrams from the server to my local machine I did the following on the server after *python test.py*:
 ```
@@ -158,3 +161,4 @@ git push
 and on my local machine just a *git pull*.
 
 This may not be the best way, but it did the job.
+
