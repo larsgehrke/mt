@@ -154,5 +154,5 @@ git add .
 git commit -m "gpu diagrams ..."
 git push
 ```
-and on my local machine just a *git pull*
+and on my local machine just a *git pull*.
 This may not be the best way, but it did the job.
