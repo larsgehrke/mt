@@ -138,7 +138,7 @@ To list all parameters, you can add *--verbose* at the end
 ```
 python train.py --verbose
 ```
-and to get see full information about the cl interface, you can use the *-h* or the *--help* tag
+and to see the full information about the cl interface, you can use the *-h* or the *--help* tag
 ```
 python train.py -h
 ```
