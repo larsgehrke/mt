@@ -139,5 +139,20 @@ python train.py --verbose
 ```
 and to get see full information about the cl interface, you can use the *-h* or the *--help* tag
 ```
-python train.py --verbose
+python train.py -h
 ```
+
+## Further notes
+Only because the command line interface offers you the ability to change all the parameters, you should be very aware of what you change! The command line arguments are just a representation of all parameters used in the code. They heavily dependend on the existing data. 
+In fact, for now it cannot be guaranteed that all parameter configurations will work well. Not all possible configurations were tested yet.
+
+To get the diagrams from the server to my local machine I did the following on the server after *python test.py*:
+```
+rm -rf gpu_diagrams
+mv diagrams gpu_diagrams
+git add .
+git commit -m "gpu diagrams ..."
+git push
+```
+and on my local machine just a *git pull*
+This may not be the best way, but it did the job.
