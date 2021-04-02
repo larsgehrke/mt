@@ -14,7 +14,7 @@ The code for the DISTANA implementation. Every use case (generate data, training
 
 + **diagram** An unversioned folder. By choosing to save the diagrams from test.py, this folder will be created automatically and all diagrams from the test run will be saved here.
 
-+ **diagram_gpu** Not important, can be deleted. This folder was just used to access the diagrams from the server. 
++ **gpu_diagram** Not important, can be deleted. This folder was just used to access the diagrams from the server. 
 
 + **model** The different implementations of DISTANA are collected here. Each version has its own subfolder. The facade defines the function signatures that every version must implement and it selects the version specified by the parameters at runtime. 
 *abstract_evaluator* is a super class for different versions. 
@@ -149,9 +149,9 @@ In fact, for now it cannot be guaranteed that all parameter configurations will 
 
 To get the diagrams from the server to my local machine I did the following on the server after *python test.py*:
 ```
-rm -rf gpu_diagrams
-mv diagrams gpu_diagrams
-git add gpu_diagrams/
+rm -rf gpu_diagram
+mv diagram gpu_diagram
+git add gpu_diagram/
 git commit -m "gpu diagrams ..."
 git push
 ```
