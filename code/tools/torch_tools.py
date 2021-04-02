@@ -40,8 +40,6 @@ def load_model(params: dict):
     net = th.load(os.path.join(params['model_folder'], params['model_name'] + ".pt"),
             map_location=params['device'])
 
-    print(type(net))
-
     return net
 
 class Saver():
