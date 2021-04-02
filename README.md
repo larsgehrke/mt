@@ -128,7 +128,8 @@ and use it later
 ```
 python train.py -p my_usecase
 ```
-If you want to reset the (maybe overwritten) default parameter values in default.pkl with the *init_values* dictionary, 
+If you want to reset the (maybe overwritten) default parameter values in *default.pkl* with the *init_values* dictionary, 
+
 then you can use *-r*
 ```
 python train.py -r
@@ -150,9 +151,10 @@ To get the diagrams from the server to my local machine I did the following on t
 ```
 rm -rf gpu_diagrams
 mv diagrams gpu_diagrams
-git add .
+git add gpu_diagrams/
 git commit -m "gpu diagrams ..."
 git push
 ```
 and on my local machine just a *git pull*.
+
 This may not be the best way, but it did the job.
