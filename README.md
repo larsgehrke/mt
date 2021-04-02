@@ -153,7 +153,7 @@ Note that with model saving enabled and continue training disabled by default, a
 To get the diagrams from the server to my local machine I did the following on the server after *python test.py*:
 ```
 rm -rf gpu_diagram
-mv diagrams gpu_diagram
+mv diagram gpu_diagram
 git add gpu_diagram/
 git commit -m "gpu diagrams ..."
 git push
