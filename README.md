@@ -14,7 +14,7 @@ The code for the DISTANA implementation. Every use case (generate data, training
 
 + **diagram** An unversioned folder. By choosing to save the diagrams from test.py, this folder will be created automatically and all diagrams from the test run will be saved here.
 
-+ **diagram_gpu** Not important, can be deleted. This folder was just used to access the diagrams from the server. 
++ **gpu_diagram** Not important, can be deleted. This folder was just used to access the diagrams from the server. 
 
 + **model** The different implementations of DISTANA are collected here. Each version has its own subfolder. The facade defines the function signatures that every version must implement and it selects the version specified by the parameters at runtime. 
 *abstract_evaluator* is a super class for different versions. 
@@ -108,5 +108,53 @@ python test.py -m v1b -d my_data -b 20 -g False
 ```
 In this loop you can press as many '1's as you want. Every 1 will result in another diagram saved to *code/diagram*.
 
+## Parameter management
+Instead of editing a file each time you want to change the parameters, you can use the command line (cl) interface of changing the parameters. 
+When you want to add a new parameter for DISTANA or change the initial default values of the parameters you can do that in *config/distana_params.py*.
+The drawback is, that when you change the initial parameter dictionary, you need to delete the config files in *config/distana_params/\*.pkl* on all devices and you should update the cl interface *config/distana_params.py*.
+Note that the *init_values* dictionary is only specifying the initial default values, when there is no *default.pkl* file in *config/distana_params/*. If there is a *default.pkl* file, the *init_values* dictionary will be ignored and the default parameters will be loaded from file.
 
+If you are on the server and want to have gpu execution enabled by default, then you can do the following:
+```
+python train.py -g True --save-params default
+```
+In this way the default file will be overwritten with the temporary parameter configuration.
 
+You can also save a specifc configuration in a separate file (without overwriting the default values)
+```
+python train.py -m v1b -e 10 -s 100 -g True --save-params my_usecase
+```
+and use it later
+```
+python train.py -p my_usecase
+```
+If you want to reset the (maybe overwritten) default parameter values in *default.pkl* with the *init_values* dictionary, 
+
+then you can use *-r*
+```
+python train.py -r
+```
+To list all parameters, you can add *--verbose* at the end
+```
+python train.py --verbose
+```
+and to see the full information about the cl interface, you can use the *-h* or the *--help* tag
+```
+python train.py -h
+```
+
+## Further notes
+Only because the command line interface offers you the ability to change all the parameters, you should be very aware of what you change! The command line arguments are just a representation of all parameters used in the code. They heavily dependend on the existing data. 
+In fact, for now it cannot be guaranteed that all parameter configurations will work well. Not all possible configurations were tested yet.
+
+To get the diagrams from the server to my local machine I did the following on the server after *python test.py*:
+```
+rm -rf gpu_diagram
+mv diagram gpu_diagram
+git add gpu_diagram/
+git commit -m "gpu diagrams ..."
+git push
+```
+and on my local machine just a *git pull*.
+
+This may not be the best way, but it did the job.
