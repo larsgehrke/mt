@@ -75,7 +75,7 @@ def run_testing(params):
             net_label[sample_idx], net_input[sample_idx])
 
         # Retrieve user input to continue or quit the testing
-        x = input("Press 1 to see another example, anything else to quit.")
+        x = 2 #input("Press 1 to see another example, anything else to quit.")
         
         sample_idx += 1
         

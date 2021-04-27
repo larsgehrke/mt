@@ -133,7 +133,7 @@ class TestSupervisor():
         :param trainable_params: number of trainable model parameters
         '''
 
-        print("Trainable model parameters:", trainable_params)
+        #print("Trainable model parameters:", trainable_params)
 
         self.params = params
 
@@ -154,9 +154,10 @@ class TestSupervisor():
         :param error: test error
         '''
         forward_pass_duration = time.time() - time_start
-        print("\tForward pass for batch size ",batch_size,
-            " took: ", str(np.round(forward_pass_duration, 10)).ljust(12, ' '), 
-            " seconds with error ", str(np.round(error, 10)).ljust(12, ' '))
+        print(str(np.round(forward_pass_duration, 10)).ljust(12, ' '))
+	#print("\tForward pass for batch size ",batch_size,
+        #    " took: ", str(np.round(forward_pass_duration, 10)).ljust(12, ' '),
+        #    " seconds with error ", str(np.round(error, 10)).ljust(12, ' '))
 
     def plot_sample(self, net_outputs: np.ndarray, net_label: np.ndarray, net_input: np.ndarray):
         '''
@@ -248,7 +249,7 @@ class TestSupervisor():
         Closing the view. If necessary, summary information can be printed out.
         '''
            
-        print('Done')
+        #print('Done')
 
 
    
