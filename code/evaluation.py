@@ -6,6 +6,7 @@ import numpy as np
 
 batches = ["1", "2", "4", "8", "16", "32", "64", "128"]
 models = ["v1a", "v1b"]
+latex = ""
 
 for b in batches:
     for m in models:
@@ -13,12 +14,17 @@ for b in batches:
         for i in range(10):
             x = os.popen(f"python test.py -m {m} -b {b}").read()
             data[i] = float(x)
-            print(data[i])
         mean = np.mean(data)
         mean = np.around(mean, decimals=5)
         stddev = np.std(data)
         stddev = np.around(stddev, decimals = 5)
         print(f"[batch size {b}, model {m}] mean: {mean}, stddev: {stddev}")
+        latex = latex + f"{mean} $\\pm$ {stddev}"
+        if m == "v1a":
+            latex = latex + " & "
+    latex = latex + "\\\\\n"
+
+print(latex)
 
 
 
