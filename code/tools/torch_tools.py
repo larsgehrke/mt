@@ -19,7 +19,7 @@ def determine_device(use_cuda: bool) -> str:
     #print()
 
     # Additional Info when using cuda
-    if device.type == "cuda":
+    #if device.type == "cuda":
         #print(th.cuda.get_device_name(0))
         # Deactivated the following lines, because the allocated memory was always 0
         # print("Memory Usage:")
