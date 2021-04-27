@@ -9,7 +9,7 @@ models = ["v1a", "v1b"]
 
 for b in batches:
     for m in models:
-        data = numpy.zeros(10)
+        data = np.zeros(10)
         for i in range(10):
             x = os.popen(f"python test.py -m {m} -b {b}").read()
             data[i] = x.astype(np.float)
