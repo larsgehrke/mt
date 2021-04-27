@@ -15,8 +15,8 @@ def determine_device(use_cuda: bool) -> str:
     :return: The device where tensor calculations shall be made on
     """
     device = th.device("cuda" if th.cuda.is_available() and use_cuda else "cpu")
-    print("Using device:", device)
-    print()
+    #print("Using device:", device)
+    #print()
 
     # Additional Info when using cuda
     if device.type == "cuda":
@@ -36,7 +36,7 @@ def load_model(params: dict):
     Load trained PyTorch model from file.
     :return loaded PyTorch model
     '''
-    print('Restoring model (that is the network\'s weights) from file...')
+    #print('Restoring model (that is the network\'s weights) from file...')
     net = th.load(os.path.join(params['model_folder'], params['model_name'] + ".pt"),
             map_location=params['device'])
 
