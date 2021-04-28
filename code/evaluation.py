@@ -13,7 +13,7 @@ for b in batches:
         data = np.zeros(10)
         for i in range(10):
             x = os.popen(f"python test.py -g True -m {m} -b {b}").read()
-            data[i] = float(x.spi)
+            data[i] = float(x)
         mean = np.mean(data)
         mean = np.around(mean, decimals=5)
         stddev = np.std(data)
