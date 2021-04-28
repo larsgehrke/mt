@@ -28,7 +28,8 @@ for b in batches:
             print(x)
             plain_eval+=x
             desc_eval+=x
-            plain_eval += "===\n"
+            if counter < len(batches) * len(models)*len(ssettings):
+                plain_eval += "===\n"
 
     #   lines = x.split("\n")
     #     for line in lines:
