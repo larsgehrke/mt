@@ -45,6 +45,8 @@ class TrainSupervisor():
 
         self._epoch = 0
 
+        self.finished_training_time = None
+
         #print("Trainable model parameters:", trainable_params)
 
     def finished_training(self, errors: list):
@@ -52,6 +54,7 @@ class TrainSupervisor():
         Further processing of training results.
         :param errors: list of training errors of the curent epoch 
         '''
+        self.finished_training_time = time.time()
         self._epoch += 1
 
         error = np.mean(errors)
@@ -102,8 +105,8 @@ class TrainSupervisor():
         #       + '\t\tValidation error: ' + self.val_sign
         #       + str(np.round(self.epoch_errors_val[-1], 10)).ljust(12, ' '))
 
-        print(str(np.round(time.time() - epoch_start_time, 3))+","
-            + str(np.round(self.epoch_errors_train[-1], 10))
+        print(str(np.round(self.finished_training_time - epoch_start_time, 3))+","
+            + str(np.round(self.epoch_errors_train[-1], 10))+","
             + str(np.round(self.epoch_errors_val[-1], 10)))
 
 
