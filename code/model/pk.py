@@ -76,8 +76,8 @@ class PK(th.nn.Module):
                 list[2]: cell state of the LSTM for this time step (C_t)
 
         '''
-        sprint(input_flat, "input_flat")
-        sprint(self.W_input, "self.W_input")
+        #sprint(input_flat, "input_flat")
+        #sprint(self.W_input, "self.W_input")
 
         # first fully connected layer
         x_t = th.tanh(th.matmul(input_flat, self.W_input))
