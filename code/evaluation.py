@@ -4,8 +4,8 @@ import numpy as np
 
 
 
-batches = ["100"]#["1", "10", "100"]
-models =  ["v2","v3"]#["old", "old2", "v1a", "v1b", "v2", "v3"]
+batches = ["1", "2", "4", "8", "16", "32", "64", "128"]
+models =  ["v1a", "v1b", "v2", "v3"]
 settings = [""]
 
 desc_eval = ""
@@ -22,7 +22,7 @@ for b in batches:
             desc = f"\n\n{counter}) batch size: {b} model: {m} settings: {setting}\n"
             counter += 1
             print(desc)
-            desc_eval += desc
+            desc_eval += desc+"\n"
             command = f"python train.py -b {b} -m {m} {setting}"
             x = os.popen(command).read()
             print(x)
