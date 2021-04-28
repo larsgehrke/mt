@@ -45,7 +45,7 @@ class TrainSupervisor():
 
         self._epoch = 0
 
-        print("Trainable model parameters:", trainable_params)
+        #print("Trainable model parameters:", trainable_params)
 
     def finished_training(self, errors: list):
         '''
@@ -94,13 +94,17 @@ class TrainSupervisor():
 
         #
         # Print progress to the console with nice formatting
-        print('Epoch ' + str(idx+1).zfill(int(np.log10(self.epochs)) + 1)
-              + '/' + str(self.epochs) + ' took '
-              + str(np.round(time.time() - epoch_start_time, 2)).ljust(5, '0')
-              + ' seconds.\t\tAverage epoch training error: ' + self.train_sign
-              + str(np.round(self.epoch_errors_train[-1], 10)).ljust(12, ' ')
-              + '\t\tValidation error: ' + self.val_sign
-              + str(np.round(self.epoch_errors_val[-1], 10)).ljust(12, ' '))
+        # print('Epoch ' + str(idx+1).zfill(int(np.log10(self.epochs)) + 1)
+        #       + '/' + str(self.epochs) + ' took '
+        #       + str(np.round(time.time() - epoch_start_time, 2)).ljust(5, '0')
+        #       + ' seconds.\t\tAverage epoch training error: ' + self.train_sign
+        #       + str(np.round(self.epoch_errors_train[-1], 10)).ljust(12, ' ')
+        #       + '\t\tValidation error: ' + self.val_sign
+        #       + str(np.round(self.epoch_errors_val[-1], 10)).ljust(12, ' '))
+
+        print(str(np.round(time.time() - epoch_start_time, 3))+","
+            + str(np.round(self.epoch_errors_train[-1], 10))
+            + str(np.round(self.epoch_errors_val[-1], 10)))
 
 
     def finished(self, training_start_time):
@@ -109,8 +113,8 @@ class TrainSupervisor():
         :param training_start_time: start time of the training
         '''
         now = time.time()
-        print('\nTraining took ' + str(np.round(now - training_start_time, 2)) + ' seconds.\n\n')
-        print("Done!")
+        # print('\nTraining took ' + str(np.round(now - training_start_time, 2)) + ' seconds.\n\n')
+        # print("Done!")
 
 
 '''

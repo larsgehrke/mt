@@ -183,7 +183,7 @@ std::vector<torch::Tensor> graph_cuda_forward(
   const auto batch_size = dyn_input.size(0);
   const auto amount_pks = dyn_input.size(1);
   const auto dyn_size = dyn_input.size(2);
-  const auto lat_size = lat_input.size(2);
+  const int lat_size = lat_input.size(2);
 
   /* allocate enough memory space for the output of the kernel function */
   auto out = torch::zeros({batch_size, amount_pks, 

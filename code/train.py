@@ -123,13 +123,13 @@ if __name__ == "__main__":
     params = param_manager.parse_params(is_training = True)
 
     # print out basic information about this run
-    print(f'''Run the training of architecture {
-        params["architecture_name"]
-        } with model {
-        params["model_name"]
-        } and data {
-        params["data_type"]
-        }''')
+    # print(f'''Run the training of architecture {
+    #     params["architecture_name"]
+    #     } with model {
+    #     params["model_name"]
+    #     } and data {
+    #     params["data_type"]
+    #     }''')
 
     # call main method above
     run_training(params)
