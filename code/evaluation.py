@@ -5,7 +5,7 @@ import numpy as np
 
 
 batches = ["100"]#["1", "10", "100"]
-models =  ["v3"]#["old", "old2", "v1a", "v1b", "v2", "v3"]
+models =  ["v2","v3"]#["old", "old2", "v1a", "v1b", "v2", "v3"]
 settings = [""]
 
 desc_eval = ""
@@ -26,7 +26,8 @@ for b in batches:
             x = os.popen(command).read()
             print(x)
             plain_eval+=x
-            plain_eval += "\n===\n"
+            desc_eval+=x
+            plain_eval += "===\n"
 
     #   lines = x.split("\n")
     #     for line in lines:
