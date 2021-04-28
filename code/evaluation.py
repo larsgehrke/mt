@@ -5,25 +5,26 @@ import numpy as np
 
 
 batches = ["1", "2", "4", "8", "16", "32", "64", "128"]
-models = ["v1a", "v1b"]
+models = ["v1a", "v1b", "v2", "v3"]
 latex = ""
 
 for b in batches:
-    for m in models:
+    for i,m in enumerate(models):
         data = np.zeros(10)
         for i in range(10):
-            x = os.popen(f"python test.py -m {m} -b {b}").read()
-            data[i] = float(x)
+            x = os.popen(f"python test.py -g True -m {m} -b {b}").read()
+            data[i] = float(x.spi)
         mean = np.mean(data)
         mean = np.around(mean, decimals=5)
         stddev = np.std(data)
         stddev = np.around(stddev, decimals = 5)
         print(f"[batch size {b}, model {m}] mean: {mean}, stddev: {stddev}")
         latex = latex + f"{mean} $\\pm$ {stddev}"
-        if m == "v1a":
+        if i < len(models)-1:
             latex = latex + " & "
     latex = latex + "\\\\\n"
 
+print()
 print(latex)
 
 
