@@ -4,8 +4,8 @@ import numpy as np
 
 
 
-batches = ["1", "10", "100"]
-models =  ["old", "old2", "v1a", "v1b", "v2", "v3"]
+batches = ["100"]#["1", "10", "100"]
+models =  ["v2","v3"]#["old", "old2", "v1a", "v1b", "v2", "v3"]
 settings = [""]
 
 desc_eval = ""
