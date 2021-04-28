@@ -4,7 +4,7 @@ import numpy as np
 
 
 
-batches = ["1", "2", "4", "8", "16", "32", "64", "128"]
+batches = ["1", "2", "4", "8", "16", "32", "64", "128"].reverse()
 models =  ["v1a", "v1b", "v2", "v3"]
 settings = [""]
 
