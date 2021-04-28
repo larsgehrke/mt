@@ -179,10 +179,13 @@ std::vector<torch::Tensor> graph_cuda_forward(
 
   /* set the batch size dynamically by means of the input shape*/
   const auto batch_size = dyn_input.size(0);
+  const auto amount_pks = dyn_input.size(1);
+  const auto dyn_size = dyn_input.size(2);
+  const auto lat_size = lat_input.size(2);
 
   /* allocate enough memory space for the output of the kernel function */
-  auto out = torch::zeros({batch_size, PK_ROWS * PK_COLS, 
-    DYN_SIZE + NEIGHBORS * LAT_SIZE}, options);
+  auto out = torch::zeros({batch_size, amount_pks, 
+    dyn_size + NEIGHBORS * lat_size}, options);
 
   /* map the grid of PKs to the grid of threads per block*/
   const dim3 threads(PK_COLS, PK_ROWS);
@@ -209,13 +212,17 @@ std::vector<torch::Tensor> graph_cuda_backward(
 {
   /* set the batch size dynamically by means of the input shape*/
   const auto batch_size = d_out.size(0);
+  const auto amount_pks = d_out.size(1);
+  const auto total = d_out.size(2);
+  const int lat_size = (total -1)/NEIGHBORS;
+
 
   /* get the torch tensor options to specify the gpu usage later */
   auto options = torch::TensorOptions().device(torch::kCUDA).requires_grad(true);
 
   /* allocate enough memory space for the output of the kernel function */
-  auto d_dyn_input = torch::zeros({batch_size, PK_ROWS * PK_COLS, DYN_SIZE}, options);
-  auto d_lat_input = torch::zeros({batch_size, PK_ROWS * PK_COLS, LAT_SIZE}, options);
+  auto d_dyn_input = torch::zeros({batch_size, amount_pks, 1}, options);
+  auto d_lat_input = torch::zeros({batch_size, amount_pks, lat_size}, options);
 
   /* map the grid of PKs to the grid of threads per block*/
   const dim3 threads(PK_ROWS, PK_COLS);
