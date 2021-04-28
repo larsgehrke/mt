@@ -31,6 +31,12 @@ for b in batches:
             if counter < len(batches) * len(models)*len(settings):
                 plain_eval += "===\n"
 
+            with open(desc_eval_file, "w+") as f:
+                f.write(desc_eval)
+
+            with open(plain_eval_file, "w+") as f:
+                f.write(plain_eval)
+
     #   lines = x.split("\n")
     #     for line in lines:
     #         speed, train, val = line.split(",")
@@ -45,11 +51,7 @@ for b in batches:
     #         latex = latex + " & "
     # latex = latex + "\\\\\n"
 
-with open(desc_eval_file, "w+") as f:
-    f.write(desc_eval)
 
-with open(plain_eval_file, "w+") as f:
-    f.write(plain_eval)
 
 
 
