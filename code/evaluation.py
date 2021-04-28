@@ -4,15 +4,17 @@ import numpy as np
 
 
 
-batches = ["1", "2", "4", "8", "16", "32", "64", "128"]
-models = ["v1a", "v1b", "v2", "v3"]
+#batches = ["1", "2", "4", "8", "16", "32", "64", "128"]
+models = ["old", "old2"]
+batches = ["","-g True"]
 latex = ""
 
 for b in batches:
     for i,m in enumerate(models):
         data = np.zeros(10)
         for i in range(10):
-            x = os.popen(f"python test.py -g True -m {m} -b {b}").read()
+            command = f"python test.py {b} -m {m} -b 1"
+            x = os.popen(command).read()
             data[i] = float(x)
         mean = np.mean(data)
         mean = np.around(mean, decimals=5)
