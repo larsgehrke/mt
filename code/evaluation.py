@@ -6,8 +6,8 @@ import numpy as np
 
 batches = ["1"]
 batches.reverse()
-models =  ["old", "old2", "v1a", "v1b", "v2", "v3"]
-settings = [""]
+models =  ["old", "old2"] #, "old2", "v1a", "v1b", "v2", "v3"]
+settings = ["","--pk-pre-layer-size 1", "--pk-pre-layer-size 50", "--pk-num-lstm-cells 1", "--pk-num-lstm-cells 50","--pk-lat-size 1", "--pk-lat-size 5", "-s 130", "-s 150"]
 
 desc_eval = ""
 desc_eval_file = "desc_eval.txt"
