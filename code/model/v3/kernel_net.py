@@ -79,7 +79,7 @@ class KernelNetwork(th.nn.Module):
 
         file = "gpu.npy" if self.config.use_gpu else "cpu.npy"
         with open(file, 'wb') as f:
-...         np.save(f, input_.cpu().detach().numpy())
+            np.save(f, input_.cpu().detach().numpy())
 
         sprint(input_, "input_", exit=True)
 
