@@ -15,7 +15,7 @@ import time
 
 from tools.debug import sprint
 
-device_str = 'gpu'
+device_str = 'cuda'
 
 def test_graph():
 
