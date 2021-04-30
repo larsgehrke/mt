@@ -77,9 +77,15 @@ class KernelNetwork(th.nn.Module):
             
             input_ = th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
 
-        file = "gpu.npy" if self.config.use_gpu else "cpu.npy"
-        with open(file, 'wb') as f:
+        file_out = "out_gpu.npy" if self.config.use_gpu else "out_cpu.npy"
+        file_dyn = "dyn_gpu.npy" if self.config.use_gpu else "dyn_cpu.npy"
+        file_lat = "lat_gpu.npy" if self.config.use_gpu else "lat_cpu.npy"
+        with open(file_out, 'wb') as f:
             np.save(f, input_.cpu().detach().numpy())
+        with open(file_dyn, 'wb') as f:
+            np.save(f, self.tensors.pk_dyn_in.cpu().detach().numpy())
+        with open(file_lat, 'wb') as f:
+            np.save(f, self.tensors.pk_lat_out.cpu().detach().numpy())
 
         sprint(input_, "input_", exit=True)
 

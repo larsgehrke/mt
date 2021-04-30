@@ -59,7 +59,5 @@ class Graph(th.nn.Module):
         '''
         return GraphFunction.apply(dyn_in, lat_in)
 
-    def backward(self, grad_rearranged_in):
-        return GraphFunction.backward(None,grad_rearranged_in)
 
 
