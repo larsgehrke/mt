@@ -77,7 +77,11 @@ class KernelNetwork(th.nn.Module):
             
             input_ = th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
 
-        sprint(input_, "input_.shape", exit=True)
+        file = "gpu.npy" if self.config.use_gpu else "cpu.npy"
+        with open(file, 'wb') as f:
+...         np.save(f, input_.cpu().detach().numpy())
+
+        sprint(input_, "input_", exit=True)
 
         return input_
 
