@@ -4,6 +4,8 @@ import torch as th
 
 from model.pk import PK
 
+from tools.debug import sprint
+
 class KernelNetwork(th.nn.Module):
     """
     This class contains the kernelized network topology for the spatio-temporal
@@ -75,7 +77,7 @@ class KernelNetwork(th.nn.Module):
             
             input_ = th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
 
-        print(input_.shape())
+        sprint(input_.shape, "input_.shape", exit=True)
 
         return input_
 
