@@ -41,6 +41,7 @@ def run_testing(params):
     
     # Get the test data
     test_data_files = get_data_filenames(os.path.join(params['data_folder'],'test',''))
+    print(len(test_data_files))
     # Save the test configuration and data in the model class and get max number of iterations
     amount_test = model.set_testing(test_data_files,criterion, params['teacher_forcing_steps'])
     # Create the view object 
