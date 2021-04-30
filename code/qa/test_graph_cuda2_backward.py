@@ -27,7 +27,7 @@ def test_graph():
     pk_rows, pk_cols, pk_neighbors, pk_neighbor_size = 16, 16, 8, 1
     total = pk_rows * pk_cols
     
-    #g = Graph(_build_connections())
+    g = Graph(_build_connections())
 
     dyn_in = th.zeros(size=(1, total, 1),
                               device=device_str)
