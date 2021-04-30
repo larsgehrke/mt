@@ -16,8 +16,6 @@ from model.v3.kernel_net import KernelNetwork
 
 from model.kernel_tensors import KernelTensors
 
-from tools.debug import sprint
-
 
 class Evaluator(AbstractEvaluator):
 
@@ -30,8 +28,6 @@ class Evaluator(AbstractEvaluator):
         
 
     def _evaluate(self, net_input, batch_size):
-
-        sprint(net_input, "net_input")
 
         seq_len = self.config.seq_len
         amount_pks = self.config.amount_pks
