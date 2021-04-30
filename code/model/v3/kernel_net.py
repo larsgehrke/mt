@@ -75,6 +75,8 @@ class KernelNetwork(th.nn.Module):
             
             input_ = th.cat((self.tensors.pk_dyn_in, lat_in_flat),2)
 
+        print(input_.shape())
+
         return input_
 
     def forward(self, dyn_in):
