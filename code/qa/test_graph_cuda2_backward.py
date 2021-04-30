@@ -31,18 +31,18 @@ def test_graph():
 
     dyn_in = th.zeros(size=(1, total, 1),
                               device=device_str)
-    dyn_in[0] = 42
-    dyn_in[3] = 42
-    dyn_in[7] = 42
-    dyn_in[19] = 42
-    dyn_in[44] = 42
+    dyn_in[0,0,0] = 42
+    dyn_in[0,3,0] = 42
+    dyn_in[0,7,0] = 42
+    dyn_in[0,19,0] = 42
+    dyn_in[0,44,0] = 42
 
 
     lat_in = th.ones(size=(1, total, 1),
                               device=device_str)
-    lat_in[0] = 2
-    lat_in[5] = 55
-    lat_in[10] = 12    
+    lat_in[0,0,0] = 2
+    lat_in[0,5,0] = 55
+    lat_in[0,10,0] = 12    
 
     # Most of the nodes have 8 incoming values
     expect = th.zeros((total, 1)) + 8
