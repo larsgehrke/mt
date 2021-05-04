@@ -90,6 +90,8 @@ def run_training(params):
             
         # process training results
         view.finished_training(training_errors)
+        # Retrieve user input to continue or quit the testing
+        x = input("Press 1 to see another example, anything else to quit.")
 
         # Iterate through epoch
         for _iter_val in range(amount_val):
