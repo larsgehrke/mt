@@ -14,15 +14,15 @@ class PK(th.nn.Module):
     '''
 
     def __init__(self,  
-        amount_pks: int, 
         input_size: int, 
+        pre_layer_size: int,
         lstm_size: int, 
         output_size: int, 
         device: str):
         '''
         The initialisation of the PK module.
-        :param amount_pks: The amount of PKs in total.
         :param input_size: The size of the input to each PK (dynamical and lateral)
+        :param pk_pre_layer_size: The size of the input layer of each PK. 
         :param lstm_size: number of LSTM nodes in the PK.
         :param output_size: The size of the output of each PK (dynamical and lateral)
         :param device: PyTorch specific string to select either CPU('cpu') or GPU ('cuda') for the execution
@@ -30,17 +30,15 @@ class PK(th.nn.Module):
         '''
 
         super(PK, self).__init__()
-        self.amount_pks = amount_pks
-        self.input_size = input_size
         self.lstm_size = lstm_size
 
         # starting fc layer weights
         self.W_input = th.nn.Parameter(
-            th.Tensor(input_size,4)) 
+            th.Tensor(input_size,pre_layer_size)) 
 
         # LSTM weights
         self.W_lstm = th.nn.Parameter(
-            th.Tensor( 4 + lstm_size,4 * lstm_size))
+            th.Tensor( pre_layer_size + lstm_size, 4 * lstm_size))
 
         # ending fc layer weights
         self.W_output = th.nn.Parameter(
