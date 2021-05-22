@@ -11,16 +11,16 @@ rows = []
 row = ""
 
 for idx,b in enumerate(batches):
-    row[idx] = str(b)
+    rows[idx] = str(b)
     print("batch size " + str(b)+ ":")
     for m in models:
         res = "model " + str(m) + ": "
         command = f"python train.py -b {b} -m {m}"
         x = os.popen(command).read()
         print(res + str(x))
-        row[idx] = row[idx] + " & " + str(x)  
+        rows[idx] = rows[idx] + " & " + str(x)  
         
-    row[idx] = row[idx] + "\\\\"
+    rows[idx] = rows[idx] + "\\\\"
 
 for r in rows:
     print(str(r))
