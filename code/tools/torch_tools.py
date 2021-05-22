@@ -15,19 +15,19 @@ def determine_device(use_cuda: bool) -> str:
     :return: The device where tensor calculations shall be made on
     """
     device = th.device("cuda" if th.cuda.is_available() and use_cuda else "cpu")
-    print("Using device:", device)
-    print()
+    #print("Using device:", device)
+    #print()
 
     # Additional Info when using cuda
-    if device.type == "cuda":
-        print(th.cuda.get_device_name(0))
+    #if device.type == "cuda":
+        #print(th.cuda.get_device_name(0))
         # Deactivated the following lines, because the allocated memory was always 0
         # print("Memory Usage:")
         # print("\tAllocated:",
         #       round(th.cuda.memory_allocated(0) / 1024 ** 3, 1), "GB")
         # print("\tCached:   ", round(th.cuda.memory_reserved(0) / 1024 ** 3, 1),
         #       "GB")
-        print()
+        #print()
 
     return device
 
@@ -36,7 +36,7 @@ def load_model(params: dict):
     Load trained PyTorch model from file.
     :return loaded PyTorch model
     '''
-    print('Restoring model (that is the network\'s weights) from file...')
+    #print('Restoring model (that is the network\'s weights) from file...')
     net = th.load(os.path.join(params['model_folder'], params['model_name'] + ".pt"),
             map_location=params['device'])
 

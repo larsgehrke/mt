@@ -28,6 +28,9 @@ from tools.persistence import get_data_filenames
 from tools.supervisor import TrainSupervisor
 import tools.torch_tools as th_tools
 
+import time
+import sys
+
 
 
 def run_training(params):
@@ -79,15 +82,29 @@ def run_training(params):
         # save batch errors
         training_errors = []
         val_errors = []
+        time_train = []
 
         # Iterate through epoch
-        for _iter_train in range(amount_train):
+        for _iter_train in range(amount_train)[:10]:
             # Train the network for the given training data
+            before = time.time()
             mse = model.train(iter_idx=_iter_train)
+            dur = time.time()-before
+
+            print(f"{amount_train + 1 } iteration: {str(np.round(dur, 3))} seconds")
+            time_train.append(dur)
 
             # collect training errors
             training_errors.append(mse)
             
+        mean = np.mean(data)
+        mean = np.around(mean, decimals=5)
+        stddev = np.std(data)
+        stddev = np.around(stddev, decimals = 5)
+        print(f"mean: {mean}, stddev: {stddev}")
+
+        sys.exit()
+
         # process training results
         view.finished_training(training_errors)
         # Retrieve user input to continue or quit the testing
@@ -125,13 +142,13 @@ if __name__ == "__main__":
     params = param_manager.parse_params(is_training = True)
 
     # print out basic information about this run
-    print(f'''Run the training of architecture {
-        params["architecture_name"]
-        } with model {
-        params["model_name"]
-        } and data {
-        params["data_type"]
-        }''')
+    # print(f'''Run the training of architecture {
+    #     params["architecture_name"]
+    #     } with model {
+    #     params["model_name"]
+    #     } and data {
+    #     params["data_type"]
+    #     }''')
 
     # call main method above
     run_training(params)

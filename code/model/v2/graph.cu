@@ -16,7 +16,8 @@ namespace
     __global__ void graph_forward_kernel(
         const torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> dyn_input,
         const torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> lat_input,
-        torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> out) {
+        torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> out,
+        const int lat_size) {
 
       /*
       [Note that the out variable is the output of this function, 
@@ -81,7 +82,7 @@ namespace
       const bool x_lt_max = threadIdx.x < PK_COLS - 1;
 
       /* Setting the lateral input of the network */
-      for (int lat = 0; lat < LAT_SIZE; lat++)
+      for (int lat = 0; lat < lat_size; lat++)
       {
         /* TOP GROUP */
         if (y_gt_0)
@@ -93,25 +94,25 @@ namespace
           }
 
           /* TOP CENTER */
-          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE + lat] = lat_input[batch_block_id][top][lat];
+          out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size + lat] = lat_input[batch_block_id][top][lat];
       
           /* TOP RIGHT */
           if (x_lt_max)
           {
-            out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 2 + lat] = lat_input[batch_block_id][top+1][lat];
+            out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size * 2 + lat] = lat_input[batch_block_id][top+1][lat];
           }
         }
   
         /* LEFT */
         if(x_gt_0)
         {
-          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 3 + lat] = lat_input[batch_block_id][pk_thread_id-1][lat];
+          out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size * 3 + lat] = lat_input[batch_block_id][pk_thread_id-1][lat];
         }
 
         /* RIGHT */
         if(x_lt_max)
         {
-          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 4 + lat] = lat_input[batch_block_id][pk_thread_id+1][lat];
+          out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size * 4 + lat] = lat_input[batch_block_id][pk_thread_id+1][lat];
         }
 
         /* BOTTOM GROUP */
@@ -120,15 +121,15 @@ namespace
           /* BOTTOM LEFT */
           if (x_gt_0)
           { 
-            out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 5 + lat] = lat_input[batch_block_id][bottom-1][lat];
+            out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size * 5 + lat] = lat_input[batch_block_id][bottom-1][lat];
           }
           /* BOTTOM CENTER */
-          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 6 + lat] = lat_input[batch_block_id][bottom][lat];
+          out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size * 6 + lat] = lat_input[batch_block_id][bottom][lat];
           
           /* BOTTOM RIGHT */
           if (x_lt_max)
           {
-            out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 7 + lat] = lat_input[batch_block_id][bottom+1][lat];
+            out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size * 7 + lat] = lat_input[batch_block_id][bottom+1][lat];
           }
         } 
         /* end of for loop for lateral connections*/
@@ -140,7 +141,8 @@ namespace
     __global__ void graph_backward_kernel(
       const torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_out,
         torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_dyn_input,
-        torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_lat_input) 
+        torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_lat_input,
+        const int lat_size) 
     {
 
       /*
@@ -177,7 +179,7 @@ namespace
       const bool y_lt_max = threadIdx.y < PK_ROWS - 1;
       const bool x_lt_max = threadIdx.x < PK_COLS - 1;
 
-      for (int lat = 0; lat < LAT_SIZE; lat++)
+      for (int lat = 0; lat < lat_size; lat++)
       {
         /* TOP GROUP */
         if (y_gt_0)
@@ -189,25 +191,25 @@ namespace
           }
 
           /* TOP CENTER */
-          d_lat_input[batch_block_id][top][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE + lat];
+          d_lat_input[batch_block_id][top][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size + lat];
       
           /* TOP RIGHT */
           if (x_lt_max)
           {
-            d_lat_input[batch_block_id][top+1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 2 + lat];
+            d_lat_input[batch_block_id][top+1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size * 2 + lat];
           }
         }
   
         /* LEFT */
         if(x_gt_0)
         {
-          d_lat_input[batch_block_id][pk_thread_id-1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 3 + lat];
+          d_lat_input[batch_block_id][pk_thread_id-1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size * 3 + lat];
         }
 
         /* RIGHT */
         if(x_lt_max)
         {
-          d_lat_input[batch_block_id][pk_thread_id+1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 4 + lat];
+          d_lat_input[batch_block_id][pk_thread_id+1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size * 4 + lat];
         }
 
         /* BOTTOM GROUP */
@@ -216,15 +218,15 @@ namespace
           /* BOTTOM LEFT */
           if (x_gt_0)
           { 
-            d_lat_input[batch_block_id][bottom-1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 5 + lat];
+            d_lat_input[batch_block_id][bottom-1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size * 5 + lat];
           }
           /* BOTTOM CENTER */
-          d_lat_input[batch_block_id][bottom][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 6 + lat];
+          d_lat_input[batch_block_id][bottom][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size * 6 + lat];
           
           /* BOTTOM RIGHT */
           if (x_lt_max)
           {
-            d_lat_input[batch_block_id][bottom+1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * 7 + lat];
+            d_lat_input[batch_block_id][bottom+1][lat] += d_out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size * 7 + lat];
           }
         } 
         /* end of for loop for lateral connections*/
@@ -245,10 +247,13 @@ std::vector<torch::Tensor> graph_cuda_forward(
 
   /* set the batch size dynamically by means of the input shape*/
   const auto batch_size = dyn_input.size(0);
+  const auto amount_pks = dyn_input.size(1);
+
+  const int lat_size = lat_input.size(2);
 
   /* allocate enough memory space for the output of the kernel function */
-  auto out = torch::zeros({batch_size, PK_ROWS * PK_COLS, 
-    DYN_SIZE + NEIGHBORS * LAT_SIZE}, options);
+  auto out = torch::zeros({batch_size, amount_pks, 
+    DYN_SIZE + NEIGHBORS * lat_size}, options);
 
   /* map the grid of PKs to the grid of threads per block*/
   const dim3 threads(PK_COLS, PK_ROWS);
@@ -260,7 +265,8 @@ std::vector<torch::Tensor> graph_cuda_forward(
     graph_forward_kernel<scalar_t><<<blocks, threads>>>(
         dyn_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
         lat_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
-        out.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>()
+        out.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
+        lat_size
         );
   }));
 
@@ -271,15 +277,18 @@ std::vector<torch::Tensor> graph_cuda_forward(
 std::vector<torch::Tensor> graph_cuda_backward(
     torch::Tensor d_out) 
 {
-  /* set the batch size dynamically by means of the input shape*/
+   /* set the batch size dynamically by means of the input shape*/
   const auto batch_size = d_out.size(0);
+  const auto amount_pks = d_out.size(1);
+  const auto total = d_out.size(2);
+  const int lat_size = (total - DYN_SIZE)/NEIGHBORS;
 
   /* get the torch tensor options to specify the gpu usage later */
   auto options = torch::TensorOptions().device(torch::kCUDA).requires_grad(true);
 
   /* allocate enough memory space for the output of the kernel function */
-  auto d_dyn_input = torch::zeros({batch_size, PK_ROWS * PK_COLS, DYN_SIZE}, options);
-  auto d_lat_input = torch::zeros({batch_size, PK_ROWS * PK_COLS, LAT_SIZE}, options);
+  auto d_dyn_input = torch::zeros({batch_size, amount_pks, DYN_SIZE}, options);
+  auto d_lat_input = torch::zeros({batch_size, amount_pks, lat_size}, options);
 
   /* map the grid of PKs to the grid of threads per block*/
   const dim3 threads(PK_ROWS, PK_COLS);
@@ -292,7 +301,8 @@ std::vector<torch::Tensor> graph_cuda_backward(
     graph_backward_kernel<scalar_t><<<blocks, threads>>>(
         d_out.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
         d_dyn_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
-        d_lat_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>());
+        d_lat_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
+        lat_size);
   }));
 
 

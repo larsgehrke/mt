@@ -75,7 +75,7 @@ def run_testing(params):
             net_label[sample_idx], net_input[sample_idx])
 
         # Retrieve user input to continue or quit the testing
-        x = input("Press 1 to see another example, anything else to quit.")
+        x = 2 #input("Press 1 to see another example, anything else to quit.")
         
         sample_idx += 1
         
@@ -103,13 +103,13 @@ if __name__ == "__main__":
     params = param_manager.parse_params(is_training = False)
 
     # print out basic information about this run
-    print(f'''Run the testing of architecture {
-        params["architecture_name"]
-        } with model {
-        params["model_name"]
-        } and data {
-        params["data_type"]
-        }''')
+    # print(f'''Run the testing of architecture {
+    #     params["architecture_name"]
+    #     } with model {
+    #     params["model_name"]
+    #     } and data {
+    #     params["data_type"]
+    #     }''')
 
     # call main method above
     run_testing(params)

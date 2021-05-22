@@ -19,7 +19,8 @@ namespace
         const torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> dyn_input,
         const torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> lat_input,
         const torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> connections,
-        torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> out) {
+        torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> out,
+        const int lat_size) {
 
       /*
       [Note that the out variable is the output of this function, 
@@ -88,9 +89,9 @@ namespace
 
       while (counter < max_len && from >= 0) 
       {
-        for (int lat = 0; lat < LAT_SIZE; lat++)
+        for (int lat = 0; lat < lat_size; lat++)
         {
-          out[batch_block_id][pk_thread_id][DYN_SIZE + LAT_SIZE * to + lat] = lat_input[batch_block_id][from][lat];
+          out[batch_block_id][pk_thread_id][DYN_SIZE + lat_size * to + lat] = lat_input[batch_block_id][from][lat];
         }
 
         counter++;
@@ -112,7 +113,8 @@ namespace
       const torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_out,
       const torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> connections,
         torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_dyn_input,
-        torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_lat_input) 
+        torch::PackedTensorAccessor32<scalar_t,DIMS,torch::RestrictPtrTraits> d_lat_input,
+        const int lat_size) 
     {
       /*
       *
@@ -149,9 +151,9 @@ namespace
 
       while (counter < max_len && from >= 0) 
       {
-        for (int lat = 0; lat < LAT_SIZE; lat++)
+        for (int lat = 0; lat < lat_size; lat++)
         {
-          d_lat_input[batch_block_id][from][lat] = d_out[batch_block_id][pk_thread_id][ DYN_SIZE + LAT_SIZE * to + lat];
+          d_lat_input[batch_block_id][from][lat] = d_out[batch_block_id][pk_thread_id][ DYN_SIZE + lat_size * to + lat];
         }
 
         counter++;
@@ -179,10 +181,13 @@ std::vector<torch::Tensor> graph_cuda_forward(
 
   /* set the batch size dynamically by means of the input shape*/
   const auto batch_size = dyn_input.size(0);
+  const auto amount_pks = dyn_input.size(1);
+  const auto dyn_size = dyn_input.size(2);
+  const int lat_size = lat_input.size(2);
 
   /* allocate enough memory space for the output of the kernel function */
-  auto out = torch::zeros({batch_size, PK_ROWS * PK_COLS, 
-    DYN_SIZE + NEIGHBORS * LAT_SIZE}, options);
+  auto out = torch::zeros({batch_size, amount_pks, 
+    dyn_size + NEIGHBORS * lat_size}, options);
 
   /* map the grid of PKs to the grid of threads per block*/
   const dim3 threads(PK_COLS, PK_ROWS);
@@ -195,7 +200,8 @@ std::vector<torch::Tensor> graph_cuda_forward(
         dyn_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
         lat_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
         connections.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
-        out.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>()        
+        out.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
+        lat_size        
         );
   }));
 
@@ -209,13 +215,17 @@ std::vector<torch::Tensor> graph_cuda_backward(
 {
   /* set the batch size dynamically by means of the input shape*/
   const auto batch_size = d_out.size(0);
+  const auto amount_pks = d_out.size(1);
+  const auto total = d_out.size(2);
+  const int lat_size = (total - DYN_SIZE)/NEIGHBORS;
+
 
   /* get the torch tensor options to specify the gpu usage later */
   auto options = torch::TensorOptions().device(torch::kCUDA).requires_grad(true);
 
   /* allocate enough memory space for the output of the kernel function */
-  auto d_dyn_input = torch::zeros({batch_size, PK_ROWS * PK_COLS, DYN_SIZE}, options);
-  auto d_lat_input = torch::zeros({batch_size, PK_ROWS * PK_COLS, LAT_SIZE}, options);
+  auto d_dyn_input = torch::zeros({batch_size, amount_pks, DYN_SIZE}, options);
+  auto d_lat_input = torch::zeros({batch_size, amount_pks, lat_size}, options);
 
   /* map the grid of PKs to the grid of threads per block*/
   const dim3 threads(PK_ROWS, PK_COLS);
@@ -228,7 +238,8 @@ std::vector<torch::Tensor> graph_cuda_backward(
         d_out.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
         connections.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
         d_dyn_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
-        d_lat_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>()
+        d_lat_input.packed_accessor32<scalar_t,DIMS,torch::RestrictPtrTraits>(),
+        lat_size
         );
   }));
 
