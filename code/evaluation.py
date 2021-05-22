@@ -11,7 +11,6 @@ out = ""
 
 for b in batches:
     for m in models:
-        desc_eval += desc+"\n"
         command = f"python train.py -b {b} -m {m}"
         x = os.popen(command).read()
         out = out + " & " + str(x)  
