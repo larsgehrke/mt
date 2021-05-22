@@ -93,7 +93,7 @@ def run_training(params):
             dur = time.time()-before
 
             if _iter_train >0:
-                print(f"{_iter_train } iteration: {str(np.round(dur, 3))} seconds")
+                #print(f"{_iter_train } iteration: {str(np.round(dur, 3))} seconds")
                 time_train.append(dur)
 
             # collect training errors
@@ -103,7 +103,7 @@ def run_training(params):
         mean = np.around(mean, decimals=5)
         stddev = np.std(time_train)
         stddev = np.around(stddev, decimals = 5)
-        print(f"mean: {mean}, stddev: {stddev}")
+        print(str(mean)+ " \\textcolor{gray}{$\pm$ "+ str(stddev)+"}")
 
         sys.exit()
 
