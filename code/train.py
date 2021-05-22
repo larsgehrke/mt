@@ -91,7 +91,7 @@ def run_training(params):
             mse = model.train(iter_idx=_iter_train)
             dur = time.time()-before
 
-            print(f"{amount_train + 1 } iteration: {str(np.round(dur, 3))} seconds")
+            print(f"{_iter_train + 1 } iteration: {str(np.round(dur, 3))} seconds")
             time_train.append(dur)
 
             # collect training errors
