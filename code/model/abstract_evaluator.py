@@ -3,6 +3,7 @@ import numpy as np
 import torch as th
 
 from config.kernel_config import KernelConfig
+import time
 
 class AbstractEvaluator():
     '''
@@ -94,15 +95,18 @@ class AbstractEvaluator():
             net_input, net_label = self._load_data(iter_idx = iter_idx)
             net_output = self._evaluate(self._np_to_th(net_input))
 
+        # Forward pass
+        before = time.time()
         mse = self.train_criterion(net_output, self._np_to_th(net_label))
+        dur = time.time() - before
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_output - th.from_numpy(net_label), 2))
 
         # backward pass
-        mse.backward()
-        self.optimizer.step()
+        #mse.backward()
+        #self.optimizer.step()
 
-        return mse.item() # return only the number, not the th object
+        return dur #mse.item() # return only the number, not the th object
 
 
     def _test(self, iter_idx, return_only_error):
