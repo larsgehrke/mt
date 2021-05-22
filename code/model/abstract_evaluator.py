@@ -84,6 +84,7 @@ class AbstractEvaluator():
 
 
     def _train(self, iter_idx):
+        before = time.time()
         # Set the gradients back to zero
         self.optimizer.zero_grad()
 
@@ -96,7 +97,7 @@ class AbstractEvaluator():
             net_output = self._evaluate(self._np_to_th(net_input))
 
         # Forward pass
-        before = time.time()
+        
         mse = self.train_criterion(net_output, self._np_to_th(net_label))
         dur = time.time() - before
         # Alternatively, the mse can be calculated 'manually'
