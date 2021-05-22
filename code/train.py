@@ -86,16 +86,17 @@ def run_training(params):
 
         # Iterate through epoch
         for _iter_train in range(amount_train)[:10]:
-            # Train the network for the given training data
-            before = time.time()
-            mse = model.train(iter_idx=_iter_train)
-            dur = time.time()-before
+            if _iter_train >0:
+                # Train the network for the given training data
+                before = time.time()
+                mse = model.train(iter_idx=_iter_train)
+                dur = time.time()-before
 
-            print(f"{_iter_train + 1 } iteration: {str(np.round(dur, 3))} seconds")
-            time_train.append(dur)
+                print(f"{_iter_train + 1 } iteration: {str(np.round(dur, 3))} seconds")
+                time_train.append(dur)
 
-            # collect training errors
-            training_errors.append(mse)
+                # collect training errors
+                training_errors.append(mse)
             
         mean = np.mean(time_train)
         mean = np.around(mean, decimals=5)
