@@ -82,16 +82,14 @@ def run_training(params):
         # save batch errors
         training_errors = []
         val_errors = []
-        #time_train = []
+        time_train = []
 
         # Iterate through epoch
         for _iter_train in range(amount_train)[:11]:
 
             # Train the network for the given training data
-            #before = time.time()
             dur = model.train(iter_idx=_iter_train)
             
-            #dur = time.time()-before
             if _iter_train >0:
                 print(f"{_iter_train } iteration: {str(np.round(dur, 3))} seconds")
                 time_train.append(dur)
