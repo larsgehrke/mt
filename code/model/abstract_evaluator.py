@@ -84,30 +84,33 @@ class AbstractEvaluator():
 
 
     def _train(self, iter_idx):
-        before = time.time()
+
         # Set the gradients back to zero
         self.optimizer.zero_grad()
 
         net_output = None
         if self.batch_processing:
             net_input, net_label, batch_size = self._load_data(iter_idx = iter_idx)
+            before = time.time()
             net_output = self._evaluate(self._np_to_th(net_input), batch_size)
         else:
             net_input, net_label = self._load_data(iter_idx = iter_idx)
+            before = time.time()
             net_output = self._evaluate(self._np_to_th(net_input))
 
         # Forward pass
-        
         mse = self.train_criterion(net_output, self._np_to_th(net_label))
-        dur = time.time() - before
+        
         # Alternatively, the mse can be calculated 'manually'
         # mse = th.mean(th.pow(net_output - th.from_numpy(net_label), 2))
-
+        dur1 = time.time() - before
+        before = time.time()
         # backward pass
-        #mse.backward()
-        #self.optimizer.step()
+        mse.backward()
+        self.optimizer.step()
+        dur2 = time.time() - before
 
-        return dur #mse.item() # return only the number, not the th object
+        return dur1, dur2 #mse.item() # return only the number, not the th object
 
 
     def _test(self, iter_idx, return_only_error):

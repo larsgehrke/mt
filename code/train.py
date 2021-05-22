@@ -82,24 +82,32 @@ def run_training(params):
         # save batch errors
         training_errors = []
         val_errors = []
-        time_train = []
+        time_forward = []
+        time_backward = []
 
         # Iterate through epoch
         for _iter_train in range(amount_train)[:11]:
 
             # Train the network for the given training data
-            dur = model.train(iter_idx=_iter_train)
+            dur_forward, dur_backward = model.train(iter_idx=_iter_train)
             
             if _iter_train >0:
-                print(f"{_iter_train } iteration: {str(np.round(dur, 3))} seconds")
-                time_train.append(dur)
+                #print(f"{_iter_train } iteration: {str(np.round(dur, 3))} seconds")
+                time_forward.append(dur_forward)
+                time_backward.append(dur_backward)
 
             # collect training errors
             #training_errors.append(mse)
             
-        mean = np.mean(time_train)
+        mean = np.mean(time_forward)
         mean = np.around(mean, decimals=5)
-        stddev = np.std(time_train)
+        stddev = np.std(time_forward)
+        stddev = np.around(stddev, decimals = 5)
+        print(str(mean)+ " \\textcolor{gray}{$\pm$ "+ str(stddev)+"}")
+        #backward
+        mean = np.mean(time_backward)
+        mean = np.around(mean, decimals=5)
+        stddev = np.std(time_backward)
         stddev = np.around(stddev, decimals = 5)
         print(str(mean)+ " \\textcolor{gray}{$\pm$ "+ str(stddev)+"}")
         sys.exit()
