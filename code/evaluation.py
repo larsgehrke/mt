@@ -8,7 +8,7 @@ batches = ["1", "2", "4", "8", "16", "32", "64", "128"]
 models =  ["v1a", "v1b", "v2", "v3"]
 
 rows = []
-row
+row = ""
 
 for idx,b in enumerate(batches):
     row = str(b)
