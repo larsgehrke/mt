@@ -11,7 +11,7 @@ use_gpu_values = ["False", "True"]
 
 rows = []
 row = ""
-for use_gpu in enumerate(use_gpu_values):
+for use_gpu in use_gpu_values:
     print(f"=== use gpu? {use_gpu} ===")
     for om in old_models:
         print(f"= version {om} =")
@@ -21,7 +21,7 @@ for use_gpu in enumerate(use_gpu_values):
     print()
     for b in batches:
         print("== batch size " + str(b)+ " ==")
-        for nm in enumerate(new_models):
+        for nm in new_models:
             if not(use_gpu=="False" and (nm=="v2" or nm=="v3")):   
                 print(f"= version {nm} =")
                 command = f"python train.py --use-gpu {use_gpu} -b {b} -m {nm}"
