@@ -97,9 +97,9 @@ def run_training(params):
             # collect training errors
             training_errors.append(mse)
             
-        mean = np.mean(data)
+        mean = np.mean(time_train)
         mean = np.around(mean, decimals=5)
-        stddev = np.std(data)
+        stddev = np.std(time_train)
         stddev = np.around(stddev, decimals = 5)
         print(f"mean: {mean}, stddev: {stddev}")
 
