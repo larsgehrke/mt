@@ -23,7 +23,7 @@ class GraphFunction(th.autograd.Function):
     def forward(ctx, dyn_in, lat_in):
 
         rearranged_in = graph_cuda.forward(dyn_in.contiguous(), lat_in.contiguous())[0]
-        print(rearranged_in.size())
+        
         return rearranged_in
 
     @staticmethod

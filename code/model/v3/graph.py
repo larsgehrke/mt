@@ -28,15 +28,11 @@ class GraphFunction(th.autograd.Function):
 
         rearranged_in = graph_cuda.forward(dyn_in.contiguous(), 
             lat_in.contiguous(), GraphFunction.connections)[0]
-        print(rearranged_in.size())
 
         return rearranged_in
 
     @staticmethod
     def backward(ctx, grad_rearranged_in):
-
-        print(f"backward pass: \nconnections {GraphFunction.connections.size()}\ngrad {grad_rearranged_in.size()}")
-        print(f"")
 
         d_dyn_in, d_lat_in = graph_cuda.backward(grad_rearranged_in.contiguous(),
             GraphFunction.connections)
