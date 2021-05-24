@@ -7,7 +7,7 @@
     The amount of connections per node and the position of the connections in the lateral array.
 
 '''
-from model.v3.graph import Graph
+from model.v3.graph import GraphFunction
 import torch as th
 import numpy as np
 
@@ -27,7 +27,8 @@ def test_graph():
     pk_rows, pk_cols, pk_neighbors, pk_neighbor_size = 16, 16, 8, 1
     total = pk_rows * pk_cols
     
-    g = Graph(_build_connections())
+    _connections = self._prepare_connections()
+    GraphFunction.connections = _connections
 
     dyn_in = th.zeros(size=(1, total, 1),
                               device=device_str)
@@ -63,8 +64,8 @@ def test_graph():
     expect = th.unsqueeze(expect, 0)
     print(expect.shape)
 
-    out = g.forward(dyn_in, lat_in)
-    d_dyn_in, d_lat_in = g.backward(out)
+    out = GraphFunction.forward(dyn_in, lat_in)
+    d_dyn_in, d_lat_in = GraphFunction.backward(out)
 
    
     print(f"d_dyn_in.shape: {d_dyn_in.shape}")
