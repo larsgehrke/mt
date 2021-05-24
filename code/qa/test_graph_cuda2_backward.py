@@ -66,6 +66,9 @@ def test_graph():
     out = GraphFunction.forward(None,dyn_in, lat_in)
     d_dyn_in, d_lat_in = GraphFunction.backward(None,out)
 
+    print(dyn_in[0,0,0] == 42)
+    print(dyn_in[0,3,0] == 42)
+
    
     print(f"d_dyn_in.shape: {d_dyn_in.shape}")
     print(f"d_lat_in.shape: {d_lat_in.shape}")
