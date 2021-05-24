@@ -162,7 +162,7 @@ class TestSupervisor():
         '''
         forward_pass_duration = time.time() - time_start
         print(str(np.round(forward_pass_duration, 10)).ljust(12, ' '))
-	    print("\tForward pass for batch size ",batch_size,
+        print("\tForward pass for batch size ",batch_size,
             " took: ", str(np.round(forward_pass_duration, 10)).ljust(12, ' '),
             " seconds with error ", str(np.round(error, 10)).ljust(12, ' '))
 
