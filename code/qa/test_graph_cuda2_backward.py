@@ -63,8 +63,8 @@ def test_graph():
     expect = th.unsqueeze(expect, 0)
     print(expect.shape)
 
-    out = GraphFunction.forward(dyn_in, lat_in)
-    d_dyn_in, d_lat_in = GraphFunction.backward(out)
+    out = GraphFunction.forward(None,dyn_in, lat_in)
+    d_dyn_in, d_lat_in = GraphFunction.backward(None,out)
 
    
     print(f"d_dyn_in.shape: {d_dyn_in.shape}")
