@@ -44,25 +44,6 @@ def test_graph():
     lat_in[0,5,0] = 55
     lat_in[0,10,0] = 12    
 
-    # Most of the nodes have 8 incoming values
-    expect = th.zeros((total, 1)) + 8
-
-
-    # Most of the edge nodes have only 5 incoming values
-    for i in range(total):
-        # first row, last row, left and right column
-        if i < pk_cols or i > total - pk_cols or i%pk_cols == 0 or (i+1)%pk_cols == 0:
-            expect[i] = 5
-
-    # The 4 corners have only 3 incoming values
-    expect[0] = 3
-    expect[pk_cols-1] = 3
-    expect[total - pk_cols] = 3
-    expect[total-1] = 3
-
-    expect = th.unsqueeze(expect, 0)
-    print(expect.shape)
-
     out = GraphFunction.forward(None,dyn_in, lat_in)
     d_dyn_in, d_lat_in = GraphFunction.backward(None,out)
 
@@ -83,15 +64,6 @@ def test_graph():
     print(d_dyn_in)
     print("\nd_lat_in")
     print(d_lat_in)
-
-    # start = time.time()
-    # out = g.forward(dyn_in, lat_in)
-    # stop = time.time()
-    # print("forward pass took " + str(stop-start) + " seconds")
-
-    # out_all = out.cpu().detach().numpy()
-    # # lateral output
-    # out = out_all[:,:,1:]
 
 
 def _build_connections(rows=16, cols=16):

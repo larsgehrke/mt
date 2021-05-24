@@ -136,38 +136,39 @@ class KernelNetwork(th.nn.Module):
         for pk_row in range(rows):
             for pk_col in range(cols):
 
-                # Find the neighboring PKs to which this PK is connected
-                neighbors = {"top left": [pk_row - 1, pk_col - 1],
-                             "top": [pk_row - 1, pk_col],
-                             "top right": [pk_row - 1, pk_col + 1],
-                             "left": [pk_row, pk_col - 1],
-                             "right": [pk_row, pk_col + 1],
-                             "bottom left": [pk_row + 1, pk_col - 1],
-                             "bottom": [pk_row + 1, pk_col],
-                             "bottom right": [pk_row + 1, pk_col + 1]}
-                             
-                # Set the values of the PK adjacency matrix on true that
-                # represent a connection between the connected PKs
-                for neighbor_direction in neighbors:
+                if(pk_col < 5):
+                    # Find the neighboring PKs to which this PK is connected
+                    neighbors = {"top left": [pk_row - 1, pk_col - 1],
+                                 "top": [pk_row - 1, pk_col],
+                                 "top right": [pk_row - 1, pk_col + 1],
+                                 "left": [pk_row, pk_col - 1],
+                                 "right": [pk_row, pk_col + 1],
+                                 "bottom left": [pk_row + 1, pk_col - 1],
+                                 "bottom": [pk_row + 1, pk_col],
+                                 "bottom right": [pk_row + 1, pk_col + 1]}
+                                 
+                    # Set the values of the PK adjacency matrix on true that
+                    # represent a connection between the connected PKs
+                    for neighbor_direction in neighbors:
 
-                    # Get the row and column index of the current neighbor
-                    neighbor_row, neighbor_col = neighbors[neighbor_direction]
+                        # Get the row and column index of the current neighbor
+                        neighbor_row, neighbor_col = neighbors[neighbor_direction]
 
-                    # If the neighbor lies within the defined field, define
-                    # it as neighbor in the adjacency matrix
-                    if (0 <= neighbor_row < rows) and \
-                       (0 <= neighbor_col < cols):
+                        # If the neighbor lies within the defined field, define
+                        # it as neighbor in the adjacency matrix
+                        if (0 <= neighbor_row < rows) and \
+                           (0 <= neighbor_col < cols):
 
-                        # Determine the index of the neighbor
-                        neighbor_idx = neighbor_row * cols + neighbor_col
+                            # Determine the index of the neighbor
+                            neighbor_idx = neighbor_row * cols + neighbor_col
 
-                        # Set the corresponding entry in the adjacency matrix to
-                        # one
-                        pk_adj_mat[0, pk_id_running, neighbor_idx] = 1
-                        pk_adj_mat[1, pk_id_running, neighbor_idx] = \
-                            direction_dict[neighbor_direction]
+                            # Set the corresponding entry in the adjacency matrix to
+                            # one
+                            pk_adj_mat[0, pk_id_running, neighbor_idx] = 1
+                            pk_adj_mat[1, pk_id_running, neighbor_idx] = \
+                                direction_dict[neighbor_direction]
 
-                pk_id_running += 1
+                    pk_id_running += 1
 
         #
         # Set up vectors that describe which lateral output goes to which
