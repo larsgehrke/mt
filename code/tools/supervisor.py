@@ -47,7 +47,7 @@ class TrainSupervisor():
 
         self.finished_training_time = None
 
-        #print("Trainable model parameters:", trainable_params)
+        print("Trainable model parameters:", trainable_params)
 
     def finished_training(self, errors: list):
         '''
@@ -97,17 +97,17 @@ class TrainSupervisor():
 
         #
         # Print progress to the console with nice formatting
-        # print('Epoch ' + str(idx+1).zfill(int(np.log10(self.epochs)) + 1)
-        #       + '/' + str(self.epochs) + ' took '
-        #       + str(np.round(time.time() - epoch_start_time, 2)).ljust(5, '0')
-        #       + ' seconds.\t\tAverage epoch training error: ' + self.train_sign
-        #       + str(np.round(self.epoch_errors_train[-1], 10)).ljust(12, ' ')
-        #       + '\t\tValidation error: ' + self.val_sign
-        #       + str(np.round(self.epoch_errors_val[-1], 10)).ljust(12, ' '))
+        print('Epoch ' + str(idx+1).zfill(int(np.log10(self.epochs)) + 1)
+              + '/' + str(self.epochs) + ' took '
+              + str(np.round(time.time() - epoch_start_time, 2)).ljust(5, '0')
+              + ' seconds.\t\tAverage epoch training error: ' + self.train_sign
+              + str(np.round(self.epoch_errors_train[-1], 10)).ljust(12, ' ')
+              + '\t\tValidation error: ' + self.val_sign
+              + str(np.round(self.epoch_errors_val[-1], 10)).ljust(12, ' '))
 
-        print(str(np.round(self.finished_training_time - epoch_start_time, 3))+","
-            + str(np.round(self.epoch_errors_train[-1], 10))+","
-            + str(np.round(self.epoch_errors_val[-1], 10)))
+        # print(str(np.round(self.finished_training_time - epoch_start_time, 3))+","
+        #     + str(np.round(self.epoch_errors_train[-1], 10))+","
+        #     + str(np.round(self.epoch_errors_val[-1], 10)))
 
 
     def finished(self, training_start_time):
@@ -116,8 +116,8 @@ class TrainSupervisor():
         :param training_start_time: start time of the training
         '''
         now = time.time()
-        # print('\nTraining took ' + str(np.round(now - training_start_time, 2)) + ' seconds.\n\n')
-        # print("Done!")
+        print('\nTraining took ' + str(np.round(now - training_start_time, 2)) + ' seconds.\n\n')
+        print("Done!")
 
 
 '''
@@ -140,7 +140,7 @@ class TestSupervisor():
         :param trainable_params: number of trainable model parameters
         '''
 
-        #print("Trainable model parameters:", trainable_params)
+        print("Trainable model parameters:", trainable_params)
 
         self.params = params
 
@@ -150,7 +150,7 @@ class TestSupervisor():
 
         self.sample_idx = 0
 
-        plt.style.use('dark_background')
+        #plt.style.use('dark_background')
 
 
     def finish_batch(self, time_start: float, batch_size: int, error:float):
@@ -162,9 +162,9 @@ class TestSupervisor():
         '''
         forward_pass_duration = time.time() - time_start
         print(str(np.round(forward_pass_duration, 10)).ljust(12, ' '))
-	#print("\tForward pass for batch size ",batch_size,
-        #    " took: ", str(np.round(forward_pass_duration, 10)).ljust(12, ' '),
-        #    " seconds with error ", str(np.round(error, 10)).ljust(12, ' '))
+	    print("\tForward pass for batch size ",batch_size,
+            " took: ", str(np.round(forward_pass_duration, 10)).ljust(12, ' '),
+            " seconds with error ", str(np.round(error, 10)).ljust(12, ' '))
 
     def plot_sample(self, net_outputs: np.ndarray, net_label: np.ndarray, net_input: np.ndarray):
         '''
@@ -256,7 +256,7 @@ class TestSupervisor():
         Closing the view. If necessary, summary information can be printed out.
         '''
            
-        #print('Done')
+        print('Done')
 
 
    
