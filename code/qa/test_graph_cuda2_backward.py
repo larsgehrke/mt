@@ -68,6 +68,13 @@ def test_graph():
 
     print(dyn_in[0,0,0] == 42)
     print(dyn_in[0,3,0] == 42)
+    print(dyn_in[0,7,0] == 42)
+    print(dyn_in[0,19,0] == 42)
+    print(dyn_in[0,44,0] == 42)
+
+    print(lat_in[0,0,0] == 2)
+    print(lat_in[0,5,0] == 55)
+    print(lat_in[0,10,0] == 12)    
 
    
     print(f"d_dyn_in.shape: {d_dyn_in.shape}")
