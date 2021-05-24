@@ -8,9 +8,6 @@
 /* Custom config file written by Python code*/
 #include <config.h>
 
-#define DIMS 3
-#define NEIGHBORS 8
-
 namespace 
 {
 
