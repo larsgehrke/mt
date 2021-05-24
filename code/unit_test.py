@@ -15,7 +15,7 @@ if __name__ == "__main__":
             formatter_class=argparse.RawTextHelpFormatter)
 
     # define the cl arguments corresponding to the unit tests
-    parser.add_argument('unit_test', choices=['graph', 'graph2'],  
+    parser.add_argument('unit_test', choices=['graph', 'graph2', 'graph2-back'],  
             help='Which unit test should be executed?')
 
     # parse command line arguments
@@ -28,4 +28,7 @@ if __name__ == "__main__":
         test_graph()
     if options.unit_test == "graph2":
         from qa.test_graph_cuda2 import test_graph
+        test_graph()
+    if options.unit_test == "graph2-back":
+        from qa.test_graph_cuda2_backward import test_graph
         test_graph()
