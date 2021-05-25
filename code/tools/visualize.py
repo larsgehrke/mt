@@ -24,9 +24,9 @@ def plot_kernel_activity(idx, ax, label, net_out, pk_rows, pk_cols,
     total = (pk_rows * pk_cols)
     kernel = int(math.floor(total*(0.2*(idx+1))))
 
-    if net_in is not None:
-        ax.plot(range(len(net_in)), net_in[:, kernel, 0],
-                label='Network input', color='green')
+    #if net_in is not None:
+    #    ax.plot(range(len(net_in)), net_in[:, kernel, 0],
+    #            label='Network input', color='green')
     ax.plot(range(len(label)), label[:, kernel, 0],
             label='Target', color='deepskyblue')
     ax.plot(range(len(net_out)), net_out[:, kernel, 0],
