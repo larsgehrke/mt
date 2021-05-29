@@ -1,0 +1,37 @@
+{
+"architecture_name": "distana",
+"model_name": "v3",
+"data_type": "tmp_data",
+"data_noise": 0.0,
+"p_zero_input": 0.0,
+"use_gpu": True,
+"device": cuda,
+"save_model": True,
+"continue_training": False,
+"epochs": 16,
+"seq_len": 140,
+"learning_rate": 0.001,
+"batch_size_train": 2,
+"batch_size_test": 100,
+"teacher_forcing_steps": 15,
+"closed_loop_steps": 135,
+"pk_rows": 16,
+"pk_cols": 16,
+"pk_dyn_size": 1,
+"pk_lat_size": 1,
+"pk_pre_layer_size": 4,
+"pk_num_lstm_cells": 16,
+"amount_pks": 256,
+"data_folder": "./data/tmp_data/",
+"model_folder": "./model/v3/saved_models/",
+"diagram_folder": "./diagram/",
+}
+#
+# Performance
+
+CURRENT_EPOCH = 6
+EPOCHS = 16
+CURRENT_TRAINING_ERROR = 5.972973310235829e-06
+LOWEST_TRAINING_ERROR = 5.972973310235829e-06
+CURRENT_VALIDATION_ERROR = 0.001161909312941134
+LOWEST_VALIDATION_ERROR = 0.001161909312941134
