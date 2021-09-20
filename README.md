@@ -1,6 +1,7 @@
 # DISTANA Implementation by Lars Gehrke
-This is the repository for Lars Gehrke writing his master's thesis about implementing DISTANA in a parallelized fashion on the GPU to accelerate the training and the testing.
+This is the repository for Lars Gehrke writing his master's thesis at the University of Tübingen about implementing DISTANA in a parallelized fashion on the GPU to accelerate the training and the testing.
 The code is based on the former implementation of Matthias Karlbauer (*code_archive/model/distana*).
+
 
 ## DISTANA - design idea and functional principle by Karlbauer
 ![DISTANA slide](./distana_slide.png)
